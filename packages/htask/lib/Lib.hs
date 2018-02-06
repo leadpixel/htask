@@ -1,4 +1,6 @@
-module Lib
+{-# LANGUAGE OverloadedStrings #-}
+
+   module Lib
     ( someFunc
     ) where
 
@@ -8,18 +10,23 @@ import Control.Monad.IO.Class
 import qualified Control.Monad.Reader as Reader
 import qualified Control.Monad.State as State
 import Data.Semigroup
+import Data.Monoid
 import Conduit
 import qualified Data.Text as T
 import qualified Data.ByteString as BS
 import qualified Data.Map as Map
 import Data.Time
+import Data.Tree
 
 
 type TaskUUID = UUID.UUID
 type Timestamp = UTCTime
 
+
 someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+someFunc = runConduit $ do
+  t <- sourceFile "tasks.txt"
+  sourceFile putStrLn "someFunc"
 
 
 data TaskEvent
@@ -43,5 +50,9 @@ data Task = Task
   { taskUuid :: TaskUUID
   , taskDescription :: T.Text
   , taskCreatedAt :: Timestamp
-    , taskStatus :: TaskStatus
+  , taskStatus :: TaskStatus
+  , taskParent :: TaskUUID
   }
+
+
+type TaskTree = Tree Task
