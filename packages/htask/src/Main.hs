@@ -37,16 +37,20 @@ main = do
   putStrLn "\nstarting a task"
   ( runEventTree $ do
       x <- addTask "test"
+      lift $ print x
       startTask x
+      listTasks
     ) >>= print
 
-  putStrLn "\nstarting root task"
+  putStrLn "\nstarting root task does not start"
   ( runEventTree $ do
       startTask UUID.nil
+      listTasks
     ) >>= print
 
   uuid <- UUID.nextRandom
-  putStrLn "\nstarting without task"
+  putStrLn "\nstarting without task fails gracefully"
   ( runEventTree $ do
       startTask uuid
+      listTasks
     ) >>= print

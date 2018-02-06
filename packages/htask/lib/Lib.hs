@@ -1,25 +1,21 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ConstraintKinds #-}
 
 module Lib
   where
 
 import Conduit
-import Control.Monad.IO.Class
-import Data.Semigroup
-import System.Random
-import Data.Foldable
-import qualified Control.Monad.Reader as Reader
 import Control.Monad
-import qualified Control.Monad.State as State
-import Data.Semigroup
+import Control.Monad.IO.Class
+import Data.Foldable
 import Data.Monoid
-import Conduit
-import qualified Data.Text as T
-import qualified Data.ByteString as BS
-import qualified Data.Map as Map
+import Data.Semigroup
 import Data.Time
 import Data.Tree
+import System.Random
+import qualified Control.Monad.Reader as Reader
+import qualified Control.Monad.State as State
 import qualified Data.ByteString as BS
 import qualified Data.Map as Map
 import qualified Data.Text as Text
@@ -62,21 +58,37 @@ data TaskStatus
 
 
 data Task = Task
-  { uuid :: TaskRef
+  { taskRef :: TaskRef
   , description :: Text.Text
   , createdAt :: Timestamp
   , status :: TaskStatus
   } deriving (Show)
 
 
-displayTask :: Task -> String
-displayTask t = if UUID.null (uuid t)
-                   then "root"
-                   else show t
+class CanLog m where
+  logDebug :: (Show a) => a -> m ()
+  logWarning :: (Show a) => a -> m ()
+  logError :: (Show a) => a -> m ()
+
+instance CanLog IO where
+  logDebug = print . show
+  logWarning = print . show
+  logError = print . show
+
+instance CanLog (State.StateT a IO) where
+  logDebug = liftIO . logDebug
+  logWarning = liftIO . logWarning
+  logError = liftIO . logError
 
 
-displayTree :: Tasks -> String
-displayTree t = show (displayTask <$> t)
+
+class HasTasks m where
+  getTasks :: m Tasks
+  putTasks :: Tasks -> m ()
+
+instance (Monad m) => HasTasks (State.StateT Tasks m) where
+  getTasks = State.get
+  putTasks = State.put
 
 
 class CanTime m where
@@ -85,6 +97,9 @@ class CanTime m where
 instance CanTime IO where
   now = Time.systemToUTCTime <$> Time.getSystemTime
 
+instance CanTime (State.StateT a IO) where
+  now = liftIO now
+
 
 class CanUuid m where
   uuidGen :: m TaskRef
@@ -92,11 +107,24 @@ class CanUuid m where
 instance CanUuid IO where
   uuidGen = UUID.nextRandom
 
+instance CanUuid (State.StateT a IO) where
+  uuidGen = liftIO uuidGen
+
 
 
 
 type CanWriteTask m = (Monad m, CanTime m, CanUuid m)
 
+
+
+displayTask :: Task -> String
+displayTask t = if UUID.null (taskRef t)
+                   then "root"
+                   else show t
+
+
+displayTree :: Tasks -> String
+displayTree t = show (displayTask <$> t)
 
 
 readTaskFile :: FilePath -> [TaskEvent]
@@ -107,25 +135,49 @@ promote :: (CanWriteTask m) => TaskEventType -> m TaskEvent
 promote t = TaskEvent <$> uuidGen <*> now <*> pure t
 
 
-runEventTree :: Int
-runEventTree = undefined
-
-
-buildEventTree :: (Foldable f, Traversable f, CanWriteTask m) => f TaskEventType -> m Tasks
-buildEventTree tts = mapM promote tts >>= parseEvents emptyTree
+runEventTree :: State.StateT Tasks IO a -> IO a
+runEventTree op = do
+  State.evalStateT op emptyTasks
 
 
 
 
-parseEvents :: (Foldable f, CanWriteTask m) => Tasks -> f TaskEvent -> m Tasks
-parseEvents tasks ts = foldM k tasks ts
+buildEventTree :: (Foldable f, Traversable f, CanLog m, CanWriteTask m) => f TaskEventType -> m Tasks
+buildEventTree tts = mapM promote tts >>= parseEvents emptyTasks
 
+
+
+
+parseEvents :: (Foldable f, CanLog m, CanWriteTask m) => Tasks -> f TaskEvent -> m Tasks
+parseEvents tasks ts = foldM applyEvent tasks ts
+
+
+applyEvent :: (CanLog m, CanWriteTask m) => Tasks -> TaskEvent -> m Tasks
+applyEvent tasks ev@(TaskEvent evId ts evTy)
+  = case evTy of
+      TaskAdd t -> storeTask tasks <$> createTask t
+      TaskStart ref -> do
+        let t = findTask tasks ref
+        case t of
+          Nothing -> do
+            logWarning "could not find matching task"
+            pure tasks
+          Just x -> do
+            let t' = updateTask x Started
+            let ts' = storeTask tasks t'
+            pure ts'
+
+
+updateTask :: Task -> TaskStatus -> Task
+updateTask t s = case UUID.null (taskRef t) of
+                   True -> t
+                   False -> t { status = s }
+
+
+findTask :: Tasks -> TaskRef -> Maybe Task
+findTask ts ref = find matchesRef ts
   where
-    k :: (CanWriteTask m) => Tasks -> TaskEvent -> m Tasks
-    k tr ev@(TaskEvent evId ts evTy)
-      = case evTy of
-          TaskAdd t -> storeTask tr <$> createTask t
-
+    matchesRef t = taskRef t == ref
 
 
 
@@ -149,13 +201,13 @@ findParent r t = Nothing
 
 rootTask :: Task
 rootTask = Task
-  { uuid = UUID.nil
+  { taskRef = UUID.nil
   , description = "root"
   , createdAt = Time.UTCTime (Time.ModifiedJulianDay 0) (Time.secondsToDiffTime 0)
   , status = Pending
   }
 
 
-emptyTree :: Tasks
-emptyTree = Tree.Node rootTask []
+emptyTasks :: Tasks
+emptyTasks = Tree.Node rootTask []
 
