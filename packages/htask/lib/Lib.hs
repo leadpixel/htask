@@ -5,39 +5,37 @@
 module Lib
   where
 
+import Capabilities.Logging
+import Capabilities.Time
+import Capabilities.UUID
 import Conduit
 import Control.Monad
 import Control.Monad.IO.Class
 import Data.Foldable
 import Data.Monoid
 import Data.Semigroup
-import Data.Time
 import Data.Tree
 import System.Random
 import qualified Control.Monad.Reader as Reader
+import qualified Control.Monad.Writer as Writer
 import qualified Control.Monad.State as State
 import qualified Data.ByteString as BS
 import qualified Data.Map as Map
 import qualified Data.Text as Text
-import qualified Data.Time as Time
-import qualified Data.Time.Clock.System as Time
 import qualified Data.Tree as Tree
 import qualified Data.UUID as UUID
-import qualified Data.UUID.V4 as UUID
 
 
 type EventUUID = UUID.UUID
 type TaskRef = UUID.UUID
-type Timestamp = Time.UTCTime
 type Tasks = Tree.Tree Task
+type TaskError = String
 
 
 data TaskEventType
   = TaskAdd Text.Text
   | TaskStart TaskRef
   | TaskComplete TaskRef
-  | TaskAbandon
-  | TaskAssign
   deriving (Show)
 
 
@@ -51,9 +49,7 @@ data TaskEvent = TaskEvent
 data TaskStatus
   = Pending
   | Started
-  | Blocked
   | Complete
-  | Aborted
   deriving (Show, Eq)
 
 
@@ -65,22 +61,8 @@ data Task = Task
   } deriving (Show)
 
 
-class CanLog m where
-  logDebug :: (Show a) => a -> m ()
-  logWarning :: (Show a) => a -> m ()
-  logError :: (Show a) => a -> m ()
-
-instance CanLog IO where
-  logDebug = print . show
-  logWarning = print . show
-  logError = print . show
-
-instance CanLog (State.StateT a IO) where
-  logDebug = liftIO . logDebug
-  logWarning = liftIO . logWarning
-  logError = liftIO . logError
-
-
+type CanCreateEvent m = (Monad m, CanTime m, CanUuid m)
+type CanCreateTask m = (Monad m, CanTime m, CanUuid m)
 
 class HasTasks m where
   getTasks :: m Tasks
@@ -91,36 +73,37 @@ instance (Monad m) => HasTasks (State.StateT Tasks m) where
   putTasks = State.put
 
 
-class CanTime m where
-  now :: m Timestamp
-
-instance CanTime IO where
-  now = Time.systemToUTCTime <$> Time.getSystemTime
-
-instance CanTime (State.StateT a IO) where
-  now = liftIO now
+instance (Monad m, MonadTrans t) => HasTasks (t (State.StateT Tasks m)) where
+  getTasks = lift getTasks
+  putTasks = lift . putTasks
 
 
-class CanUuid m where
-  uuidGen :: m TaskRef
+class CanStoreEvent m where
+  appendEvent :: TaskEvent -> m ()
 
-instance CanUuid IO where
-  uuidGen = UUID.nextRandom
-
-instance CanUuid (State.StateT a IO) where
-  uuidGen = liftIO uuidGen
+instance (Monad m) => CanStoreEvent (Writer.WriterT [TaskEvent] m) where
+  appendEvent x = Writer.tell [x]
 
 
+type TaskMonad = Writer.WriterT [TaskEvent] (State.StateT Tasks IO)
 
+instance CanUuid TaskMonad where
+  uuidGen = lift (lift uuidGen)
 
-type CanWriteTask m = (Monad m, CanTime m, CanUuid m)
+instance CanTime TaskMonad where
+  now = lift (lift now)
 
+instance CanLog TaskMonad where
+  logDebug = undefined
+  logWarning = undefined
+  logError = undefined
 
 
 displayTask :: Task -> String
-displayTask t = if UUID.null (taskRef t)
-                   then "root"
-                   else show t
+displayTask t
+  = if UUID.null (taskRef t)
+      then "root"
+      else show t
 
 
 displayTree :: Tasks -> String
@@ -131,31 +114,35 @@ readTaskFile :: FilePath -> [TaskEvent]
 readTaskFile = undefined
 
 
-promote :: (CanWriteTask m) => TaskEventType -> m TaskEvent
-promote t = TaskEvent <$> uuidGen <*> now <*> pure t
+wrapEventType :: (CanCreateEvent m) => TaskEventType -> m TaskEvent
+wrapEventType t = TaskEvent <$> uuidGen <*> now <*> pure t
 
 
-runEventTree :: State.StateT Tasks IO a -> IO a
-runEventTree op = do
-  State.evalStateT op emptyTasks
-
-
-
-
-buildEventTree :: (Foldable f, Traversable f, CanLog m, CanWriteTask m) => f TaskEventType -> m Tasks
-buildEventTree tts = mapM promote tts >>= parseEvents emptyTasks
+runTaskApi :: TaskMonad a -> IO a
+runTaskApi op = do
+  State.evalStateT
+    (fst <$> Writer.runWriterT op)
+    emptyTasks
 
 
 
 
-parseEvents :: (Foldable f, CanLog m, CanWriteTask m) => Tasks -> f TaskEvent -> m Tasks
-parseEvents tasks ts = foldM applyEvent tasks ts
+buildEventTree :: (Foldable f, Traversable f, CanLog m, CanCreateEvent m) => f TaskEventType -> m Tasks
+buildEventTree tts
+  = mapM wrapEventType tts
+  >>= parseEvents emptyTasks
 
 
-applyEvent :: (CanLog m, CanWriteTask m) => Tasks -> TaskEvent -> m Tasks
+parseEvents :: (Foldable f, CanLog m, CanCreateEvent m) => Tasks -> f TaskEvent -> m Tasks
+parseEvents = foldM applyEvent
+
+
+applyEvent :: (CanLog m, CanCreateEvent m) => Tasks -> TaskEvent -> m Tasks
 applyEvent tasks ev@(TaskEvent evId ts evTy)
   = case evTy of
-      TaskAdd t -> storeTask tasks <$> createTask t
+      TaskAdd t ->
+        storeTask tasks <$> createTask t
+
       TaskStart ref -> do
         let t = findTask tasks ref
         case t of
@@ -168,10 +155,41 @@ applyEvent tasks ev@(TaskEvent evId ts evTy)
             pure ts'
 
 
+applyEventToTasks
+  :: (Monad m, CanCreateTask m, HasTasks m)
+  => TaskEvent -> m (Either TaskError Task)
+applyEventToTasks (TaskEvent evId ts evTy) = do
+  tasks <- getTasks
+  task <- handleEvent evTy tasks
+
+  case task of
+    Left e -> pure (Left e)
+    Right v -> do
+      let tasks' = storeTask tasks v
+      putTasks tasks'
+      pure (Right v)
+
+  where
+    handleEvent :: (CanCreateTask m) => TaskEventType -> Tasks -> m (Either TaskError Task)
+    handleEvent (TaskAdd t) _
+      = Right <$> createTask t
+
+    handleEvent (TaskStart ref) tasks
+      = case findTask tasks ref of
+          Nothing -> do
+            pure (Left "could not find matching task")
+
+          Just x -> do
+            let t' = updateTask x Started
+            pure (Right t')
+
+
+
 updateTask :: Task -> TaskStatus -> Task
-updateTask t s = case UUID.null (taskRef t) of
-                   True -> t
-                   False -> t { status = s }
+updateTask t s
+  = if UUID.null (taskRef t)
+       then t
+       else t { status = s }
 
 
 findTask :: Tasks -> TaskRef -> Maybe Task
@@ -181,7 +199,7 @@ findTask ts ref = find matchesRef ts
 
 
 
-createTask :: (CanWriteTask m) => Text.Text -> m Task
+createTask :: (CanCreateTask m) => Text.Text -> m Task
 createTask t = mkTask <$> uuidGen <*> now
   where
     mkTask :: TaskRef -> Timestamp -> Task
@@ -203,7 +221,7 @@ rootTask :: Task
 rootTask = Task
   { taskRef = UUID.nil
   , description = "root"
-  , createdAt = Time.UTCTime (Time.ModifiedJulianDay 0) (Time.secondsToDiffTime 0)
+  , createdAt = zeroTime
   , status = Pending
   }
 

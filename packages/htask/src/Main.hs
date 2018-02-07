@@ -35,22 +35,27 @@ main = do
   buildEventTree [ TaskAdd "test", TaskAdd "test2" ] >>= print
 
   putStrLn "\nstarting a task"
-  ( runEventTree $ do
+  ( runTaskApi $ do
       x <- addTask "test"
-      lift $ print x
-      startTask x
+      liftIO $ print x
+      case x of
+        Left e -> liftIO $ print e
+        Right v -> do
+          k <- startTask v
+          liftIO $ print k
+
       listTasks
     ) >>= print
 
   putStrLn "\nstarting root task does not start"
-  ( runEventTree $ do
+  ( runTaskApi $ do
       startTask UUID.nil
       listTasks
     ) >>= print
 
   uuid <- UUID.nextRandom
   putStrLn "\nstarting without task fails gracefully"
-  ( runEventTree $ do
+  ( runTaskApi $ do
       startTask uuid
       listTasks
     ) >>= print
