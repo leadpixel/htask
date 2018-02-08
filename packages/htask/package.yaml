@@ -23,6 +23,9 @@ dependencies:
 - optparse-applicative
 - random
 - text
+- pretty
+- pretty-show
+- tagged
 - time
 - transformers
 - uuid
@@ -43,7 +46,7 @@ executables:
 
 tests:
   htask-test:
-    main:                Spec.hs
+    main:                Main.hs
     source-dirs:         test
     ghc-options:
     - -threaded
@@ -54,3 +57,5 @@ tests:
     - tasty
     - tasty-hunit
     - tasty-quickcheck
+    - QuickCheck
+    - HUnit

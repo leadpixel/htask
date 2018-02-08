@@ -7,29 +7,44 @@ import Lib
 import qualified Data.Text as Text
 import Control.Monad.State
 import Capabilities.Logging
+import Event
 
 
 addTask
   :: (HasTasks m, CanCreateEvent m, CanStoreEvent m, CanLog m)
   => Text.Text -> m (Either TaskError TaskRef)
 addTask t = do
-  event <- wrapEventType (TaskAdd t)
+  event <- wrapEventType (TaskAdded t)
   appendEvent event
-
-  task <- applyEventToTasks event
-  pure (taskRef <$> task)
+  applyEventToTasks event
 
 
 startTask
   :: (HasTasks m, CanCreateEvent m, CanStoreEvent m, CanLog m)
   => TaskRef -> m (Either TaskError TaskRef)
 startTask ref = do
-  event <- wrapEventType (TaskStart ref)
+  event <- wrapEventType (TaskStarted ref)
   appendEvent event
-
-  task <- applyEventToTasks event
-  pure (taskRef <$> task)
+  applyEventToTasks event
 
 
-listTasks :: (HasTasks m, CanLog m) => m Tasks
+completeTask
+  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m, CanLog m)
+  => TaskRef -> m (Either TaskError TaskRef)
+completeTask ref = do
+  event <- wrapEventType (TaskCompleted ref)
+  appendEvent event
+  applyEventToTasks event
+
+
+deleteTask
+  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m, CanLog m)
+  => TaskRef -> m (Either TaskError TaskRef)
+deleteTask ref = do
+  event <- wrapEventType (TaskDeleted ref)
+  appendEvent event
+  applyEventToTasks event
+
+
+listTasks :: (HasTasks m) => m Tasks
 listTasks = getTasks

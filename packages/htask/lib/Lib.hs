@@ -6,12 +6,14 @@ module Lib
   where
 
 import Capabilities.Logging
+import Event
 import Capabilities.Time
 import Capabilities.UUID
 import Conduit
 import Control.Monad
 import Control.Monad.IO.Class
 import Data.Foldable
+import Data.Traversable
 import Data.Monoid
 import Data.Semigroup
 import Data.Tree
@@ -26,30 +28,26 @@ import qualified Data.Tree as Tree
 import qualified Data.UUID as UUID
 
 
-type EventUUID = UUID.UUID
 type TaskRef = UUID.UUID
-type Tasks = Tree.Tree Task
+type Tasks = [Task]
+type TaskEvent = Event TaskEventType
+type EventLog = [TaskEvent]
 type TaskError = String
 
 
 data TaskEventType
-  = TaskAdd Text.Text
-  | TaskStart TaskRef
-  | TaskComplete TaskRef
+  = TaskAdded Text.Text
+  | TaskStarted TaskRef
+  | TaskCompleted TaskRef
+  | TaskDeleted TaskRef
   deriving (Show)
-
-
-data TaskEvent = TaskEvent
-  { eventUuid :: EventUUID
-  , timestamp :: Timestamp
-  , eventType :: TaskEventType
-  } deriving (Show)
 
 
 data TaskStatus
   = Pending
-  | Started
+  | InProgress
   | Complete
+  | Abandoned
   deriving (Show, Eq)
 
 
@@ -61,7 +59,6 @@ data Task = Task
   } deriving (Show)
 
 
-type CanCreateEvent m = (Monad m, CanTime m, CanUuid m)
 type CanCreateTask m = (Monad m, CanTime m, CanUuid m)
 
 class HasTasks m where
@@ -81,11 +78,11 @@ instance (Monad m, MonadTrans t) => HasTasks (t (State.StateT Tasks m)) where
 class CanStoreEvent m where
   appendEvent :: TaskEvent -> m ()
 
-instance (Monad m) => CanStoreEvent (Writer.WriterT [TaskEvent] m) where
+instance (Monad m) => CanStoreEvent (Writer.WriterT EventLog m) where
   appendEvent x = Writer.tell [x]
 
 
-type TaskMonad = Writer.WriterT [TaskEvent] (State.StateT Tasks IO)
+type TaskMonad = Writer.WriterT EventLog (State.StateT Tasks IO)
 
 instance CanUuid TaskMonad where
   uuidGen = lift (lift uuidGen)
@@ -99,97 +96,75 @@ instance CanLog TaskMonad where
   logError = undefined
 
 
-displayTask :: Task -> String
-displayTask t
-  = if UUID.null (taskRef t)
-      then "root"
-      else show t
 
-
-displayTree :: Tasks -> String
-displayTree t = show (displayTask <$> t)
-
-
-readTaskFile :: FilePath -> [TaskEvent]
+readTaskFile :: FilePath -> EventLog
 readTaskFile = undefined
 
 
 wrapEventType :: (CanCreateEvent m) => TaskEventType -> m TaskEvent
-wrapEventType t = TaskEvent <$> uuidGen <*> now <*> pure t
+wrapEventType t = Event <$> uuidGen <*> now <*> pure t
 
 
-runTaskApi :: TaskMonad a -> IO a
+runTaskApi :: TaskMonad a -> IO (a, EventLog)
 runTaskApi op = do
   State.evalStateT
-    (fst <$> Writer.runWriterT op)
+    (Writer.runWriterT op)
     emptyTasks
 
 
-
-
-buildEventTree :: (Foldable f, Traversable f, CanLog m, CanCreateEvent m) => f TaskEventType -> m Tasks
-buildEventTree tts
-  = mapM wrapEventType tts
-  >>= parseEvents emptyTasks
-
-
-parseEvents :: (Foldable f, CanLog m, CanCreateEvent m) => Tasks -> f TaskEvent -> m Tasks
-parseEvents = foldM applyEvent
-
-
-applyEvent :: (CanLog m, CanCreateEvent m) => Tasks -> TaskEvent -> m Tasks
-applyEvent tasks ev@(TaskEvent evId ts evTy)
-  = case evTy of
-      TaskAdd t ->
-        storeTask tasks <$> createTask t
-
-      TaskStart ref -> do
-        let t = findTask tasks ref
-        case t of
-          Nothing -> do
-            logWarning "could not find matching task"
-            pure tasks
-          Just x -> do
-            let t' = updateTask x Started
-            let ts' = storeTask tasks t'
-            pure ts'
+emptyTasks :: Tasks
+emptyTasks = mempty
 
 
 applyEventToTasks
   :: (Monad m, CanCreateTask m, HasTasks m)
-  => TaskEvent -> m (Either TaskError Task)
-applyEventToTasks (TaskEvent evId ts evTy) = do
-  tasks <- getTasks
-  task <- handleEvent evTy tasks
+  => TaskEvent -> m (Either TaskError TaskRef)
+applyEventToTasks evt = do
+  ts <- getTasks
 
-  case task of
-    Left e -> pure (Left e)
-    Right v -> do
-      let tasks' = storeTask tasks v
-      putTasks tasks'
-      pure (Right v)
+  case eventType evt of
+    (TaskAdded t) -> do
+      tsk <- createTask t
+      putTasks (tsk : ts)
+      pure (Right $ taskRef tsk)
 
-  where
-    handleEvent :: (CanCreateTask m) => TaskEventType -> Tasks -> m (Either TaskError Task)
-    handleEvent (TaskAdd t) _
-      = Right <$> createTask t
+    (TaskStarted ref) -> do
+      case findTask ts ref of
+        Nothing -> do
+          pure (Left "could not find matching task")
 
-    handleEvent (TaskStart ref) tasks
-      = case findTask tasks ref of
-          Nothing -> do
-            pure (Left "could not find matching task")
+        Just x -> do
+          let tsk = setTaskStatus x InProgress
+          let ts' = tsk : (filter (\y -> taskRef x /= taskRef y) ts)
+          putTasks ts'
+          pure (Right $ taskRef tsk)
 
-          Just x -> do
-            let t' = updateTask x Started
-            pure (Right t')
+    (TaskCompleted ref) -> do
+      case findTask ts ref of
+        Nothing -> do
+          pure (Left "could not find matching task")
+
+        Just x -> do
+          let tsk = setTaskStatus x Complete
+          let ts' = tsk : (filter (\y -> taskRef x /= taskRef y) ts)
+          putTasks ts'
+          pure (Right $ taskRef tsk)
+
+    (TaskDeleted ref) -> do
+      case findTask ts ref of
+        Nothing -> do
+          pure (Left "could not find matching task")
+
+        Just x -> do
+          let ts' = filter (\y -> taskRef x /= taskRef y) ts
+          putTasks ts'
+          pure (Right $ taskRef x)
 
 
 
-updateTask :: Task -> TaskStatus -> Task
-updateTask t s
-  = if UUID.null (taskRef t)
-       then t
-       else t { status = s }
+
+setTaskStatus :: Task -> TaskStatus -> Task
+setTaskStatus t s = t { status = s }
 
 
 findTask :: Tasks -> TaskRef -> Maybe Task
@@ -206,26 +181,23 @@ createTask t = mkTask <$> uuidGen <*> now
     mkTask u s = Task u t s Pending
 
 
-storeTask :: Tasks -> Task -> Tasks
-storeTask r@(Tree.Node l ps) t = Tree.Node l (tn : ps)
+insertUpdate :: Tasks -> Task -> Tasks
+insertUpdate ts t = insertTask t (removeTask (taskRef t) ts)
   where
-    tn :: Tasks
-    tn = Tree.Node t []
+    removeTask :: TaskRef -> Tasks -> Tasks
+    removeTask ref ts = rejectT (\t -> taskRef t /= ref) ts
+
+    insertTask :: Task -> Tasks -> Tasks
+    insertTask t ts = t:ts
+
+
+rejectT :: (Task -> Bool) -> Tasks -> Tasks
+rejectT f = filterT (not . f)
+
+
+filterT :: (Task -> Bool) -> Tasks -> Tasks
+filterT = filter
 
 
 findParent :: Tasks -> Task -> Maybe Task
 findParent r t = Nothing
-
-
-rootTask :: Task
-rootTask = Task
-  { taskRef = UUID.nil
-  , description = "root"
-  , createdAt = zeroTime
-  , status = Pending
-  }
-
-
-emptyTasks :: Tasks
-emptyTasks = Tree.Node rootTask []
-

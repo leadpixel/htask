@@ -21,41 +21,71 @@ import qualified Data.Time.Clock.System as Time
 import qualified Data.Tree as Tree
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
+import qualified Text.Show.Pretty as Pretty
 
 
 main :: IO ()
 main = do
+  putStrLn ""
   putStrLn "empty"
-  buildEventTree [] >>= print . displayTree
+  ( runTaskApi $ listTasks ) >>= putStrLn . Pretty.ppShow
 
-  putStrLn "\none task"
-  buildEventTree [ TaskAdd "test" ] >>= print
+  putStrLn ""
+  putStrLn "one task"
+  ( runTaskApi $ do
+      _ <- addTask "test"
+      listTasks
+    ) >>= putStrLn . Pretty.ppShow
 
-  putStrLn "\ntwo tasks"
-  buildEventTree [ TaskAdd "test", TaskAdd "test2" ] >>= print
+  putStrLn ""
+  putStrLn "two tasks"
+  ( runTaskApi $ do
+      _ <- addTask "test1"
+      _ <- addTask "test2"
+      listTasks
+    ) >>= putStrLn . Pretty.ppShow
 
-  putStrLn "\nstarting a task"
+  putStrLn ""
+  putStrLn "starting a task"
   ( runTaskApi $ do
       x <- addTask "test"
-      liftIO $ print x
       case x of
-        Left e -> liftIO $ print e
         Right v -> do
-          k <- startTask v
-          liftIO $ print k
-
+          startTask v
       listTasks
-    ) >>= print
+    ) >>= putStrLn . Pretty.ppShow
 
-  putStrLn "\nstarting root task does not start"
+  putStrLn ""
+  putStrLn "starting root task does not start"
   ( runTaskApi $ do
       startTask UUID.nil
       listTasks
-    ) >>= print
+    ) >>= putStrLn . Pretty.ppShow
 
+  putStrLn ""
   uuid <- UUID.nextRandom
-  putStrLn "\nstarting without task fails gracefully"
+  putStrLn "starting without task fails gracefully"
   ( runTaskApi $ do
       startTask uuid
       listTasks
-    ) >>= print
+    ) >>= putStrLn . Pretty.ppShow
+
+  putStrLn ""
+  putStrLn "completing a task"
+  ( runTaskApi $ do
+      x <- addTask "test"
+      case x of
+        Right v -> do
+          completeTask v
+      listTasks
+    ) >>= putStrLn . Pretty.ppShow
+
+  putStrLn ""
+  putStrLn "deleting a task"
+  ( runTaskApi $ do
+      x <- addTask "test"
+      case x of
+        Right v -> do
+          deleteTask v
+      listTasks
+    ) >>= putStrLn . Pretty.ppShow
