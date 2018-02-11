@@ -1,17 +1,16 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module API
+module HTask.API
   where
 
 import Lib
 import qualified Data.Text as Text
 import Control.Monad.State
-import Capabilities.Logging
-import Event
+import HTask.Event
 
 
 addTask
-  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m, CanLog m)
+  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
   => Text.Text -> m (Either TaskError TaskRef)
 addTask t = do
   event <- wrapEventType (TaskAdded t)
@@ -20,7 +19,7 @@ addTask t = do
 
 
 startTask
-  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m, CanLog m)
+  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
   => TaskRef -> m (Either TaskError TaskRef)
 startTask ref = do
   event <- wrapEventType (TaskStarted ref)
@@ -29,7 +28,7 @@ startTask ref = do
 
 
 completeTask
-  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m, CanLog m)
+  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
   => TaskRef -> m (Either TaskError TaskRef)
 completeTask ref = do
   event <- wrapEventType (TaskCompleted ref)
@@ -38,7 +37,7 @@ completeTask ref = do
 
 
 deleteTask
-  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m, CanLog m)
+  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
   => TaskRef -> m (Either TaskError TaskRef)
 deleteTask ref = do
   event <- wrapEventType (TaskDeleted ref)

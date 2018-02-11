@@ -5,10 +5,8 @@
 module Lib
   where
 
-import Capabilities.Logging
-import Event
-import Capabilities.Time
-import Capabilities.UUID
+import HTask.Capabilities
+import HTask.Event
 import Conduit
 import Control.Monad
 import Control.Monad.IO.Class
@@ -56,7 +54,7 @@ data Task = Task
   , description :: Text.Text
   , createdAt :: Timestamp
   , status :: TaskStatus
-  } deriving (Show)
+  } deriving (Show, Eq)
 
 
 type CanCreateTask m = (Monad m, CanTime m, CanUuid m)
@@ -82,34 +80,12 @@ instance (Monad m) => CanStoreEvent (Writer.WriterT EventLog m) where
   appendEvent x = Writer.tell [x]
 
 
-type TaskMonad = Writer.WriterT EventLog (State.StateT Tasks IO)
 
-instance CanUuid TaskMonad where
-  uuidGen = lift (lift uuidGen)
-
-instance CanTime TaskMonad where
-  now = lift (lift now)
-
-instance CanLog TaskMonad where
-  logDebug = undefined
-  logWarning = undefined
-  logError = undefined
-
-
-
-readTaskFile :: FilePath -> EventLog
-readTaskFile = undefined
+type TaskMonad m = (CanUuid m, CanTime m, CanCreateTask m, CanStoreEvent m)
 
 
 wrapEventType :: (CanCreateEvent m) => TaskEventType -> m TaskEvent
 wrapEventType t = Event <$> uuidGen <*> now <*> pure t
-
-
-runTaskApi :: TaskMonad a -> IO (a, EventLog)
-runTaskApi op = do
-  State.evalStateT
-    (Writer.runWriterT op)
-    emptyTasks
 
 
 emptyTasks :: Tasks

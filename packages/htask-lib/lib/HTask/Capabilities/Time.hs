@@ -1,9 +1,6 @@
-{-# LANGUAGE FlexibleInstances #-}
-
-module Capabilities.Time
+module HTask.Capabilities.Time
   where
 
-import Control.Monad.Trans.Class
 import qualified Data.Time as Time
 import qualified Data.Time.Clock.System as SysClock
 
@@ -16,9 +13,6 @@ class CanTime m where
 
 instance CanTime IO where
   now = SysClock.systemToUTCTime <$> SysClock.getSystemTime
-
-instance (MonadTrans m) => CanTime (m IO) where
-  now = lift now
 
 
 zeroTime :: Timestamp

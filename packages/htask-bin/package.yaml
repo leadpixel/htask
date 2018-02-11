@@ -1,14 +1,10 @@
-name:                htask
+name:                htask-bin
 version:             0.1.0.0
 github:              "palf/htask"
 license:             BSD3
 author:              "Jack Palfrey"
 maintainer:          "jack.palf@gmail.com"
 copyright:           "2018 Jack Palfrey"
-
-# Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
 
 description:         Please see the README on Github at <https://github.com/palf/htask#readme>
 
@@ -30,11 +26,8 @@ dependencies:
 - transformers
 - uuid
 
-library:
-  source-dirs: lib
-
 executables:
-  htask-exe:
+  htask:
     main:                Main.hs
     source-dirs:         src
     ghc-options:
@@ -42,7 +35,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - htask
+    - htask-lib
 
 tests:
   htask-test:
@@ -53,7 +46,7 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - htask
+    - htask-lib
     - tasty
     - tasty-hunit
     - tasty-quickcheck

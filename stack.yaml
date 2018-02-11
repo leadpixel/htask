@@ -1,4 +1,5 @@
 resolver: lts-10.4
 
 packages:
-- ./packages/htask
+- ./packages/htask-lib
+- ./packages/htask-bin

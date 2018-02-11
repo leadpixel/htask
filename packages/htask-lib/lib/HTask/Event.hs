@@ -1,10 +1,10 @@
 {-# LANGUAGE ConstraintKinds #-}
 
-module Event
+module HTask.Event
   where
 
-import Capabilities.Time
-import Capabilities.UUID
+import HTask.Capabilities.Time
+import HTask.Capabilities.UUID
 import qualified Data.UUID as UUID
 import Data.Tagged
 
