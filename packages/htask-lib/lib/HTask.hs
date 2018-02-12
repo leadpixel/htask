@@ -9,7 +9,7 @@ module HTask
   , TaskMonad
   ) where
 
-import Lib as Lib
+import Lib
 import HTask.API as API
 import HTask.Capabilities as Capabilities
 import HTask.TaskContainer as TaskContainer

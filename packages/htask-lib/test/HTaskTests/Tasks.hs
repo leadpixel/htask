@@ -23,10 +23,10 @@ instance H.CanUuid TaskTestMonad where
 
 
 extractTasks :: TaskTestMonad a -> IO H.Tasks
-extractTasks op = do
-  S.evalStateT
-    (fst <$> W.runWriterT (op >> H.listTasks))
-    H.emptyTasks
+extractTasks op
+  = S.evalStateT
+      (fst <$> W.runWriterT (op >> H.listTasks))
+      H.emptyTasks
 
 
 test_tasks :: TestTree
@@ -76,7 +76,7 @@ startingTask = testCase "starting a task" $ do
 
 startingNonTask :: TestTree
 startingNonTask = testCase "starting non-existent task does not error" $ do
-  ts <- extractTasks $ do
+  ts <- extractTasks $
     H.startTask UUID.nil
   assertEqual "expecting no tasks" 0 (length ts)
 

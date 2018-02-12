@@ -23,10 +23,10 @@ instance H.CanUuid LogTestMonad where
 
 
 extractLog :: LogTestMonad a -> IO H.EventLog
-extractLog op = do
-  S.evalStateT
-    (W.execWriterT op)
-    H.emptyTasks
+extractLog op
+  = S.evalStateT
+      (W.execWriterT op)
+      H.emptyTasks
 
 
 test_log :: TestTree
@@ -75,7 +75,7 @@ startingTask = testCase "starting a task" $ do
 
 startingNonTask :: TestTree
 startingNonTask = testCase "starting non-existent task does not error" $ do
-  ts <- extractLog $ do
+  ts <- extractLog $
     H.startTask UUID.nil
   assertEqual "expecting no log entries" 0 (length ts)
 

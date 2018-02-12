@@ -3,7 +3,6 @@ module HTask.API
 
 import Lib
 import qualified Data.Text as Text
-import Control.Monad.State
 import HTask.Event
 import HTask.TaskContainer
 import HTask.Task
@@ -19,12 +18,12 @@ addTask t = do
 
 maybeStore
   :: (CanCreateEvent m, CanStoreEvent m)
-  => (Either TaskError TaskEventDetail) -> m (Either TaskError TaskRef)
+  => Either TaskError TaskEventDetail -> m (Either TaskError TaskRef)
 maybeStore r
   = case r of
       Left e -> pure (Left e)
       Right v -> do
-        k <- wrapEventType v
+        k <- createEvent v
         appendEvent k
         pure (Right $ detailRef v)
 

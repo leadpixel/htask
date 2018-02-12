@@ -11,10 +11,10 @@ import qualified HTask as H
 
 
 runTaskApi :: H.TaskMonad H.Tasks -> IO (H.Tasks, H.EventLog)
-runTaskApi op = do
-  State.evalStateT
-    (Writer.runWriterT op)
-    H.emptyTasks
+runTaskApi op
+  = State.evalStateT
+      (Writer.runWriterT op)
+      H.emptyTasks
 
 
 test_rebuild :: TestTree

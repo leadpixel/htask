@@ -4,23 +4,7 @@ module HTask.Task
   where
 
 import HTask.Capabilities
-import HTask.Event
-import Conduit
-import Control.Monad
-import Control.Monad.IO.Class
-import Data.Foldable
-import Data.Traversable
-import Data.Monoid
-import Data.Semigroup
-import Data.Tree
-import System.Random
-import qualified Control.Monad.Reader as Reader
-import qualified Control.Monad.Writer as Writer
-import qualified Control.Monad.State as State
-import qualified Data.ByteString as BS
-import qualified Data.Map as Map
 import qualified Data.Text as Text
-import qualified Data.Tree as Tree
 import qualified Data.UUID as UUID
 
 
