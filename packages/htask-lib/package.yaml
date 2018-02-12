@@ -16,7 +16,6 @@ dependencies:
 - containers
 - mtl
 - operational
-- optparse-applicative
 - random
 - text
 - pretty

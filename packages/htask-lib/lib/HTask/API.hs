@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
-
 module HTask.API
   where
 
@@ -7,42 +5,52 @@ import Lib
 import qualified Data.Text as Text
 import Control.Monad.State
 import HTask.Event
+import HTask.TaskContainer
+import HTask.Task
 
 
 addTask
   :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
   => Text.Text -> m (Either TaskError TaskRef)
 addTask t = do
-  event <- wrapEventType (TaskAdded t)
-  appendEvent event
-  applyEventToTasks event
+  r <- applyIntentToTasks (AddTask t)
+  maybeStore r
+
+
+maybeStore
+  :: (CanCreateEvent m, CanStoreEvent m)
+  => (Either TaskError TaskEventDetail) -> m (Either TaskError TaskRef)
+maybeStore r
+  = case r of
+      Left e -> pure (Left e)
+      Right v -> do
+        k <- wrapEventType v
+        appendEvent k
+        pure (Right $ detailRef v)
 
 
 startTask
   :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
   => TaskRef -> m (Either TaskError TaskRef)
 startTask ref = do
-  event <- wrapEventType (TaskStarted ref)
-  appendEvent event
-  applyEventToTasks event
+  r <- applyIntentToTasks (StartTask ref)
+  maybeStore r
 
 
 completeTask
   :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
   => TaskRef -> m (Either TaskError TaskRef)
 completeTask ref = do
-  event <- wrapEventType (TaskCompleted ref)
-  appendEvent event
-  applyEventToTasks event
+  r <- applyIntentToTasks (CompleteTask ref)
+  maybeStore r
 
 
 deleteTask
   :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
   => TaskRef -> m (Either TaskError TaskRef)
 deleteTask ref = do
-  event <- wrapEventType (TaskDeleted ref)
-  appendEvent event
-  applyEventToTasks event
+  r <- applyIntentToTasks (DeleteTask ref)
+  maybeStore r
 
 
 listTasks :: (HasTasks m) => m Tasks

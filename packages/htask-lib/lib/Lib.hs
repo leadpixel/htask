@@ -7,6 +7,8 @@ module Lib
 
 import HTask.Capabilities
 import HTask.Event
+import HTask.TaskContainer
+import HTask.Task
 import Conduit
 import Control.Monad
 import Control.Monad.IO.Class
@@ -26,51 +28,23 @@ import qualified Data.Tree as Tree
 import qualified Data.UUID as UUID
 
 
-type TaskRef = UUID.UUID
-type Tasks = [Task]
-type TaskEvent = Event TaskEventType
+data TaskEventDetail = TaskEventDetail
+  { detailRef :: TaskRef
+  , intent :: TaskIntent
+  } deriving (Show)
+
+
+type TaskEvent = Event TaskEventDetail
 type EventLog = [TaskEvent]
 type TaskError = String
 
 
-data TaskEventType
-  = TaskAdded Text.Text
-  | TaskStarted TaskRef
-  | TaskCompleted TaskRef
-  | TaskDeleted TaskRef
+data TaskIntent
+  = AddTask Text.Text
+  | StartTask TaskRef
+  | CompleteTask TaskRef
+  | DeleteTask TaskRef
   deriving (Show)
-
-
-data TaskStatus
-  = Pending
-  | InProgress
-  | Complete
-  | Abandoned
-  deriving (Show, Eq)
-
-
-data Task = Task
-  { taskRef :: TaskRef
-  , description :: Text.Text
-  , createdAt :: Timestamp
-  , status :: TaskStatus
-  } deriving (Show, Eq)
-
-
-type CanCreateTask m = (Monad m, CanTime m, CanUuid m)
-
-class HasTasks m where
-  getTasks :: m Tasks
-  putTasks :: Tasks -> m ()
-
-instance (Monad m) => HasTasks (State.StateT Tasks m) where
-  getTasks = State.get
-  putTasks = State.put
-
-
-instance (Monad m, MonadTrans t) => HasTasks (t (State.StateT Tasks m)) where
-  getTasks = lift getTasks
-  putTasks = lift . putTasks
 
 
 class CanStoreEvent m where
@@ -80,100 +54,37 @@ instance (Monad m) => CanStoreEvent (Writer.WriterT EventLog m) where
   appendEvent x = Writer.tell [x]
 
 
-
-type TaskMonad m = (CanUuid m, CanTime m, CanCreateTask m, CanStoreEvent m)
-
-
-wrapEventType :: (CanCreateEvent m) => TaskEventType -> m TaskEvent
+wrapEventType :: (CanCreateEvent m) => TaskEventDetail -> m TaskEvent
 wrapEventType t = Event <$> uuidGen <*> now <*> pure t
 
 
-emptyTasks :: Tasks
-emptyTasks = mempty
-
-
-applyEventToTasks
+applyIntentToTasks
   :: (Monad m, CanCreateTask m, HasTasks m)
-  => TaskEvent -> m (Either TaskError TaskRef)
-applyEventToTasks evt = do
-  ts <- getTasks
+  => TaskIntent -> m (Either TaskError TaskEventDetail)
+applyIntentToTasks intent =
+  case intent of
+    (AddTask text) -> do
+      t <- createTask text
+      p <- addNewTask t
+      pure $ if p
+        then Right (TaskEventDetail (taskRef t) intent)
+        else Left "could not add; non-unique id"
 
-  case eventType evt of
-    (TaskAdded t) -> do
-      tsk <- createTask t
-      putTasks (tsk : ts)
-      pure (Right $ taskRef tsk)
+    (StartTask ref) -> do
+      p <- updateExistingTask ref $ setTaskStatus InProgress
+      pure $ if p
+        then Right (TaskEventDetail ref intent)
+        else Left "could not find matching id"
 
-    (TaskStarted ref) -> do
-      case findTask ts ref of
-        Nothing -> do
-          pure (Left "could not find matching task")
+    (CompleteTask ref) -> do
+      p <- updateExistingTask ref $ setTaskStatus Complete
+      pure $ if p
+        then Right (TaskEventDetail ref intent)
+        else Left "could not find matching id"
 
-        Just x -> do
-          let tsk = setTaskStatus x InProgress
-          let ts' = tsk : (filter (\y -> taskRef x /= taskRef y) ts)
-          putTasks ts'
-          pure (Right $ taskRef tsk)
+    (DeleteTask ref) -> do
+      p <- removeTask ref
+      pure $ if p
+        then Right (TaskEventDetail ref intent)
+        else Left "unknown fuckup"
 
-    (TaskCompleted ref) -> do
-      case findTask ts ref of
-        Nothing -> do
-          pure (Left "could not find matching task")
-
-        Just x -> do
-          let tsk = setTaskStatus x Complete
-          let ts' = tsk : (filter (\y -> taskRef x /= taskRef y) ts)
-          putTasks ts'
-          pure (Right $ taskRef tsk)
-
-    (TaskDeleted ref) -> do
-      case findTask ts ref of
-        Nothing -> do
-          pure (Left "could not find matching task")
-
-        Just x -> do
-          let ts' = filter (\y -> taskRef x /= taskRef y) ts
-          putTasks ts'
-          pure (Right $ taskRef x)
-
-
-
-
-setTaskStatus :: Task -> TaskStatus -> Task
-setTaskStatus t s = t { status = s }
-
-
-findTask :: Tasks -> TaskRef -> Maybe Task
-findTask ts ref = find matchesRef ts
-  where
-    matchesRef t = taskRef t == ref
-
-
-
-createTask :: (CanCreateTask m) => Text.Text -> m Task
-createTask t = mkTask <$> uuidGen <*> now
-  where
-    mkTask :: TaskRef -> Timestamp -> Task
-    mkTask u s = Task u t s Pending
-
-
-insertUpdate :: Tasks -> Task -> Tasks
-insertUpdate ts t = insertTask t (removeTask (taskRef t) ts)
-  where
-    removeTask :: TaskRef -> Tasks -> Tasks
-    removeTask ref ts = rejectT (\t -> taskRef t /= ref) ts
-
-    insertTask :: Task -> Tasks -> Tasks
-    insertTask t ts = t:ts
-
-
-rejectT :: (Task -> Bool) -> Tasks -> Tasks
-rejectT f = filterT (not . f)
-
-
-filterT :: (Task -> Bool) -> Tasks -> Tasks
-filterT = filter
-
-
-findParent :: Tasks -> Task -> Maybe Task
-findParent r t = Nothing
