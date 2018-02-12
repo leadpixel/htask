@@ -68,10 +68,14 @@ wrapEventType t = Event <$> uuidGen <*> now <*> pure t
 
 replayEventLog
   :: (Monad m, HasTasks m)
-  => [TaskEvent] -> Tasks -> m Tasks
+  => [TaskEvent] -> m ()
 -- replayEventLog [] ts = ts
 -- replayEventLog (x:xs) ts = replayEventLog xs (applyRawEvent x ts)
-replayEventLog vs ts = foldM (flip applyRawEvent) ts vs
+replayEventLog vs
+  = do
+    ts <- getTasks
+    ks <- foldM (flip applyRawEvent) ts vs
+    putTasks ks
 
 
 applyRawEvent
@@ -83,6 +87,10 @@ applyRawEvent ev ts = do
     (AddTask text) -> do
       let t = Task (detailRef td) text (timestamp ev) Pending
       _p <- addNewTask t
+      getTasks
+
+    (StartTask ref) -> do
+      _p <- updateExistingTask ref $ setTaskStatus InProgress
       getTasks
 
 

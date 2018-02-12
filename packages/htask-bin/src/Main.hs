@@ -21,6 +21,7 @@ import qualified Data.ByteString.Lazy   as Lazy
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import qualified Data.Map               as Map
 import qualified Data.Text              as Text
+import qualified Data.List              as List
 import qualified Data.Time              as Time
 import qualified Data.Time.Clock.System as Time
 import qualified Data.Tree              as Tree
@@ -55,21 +56,20 @@ readTaskEvents p = do
   pure $ (fmap fromJust vs)
 
 
-applyEvents :: (Monad m, H.HasTasks m) => [H.TaskEvent] -> m H.Tasks
-applyEvents vs = H.getTasks >>= H.replayEventLog vs
-
-
 runTaskApi :: [H.TaskEvent] -> ConcreteTaskMonad a -> IO a
 runTaskApi vs op
   = State.evalStateT
-      (applyEvents vs >>= H.putTasks >> op)
+      (H.replayEventLog vs >> op)
       H.emptyTasks
 
 
 main :: IO ()
 main = do
+  let (Just uuid) = UUID.fromString "9ab20d32-d6fc-489f-814d-13e0fc27d055"
+
   taskEvents <- readTaskEvents "tasks.txt"
   ts <- runTaskApi taskEvents $ do
+    -- H.startTask (uuid)
     H.listTasks
 
-  putStrLn (Pretty.ppShow ts)
+  putStrLn (Pretty.ppShow (List.sortOn H.createdAt  ts))
