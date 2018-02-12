@@ -1,19 +1,22 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 
 module HTaskTests.Log
-  where
+  ( test_log
+  ) where
 
 import Test.Tasty
 import Test.Tasty.HUnit
 import qualified Control.Monad.State as S
+import Data.Tagged
 import qualified Control.Monad.Writer as W
 import qualified HTask as H
 import qualified Data.UUID as UUID
 
 
-type LogTestMonad = W.WriterT H.EventLog (S.StateT H.Tasks IO)
+type LogTestMonad = W.WriterT [H.TaskEvent] (S.StateT H.Tasks IO)
 
 instance H.CanTime LogTestMonad where
   now = W.lift (S.lift H.now)
@@ -22,7 +25,7 @@ instance H.CanUuid LogTestMonad where
   uuidGen = W.lift (S.lift H.uuidGen)
 
 
-extractLog :: LogTestMonad a -> IO H.EventLog
+extractLog :: LogTestMonad a -> IO [H.TaskEvent]
 extractLog op
   = S.evalStateT
       (W.execWriterT op)
@@ -43,22 +46,22 @@ test_log = testGroup "logs"
 
 listingEmptyTasks :: TestTree
 listingEmptyTasks = testCase "listing empty tasks" $ do
-  log <- extractLog $ pure ()
-  assertEqual "expecting no logs" 0 (length log)
+  ts <- extractLog $ pure ()
+  assertEqual "expecting no logs" 0 (length ts)
 
 
 adding01Tasks :: TestTree
 adding01Tasks = testCase "adding one task" $ do
-  log <- extractLog $ H.addTask "some task"
-  assertEqual "expecting one log entry" 1 (length log)
+  ts <- extractLog $ H.addTask "some task"
+  assertEqual "expecting one log entry" 1 (length ts)
 
 
 adding02Tasks :: TestTree
 adding02Tasks = testCase "adding two tasks" $ do
-  log <- extractLog $ do
-    H.addTask "some task"
+  ts <- extractLog $ do
+    _ <- H.addTask "some task"
     H.addTask "some other task"
-  assertEqual "expecting two log entries" 2 (length log)
+  assertEqual "expecting two log entries" 2 (length ts)
 
 
 startingTask :: TestTree
@@ -76,7 +79,7 @@ startingTask = testCase "starting a task" $ do
 startingNonTask :: TestTree
 startingNonTask = testCase "starting non-existent task does not error" $ do
   ts <- extractLog $
-    H.startTask UUID.nil
+    H.startTask (Tagged UUID.nil)
   assertEqual "expecting no log entries" 0 (length ts)
 
 

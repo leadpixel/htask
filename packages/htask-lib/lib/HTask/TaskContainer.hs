@@ -1,7 +1,10 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 module HTask.TaskContainer
-  where
+  ( HasTasks (..)
+  , Tasks
+  , emptyTasks
+  ) where
 
 import Data.Maybe
 import Data.List
@@ -75,17 +78,3 @@ findTask :: Tasks -> TaskRef -> Maybe Task
 findTask ts ref = find matchesRef ts
   where
     matchesRef t = taskRef t == ref
-
-
-insertUpdate :: Tasks -> Task -> Tasks
-insertUpdate ts t = insertTask t (rejectTask (taskRef t) ts)
-  where
-    rejectTask :: TaskRef -> Tasks -> Tasks
-    rejectTask ref = reject (\k -> taskRef k /= ref)
-
-    insertTask :: Task -> Tasks -> Tasks
-    insertTask = (:)
-
-
-reject :: (Task -> Bool) -> Tasks -> Tasks
-reject f = filter (not . f)

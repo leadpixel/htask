@@ -1,5 +1,6 @@
 module HTask.Capabilities.UUID
-  where
+  ( CanUuid (uuidGen)
+  ) where
 
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID

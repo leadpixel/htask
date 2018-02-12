@@ -8,6 +8,8 @@ copyright:           "2018 Jack Palfrey"
 
 description:         Please see the README on Github at <https://github.com/palf/htask#readme>
 
+ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+
 dependencies:
 - base >= 4.7 && < 5
 - aeson
@@ -32,10 +34,6 @@ executables:
   htask:
     main:                Main.hs
     source-dirs:         src
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
     dependencies:
     - htask-lib
 
@@ -43,10 +41,6 @@ tests:
   htask-test:
     main:                Main.hs
     source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
     dependencies:
     - htask-lib
     - tasty

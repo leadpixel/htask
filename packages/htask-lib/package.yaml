@@ -8,6 +8,8 @@ copyright:           "2018 Jack Palfrey"
 
 description:         Please see the README on Github at <https://github.com/palf/htask#readme>
 
+ghc-options: -Wall
+
 dependencies:
 - base >= 4.7 && < 5
 - aeson
@@ -28,6 +30,7 @@ dependencies:
 
 library:
   source-dirs: lib
+  exposed-modules: HTask
 
 tests:
   htask-test:

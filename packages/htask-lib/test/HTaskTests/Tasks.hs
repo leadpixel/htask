@@ -1,9 +1,11 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 
 module HTaskTests.Tasks
-  where
+  ( test_tasks
+  ) where
 
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -11,9 +13,10 @@ import qualified Control.Monad.State as S
 import qualified Control.Monad.Writer as W
 import qualified HTask as H
 import qualified Data.UUID as UUID
+import Data.Tagged
 
 
-type TaskTestMonad = W.WriterT H.EventLog (S.StateT H.Tasks IO)
+type TaskTestMonad = W.WriterT [H.TaskEvent] (S.StateT H.Tasks IO)
 
 instance H.CanTime TaskTestMonad where
   now = W.lift (S.lift H.now)
@@ -57,7 +60,7 @@ adding01Tasks = testCase "adding one task" $ do
 adding02Tasks :: TestTree
 adding02Tasks = testCase "adding two tasks" $ do
   ts <- extractTasks $ do
-    H.addTask "some task"
+    _ <- H.addTask "some task"
     H.addTask "some other task"
   assertEqual "expecting two tasks" 2 (length ts)
 
@@ -77,7 +80,7 @@ startingTask = testCase "starting a task" $ do
 startingNonTask :: TestTree
 startingNonTask = testCase "starting non-existent task does not error" $ do
   ts <- extractTasks $
-    H.startTask UUID.nil
+    H.startTask (Tagged UUID.nil)
   assertEqual "expecting no tasks" 0 (length ts)
 
 

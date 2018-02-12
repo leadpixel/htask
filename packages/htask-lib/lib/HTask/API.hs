@@ -1,5 +1,10 @@
 module HTask.API
-  where
+  ( addTask
+  , startTask
+  , completeTask
+  , deleteTask
+  , listTasks
+  ) where
 
 import Lib
 import qualified Data.Text as Text

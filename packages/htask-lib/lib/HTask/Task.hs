@@ -1,17 +1,22 @@
 {-# LANGUAGE ConstraintKinds #-}
 
 module HTask.Task
-  where
+  ( Task (..)
+  , TaskRef
+  , TaskStatus (..)
+  , CanCreateTask
+  , createTask
+  , setTaskStatus
+  ) where
 
 import HTask.Capabilities
 import qualified Data.Text as Text
 import qualified Data.UUID as UUID
+import Data.Tagged
 
 
-type TaskRef = UUID.UUID
-
-
-type CanCreateTask m = (Monad m, CanTime m, CanUuid m)
+type TaskIdent = ()
+type TaskRef = Tagged TaskIdent UUID.UUID
 
 
 data TaskStatus
@@ -30,11 +35,14 @@ data Task = Task
   } deriving (Show, Eq)
 
 
+type CanCreateTask m = (Monad m, CanTime m, CanUuid m)
+
+
 createTask :: (CanCreateTask m) => Text.Text -> m Task
-createTask t = mkTask <$> uuidGen <*> now
-  where
-    mkTask :: TaskRef -> Timestamp -> Task
-    mkTask u s = Task u t s Pending
+createTask tex
+  = (\u m -> Task u tex m Pending)
+  <$> (Tagged <$> uuidGen)
+  <*> now
 
 
 setTaskStatus :: TaskStatus -> Task -> Task

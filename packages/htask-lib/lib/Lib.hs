@@ -4,7 +4,14 @@
 {-# LANGUAGE ConstraintKinds #-}
 
 module Lib
-  where
+  ( TaskEvent
+  , TaskError
+  , CanStoreEvent (..)
+  , TaskEventDetail (..)
+  , TaskIntent (..)
+  , applyIntentToTasks
+  , replayEventLog
+  ) where
 
 import Data.Aeson
 import GHC.Generics

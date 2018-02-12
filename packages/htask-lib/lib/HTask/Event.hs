@@ -2,7 +2,10 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module HTask.Event
-  where
+  ( Event (..)
+  , CanCreateEvent
+  , createEvent
+  ) where
 
 import Data.Aeson
 import Data.Tagged
@@ -12,7 +15,7 @@ import HTask.Capabilities.UUID
 import qualified Data.UUID as UUID
 
 
-data EventIdent = EventIdent
+type EventIdent = ()
 type EventUUID = Tagged EventIdent UUID.UUID
 
 

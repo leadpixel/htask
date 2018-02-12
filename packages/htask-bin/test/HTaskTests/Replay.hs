@@ -1,5 +1,6 @@
 module HTaskTests.Replay
-  where
+  ( test_rebuild
+  ) where
 
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -10,7 +11,7 @@ import qualified Control.Monad.Writer as Writer
 import qualified HTask as H
 
 
-runTaskApi :: H.TaskMonad H.Tasks -> IO (H.Tasks, H.EventLog)
+runTaskApi :: H.TaskMonad H.Tasks -> IO (H.Tasks, [H.TaskEvent])
 runTaskApi op
   = State.evalStateT
       (Writer.runWriterT op)
@@ -32,6 +33,6 @@ genTaskInteractions :: Gen (H.TaskMonad H.Tasks)
 genTaskInteractions = undefined
 
 
-rebuildFromLog :: H.EventLog -> H.Tasks
+rebuildFromLog :: [H.TaskEvent] -> H.Tasks
 rebuildFromLog = undefined
 
