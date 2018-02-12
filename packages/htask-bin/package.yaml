@@ -10,18 +10,20 @@ description:         Please see the README on Github at <https://github.com/palf
 
 dependencies:
 - base >= 4.7 && < 5
+- aeson
 - bytestring
 - conduit
+- utf8-string
 - conduit-combinators
 - containers
 - mtl
 - operational
 - optparse-applicative
-- random
-- text
 - pretty
 - pretty-show
+- random
 - tagged
+- text
 - time
 - transformers
 - uuid

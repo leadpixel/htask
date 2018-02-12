@@ -10,6 +10,7 @@ import Test.Tasty.HUnit
 import qualified Control.Monad.State as S
 import qualified Control.Monad.Writer as W
 import qualified HTask as H
+import qualified Data.UUID as UUID
 
 
 type TaskTestMonad = W.WriterT H.EventLog (S.StateT H.Tasks IO)
@@ -21,27 +22,82 @@ instance H.CanUuid TaskTestMonad where
   uuidGen = W.lift (S.lift H.uuidGen)
 
 
-extractTasks :: TaskTestMonad H.Tasks -> IO H.Tasks
+extractTasks :: TaskTestMonad a -> IO H.Tasks
 extractTasks op = do
   S.evalStateT
-    (fst <$> W.runWriterT op)
+    (fst <$> W.runWriterT (op >> H.listTasks))
     H.emptyTasks
 
 
 test_tasks :: TestTree
 test_tasks = testGroup "tasks"
   [ listingEmptyTasks
-  , addingATask
+  , adding01Tasks
+  , adding02Tasks
+  , startingTask
+  , startingNonTask
+  , completingTask
+  , deletingTask
   ]
 
-  where
-    listingEmptyTasks :: TestTree
-    listingEmptyTasks = testCase "listing empty tasks" $ do
-      ts <- extractTasks (H.listTasks)
-      assertEqual "expecting no tasks" 0 (length ts)
 
-    addingATask :: TestTree
-    addingATask = testCase "adding one task" $ do
-      ts <- extractTasks (H.addTask "some task" >> H.listTasks)
-      assertEqual "expecting one task" 1 (length ts)
+listingEmptyTasks :: TestTree
+listingEmptyTasks = testCase "listing empty tasks" $ do
+  ts <- extractTasks (pure ())
+  assertEqual "expecting no tasks" 0 (length ts)
 
+
+adding01Tasks :: TestTree
+adding01Tasks = testCase "adding one task" $ do
+  ts <- extractTasks $
+    H.addTask "some task"
+  assertEqual "expecting one task" 1 (length ts)
+
+
+adding02Tasks :: TestTree
+adding02Tasks = testCase "adding two tasks" $ do
+  ts <- extractTasks $ do
+    H.addTask "some task"
+    H.addTask "some other task"
+  assertEqual "expecting two tasks" 2 (length ts)
+
+
+startingTask :: TestTree
+startingTask = testCase "starting a task" $ do
+  ts <- extractTasks $ do
+    ref <- H.addTask "some task"
+    case ref of
+      Left e -> pure (Left e)
+      Right v -> H.startTask v
+  assertEqual "expecting one task" 1 (length ts)
+  assertEqual "expecting matching task" "some task" (H.description $ head ts)
+  assertEqual "expecting started task" H.InProgress (H.status $ head ts)
+
+
+startingNonTask :: TestTree
+startingNonTask = testCase "starting non-existent task does not error" $ do
+  ts <- extractTasks $ do
+    H.startTask UUID.nil
+  assertEqual "expecting no tasks" 0 (length ts)
+
+
+completingTask :: TestTree
+completingTask = testCase "completing a task" $ do
+  ts <- extractTasks $ do
+    ref <- H.addTask "some task"
+    case ref of
+      Left e -> pure (Left e)
+      Right v -> H.completeTask v
+  assertEqual "expecting one task" 1 (length ts)
+  assertEqual "expecting matching task" "some task" (H.description $ head ts)
+  assertEqual "expecting started task" H.Complete (H.status $ head ts)
+
+
+deletingTask :: TestTree
+deletingTask = testCase "deleting a task" $ do
+  ts <- extractTasks $ do
+    ref <- H.addTask "some task"
+    case ref of
+      Left e -> pure (Left e)
+      Right v -> H.deleteTask v
+  assertEqual "expecting no tasks" 0 (length ts)

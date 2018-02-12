@@ -1,10 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE ConstraintKinds #-}
 
 module Lib
   where
 
+import Data.Aeson
+import GHC.Generics
 import HTask.Capabilities
 import HTask.Event
 import HTask.TaskContainer
@@ -31,7 +34,7 @@ import qualified Data.UUID as UUID
 data TaskEventDetail = TaskEventDetail
   { detailRef :: TaskRef
   , intent :: TaskIntent
-  } deriving (Show)
+  } deriving (Show, Generic)
 
 
 type TaskEvent = Event TaskEventDetail
@@ -44,7 +47,12 @@ data TaskIntent
   | StartTask TaskRef
   | CompleteTask TaskRef
   | DeleteTask TaskRef
-  deriving (Show)
+  deriving (Show, Generic)
+
+instance ToJSON TaskIntent
+instance ToJSON TaskEventDetail
+instance FromJSON TaskIntent
+instance FromJSON TaskEventDetail
 
 
 class CanStoreEvent m where
@@ -56,6 +64,27 @@ instance (Monad m) => CanStoreEvent (Writer.WriterT EventLog m) where
 
 wrapEventType :: (CanCreateEvent m) => TaskEventDetail -> m TaskEvent
 wrapEventType t = Event <$> uuidGen <*> now <*> pure t
+
+
+replayEventLog
+  :: (Monad m, HasTasks m)
+  => [TaskEvent] -> Tasks -> m Tasks
+-- replayEventLog [] ts = ts
+-- replayEventLog (x:xs) ts = replayEventLog xs (applyRawEvent x ts)
+replayEventLog vs ts = foldM (flip applyRawEvent) ts vs
+
+
+applyRawEvent
+  :: (Monad m, HasTasks m)
+  => TaskEvent -> Tasks -> m Tasks
+applyRawEvent ev ts = do
+  let td = (eventType ev)
+  case intent td of
+    (AddTask text) -> do
+      let t = Task (detailRef td) text (timestamp ev) Pending
+      _p <- addNewTask t
+      getTasks
+
 
 
 applyIntentToTasks

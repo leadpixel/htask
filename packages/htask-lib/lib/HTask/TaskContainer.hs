@@ -55,14 +55,13 @@ instance (Monad m) => HasTasks (State.StateT Tasks m) where
 
   updateExistingTask ref op = do
     ts <- getTasks
-    let p = findTask ts ref
     maybe
       (pure False)
       (\t -> do
         let k = op t
         putTasks (k : (removeRef ts ref))
         pure True)
-      p
+      (findTask ts ref)
 
   removeTask ref = do
     ts <- getTasks
@@ -85,7 +84,7 @@ instance (Monad m, MonadTrans t) => HasTasks (t (State.StateT Tasks m)) where
 
 
 removeRef :: Tasks -> TaskRef -> Tasks
-removeRef ts ref = filter (\k -> taskRef k == ref) ts
+removeRef ts ref = filter (\k -> taskRef k /= ref) ts
 
 
 -- instance (Monad m, MonadTrans t) => HasTasks (t (State.StateT Tasks m)) where
