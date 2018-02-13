@@ -6,6 +6,7 @@ import qualified HTask as H
 import HTask.Actions
 import Data.Semigroup ((<>))
 import Data.Tagged
+import Data.List
 import HTask.TaskApplication
 import qualified Data.Text              as Text
 import qualified Data.UUID as UUID
@@ -20,14 +21,31 @@ runCommand (Remove ref) = runRemove ref
 
 
 runList :: [H.Task] -> IO ()
-runList = mapM_ nicePrint
+runList ts = mapM_ (k) (groupBy f $ sortBy g ts)
+  where
+    f :: H.Task -> H.Task -> Bool
+    f a b = H.status a == H.status b
+
+    k :: [H.Task] -> IO ()
+    k = mapM_ nicePrint
+
+    g :: H.Task -> H.Task -> Ordering
+    g a b = g' (H.status a) (H.status b)
+
+    g' :: H.TaskStatus -> H.TaskStatus -> Ordering
+    g' _ H.InProgress = GT
+    g' H.Complete H.Pending = GT
+    g' H.Abandoned H.Pending = GT
+    g' H.Abandoned H.Complete = GT
+    g' _ H.Abandoned = LT
+    g' _ _ = EQ
 
 
 nicePrint :: H.Task -> IO ()
 nicePrint t = putStrLn
-  (  --show (untag $ H.taskRef t)
-  -- <> " | "
-  symbolFor t
+  (  show (untag $ H.taskRef t)
+  <> " "
+  <> symbolFor t
   <> " "
   <> showDescription t
   )
