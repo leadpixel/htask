@@ -36,3 +36,5 @@
 {"eventUuid":"c29db543-dd5b-45c1-9171-580807142539","eventType":{"intent":{"tag":"AddTask","contents":"show output in sections by status"},"detailRef":"a20aef97-fe9b-471c-9a5e-589e066f608c"},"timestamp":"2018-02-13T12:44:06.304684Z"}
 {"eventUuid":"b5a8428b-6872-4c00-bafa-e6fec93653a6","eventType":{"intent":{"tag":"AddTask","contents":"colorise output"},"detailRef":"55cdb9ce-56f4-4335-a1db-128a4e16bd98"},"timestamp":"2018-02-13T12:44:14.033199Z"}
 {"eventUuid":"f3edfc5c-f29d-4a86-b99d-64dbcc230512","eventType":{"intent":{"tag":"AddTask","contents":"right"},"detailRef":"a89b571a-f6b8-4382-a6fe-589a4b5efa80"},"timestamp":"2018-02-13T12:45:05.006061Z"}
+{"eventUuid":"2b8821fd-2bd5-47b8-9d79-5d95bf513f31","eventType":{"intent":{"tag":"AddTask","contents":"left"},"detailRef":"6265f107-d78c-42b5-baad-ea8dbfc1d2a4"},"timestamp":"2018-02-13T12:45:17.525765Z"}
+{"eventUuid":"526a4e3f-4959-4ccc-9161-efcb6b733f91","eventType":{"intent":{"tag":"AddTask","contents":"git conflict resolution helper"},"detailRef":"ee468ca4-a0e1-4e61-a4c7-ce5ba609cbeb"},"timestamp":"2018-02-13T12:47:06.731704Z"}
