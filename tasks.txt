@@ -11,3 +11,4 @@
 {"eventUuid":"a794f5ec-c4a5-45eb-88f0-84c9f2bb97ca","eventType":{"intent":{"tag":"StartTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-13T00:37:12.228363199Z"}
 {"eventUuid":"ef23ee97-dc84-4cdc-a5fa-23c873d52c8e","eventType":{"intent":{"tag":"StartTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-13T00:37:17.744263111Z"}
 {"eventUuid":"a1c71ff5-32df-4b37-b2f5-0c1cb14e02cf","eventType":{"intent":{"tag":"StartTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-13T00:40:13.761241474Z"}
+{"eventUuid":"82069789-2da6-430d-acd2-be39ba183a45","eventType":{"intent":{"tag":"DeleteTask","contents":"bc34a572-8deb-48a4-b684-04e5a9cd4796"},"detailRef":"bc34a572-8deb-48a4-b684-04e5a9cd4796"},"timestamp":"2018-02-13T10:59:27.860775Z"}
