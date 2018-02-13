@@ -5,7 +5,8 @@
 
 module HTask.TaskApplication
   ( TaskApplication (..)
-  , runTaskApi
+  , unwrapTaskApp
+  , runTask
   ) where
 
 import qualified HTask as H
@@ -17,7 +18,7 @@ import qualified Data.ByteString.Lazy   as Lazy
 
 
 newtype TaskApplication a = TaskApp
-  { runTaskApp :: State.StateT H.Tasks IO a
+  { unwrapTaskApp :: State.StateT H.Tasks IO a
   } deriving (Functor, Applicative, Monad)
 
 
@@ -47,5 +48,5 @@ instance H.CanStoreEvent TaskApplication where
     . encode
 
 
-runTaskApi :: [H.Task] -> TaskApplication a -> IO a
-runTaskApi ts op = State.evalStateT (runTaskApp op) ts
+runTask :: [H.Task] -> TaskApplication a -> IO a
+runTask ts op = State.evalStateT (unwrapTaskApp op) ts

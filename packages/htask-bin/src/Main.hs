@@ -23,7 +23,7 @@ readTaskEvents p = (parseLines . lines) <$> readFile p
 prepTasks :: [H.TaskEvent] -> IO [H.Task]
 prepTasks vs
   = State.execStateT
-      (runTaskApp $ H.replayEventLog vs)
+      (unwrapTaskApp $ H.replayEventLog vs)
       H.emptyTasks
 
 
@@ -33,6 +33,6 @@ main = do
 
   vs <- readTaskEvents "tasks.txt"
   xs <- prepTasks vs
-  ts <- runTaskApi xs H.listTasks
+  ts <- runTask xs H.listTasks
 
   runCommand (List.sortOn H.createdAt ts) options

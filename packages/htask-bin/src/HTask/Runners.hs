@@ -20,7 +20,7 @@ runCommand ts (Remove ref) = runRemove ts ref
 
 runAdd :: [H.Task] -> Text.Text -> IO ()
 runAdd ts tex = do
-  k <- runTaskApi ts (H.addTask tex)
+  k <- runTask ts (H.addTask tex)
   print k
 
 
@@ -28,7 +28,7 @@ runStart :: [H.Task] -> Text.Text -> IO ()
 runStart ts ref
   = maybe
       (print "no")
-      (\v -> runTaskApi ts (H.startTask $ Tagged v) >>= print)
+      (\v -> runTask ts (H.startTask $ Tagged v) >>= print)
       (UUID.fromString $ Text.unpack ref)
 
 
@@ -36,7 +36,7 @@ runRemove :: [H.Task] -> Text.Text -> IO ()
 runRemove ts ref
   = maybe
       (print "no")
-      (\v -> runTaskApi ts (H.deleteTask $ Tagged v) >>= print)
+      (\v -> runTask ts (H.deleteTask $ Tagged v) >>= print)
       (UUID.fromString $ Text.unpack ref)
 
 
@@ -45,5 +45,5 @@ nicePrint :: H.Task -> IO ()
 nicePrint t = putStrLn
   (  show (untag $ H.taskRef t)
   <> " | "
-  <> show (H.description t)
+  <> (Text.unpack $ H.description t)
   )

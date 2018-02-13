@@ -11,8 +11,8 @@ import qualified Control.Monad.Writer as Writer
 import qualified HTask as H
 
 
-runTaskApi :: H.TaskMonad H.Tasks -> IO (H.Tasks, [H.TaskEvent])
-runTaskApi op
+runTask :: H.TaskMonad H.Tasks -> IO (H.Tasks, [H.TaskEvent])
+runTask op
   = State.evalStateT
       (Writer.runWriterT op)
       H.emptyTasks
@@ -24,7 +24,7 @@ test_rebuild = testProperty "can rebuild task state from log" thing
     thing :: Property
     thing = forAll genTaskInteractions $ \p ->
       monadicIO $ run $ do
-        (a, ls) <- runTaskApi (p >> H.listTasks)
+        (a, ls) <- runTask (p >> H.listTasks)
         let b = rebuildFromLog ls
         assertEqual "rebuild should be identical" a b
 
