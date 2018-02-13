@@ -38,3 +38,4 @@
 {"eventUuid":"f3edfc5c-f29d-4a86-b99d-64dbcc230512","eventType":{"intent":{"tag":"AddTask","contents":"right"},"detailRef":"a89b571a-f6b8-4382-a6fe-589a4b5efa80"},"timestamp":"2018-02-13T12:45:05.006061Z"}
 {"eventUuid":"2b8821fd-2bd5-47b8-9d79-5d95bf513f31","eventType":{"intent":{"tag":"AddTask","contents":"left"},"detailRef":"6265f107-d78c-42b5-baad-ea8dbfc1d2a4"},"timestamp":"2018-02-13T12:45:17.525765Z"}
 {"eventUuid":"526a4e3f-4959-4ccc-9161-efcb6b733f91","eventType":{"intent":{"tag":"AddTask","contents":"git conflict resolution helper"},"detailRef":"ee468ca4-a0e1-4e61-a4c7-ce5ba609cbeb"},"timestamp":"2018-02-13T12:47:06.731704Z"}
+{"eventUuid":"34c1d79c-e4f2-4524-ae9c-baaa9e438534","eventType":{"intent":{"tag":"AddTask","contents":"sort by timestamp before reading log"},"detailRef":"808fb9e7-cee8-487d-9fa7-92252176bf19"},"timestamp":"2018-02-13T12:48:28.003175Z"}
