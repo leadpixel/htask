@@ -14,7 +14,7 @@ import HTask.CLI.Remove
 
 
 defaultOption :: Parser Action
-defaultOption = pure List
+defaultOption = pure (List HideDetail)
 
 
 opts :: Parser Action
