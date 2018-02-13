@@ -8,6 +8,7 @@ data Action
   = List
   | Add Text.Text
   | Start Text.Text
+  | Complete Text.Text
   | Remove Text.Text
   deriving (Show, Read)
 

@@ -48,5 +48,5 @@ instance H.CanStoreEvent TaskApplication where
     . encode
 
 
-runTask :: [H.Task] -> TaskApplication a -> IO a
-runTask ts op = State.evalStateT (unwrapTaskApp op) ts
+runTask :: TaskApplication a -> [H.Task] -> IO a
+runTask op = State.evalStateT (unwrapTaskApp op)

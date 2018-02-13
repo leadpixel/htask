@@ -9,6 +9,7 @@ import HTask.Actions
 import HTask.CLI.List
 import HTask.CLI.Add
 import HTask.CLI.Start
+import HTask.CLI.Complete
 import HTask.CLI.Remove
 
 
@@ -21,6 +22,7 @@ opts = hsubparser
   (  command "list" listInfo
   <> command "add" addInfo
   <> command "start" startInfo
+  <> command "complete" completeInfo
   <> command "remove" removeInfo
   )
 

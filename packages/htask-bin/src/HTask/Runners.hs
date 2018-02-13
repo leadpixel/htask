@@ -11,39 +11,76 @@ import qualified Data.Text              as Text
 import qualified Data.UUID as UUID
 
 
-runCommand :: [H.Task] -> Action -> IO ()
-runCommand ts List = mapM_ nicePrint ts
-runCommand ts (Add tex) = runAdd ts tex
-runCommand ts (Start ref) = runStart ts ref
-runCommand ts (Remove ref) = runRemove ts ref
+runCommand :: Action -> [H.Task] -> IO ()
+runCommand List = runList
+runCommand (Add tex) = runAdd tex
+runCommand (Start ref) = runStart ref
+runCommand (Complete ref) = runComplete ref
+runCommand (Remove ref) = runRemove ref
 
 
-runAdd :: [H.Task] -> Text.Text -> IO ()
-runAdd ts tex = do
-  k <- runTask ts (H.addTask tex)
-  print k
-
-
-runStart :: [H.Task] -> Text.Text -> IO ()
-runStart ts ref
-  = maybe
-      (print "no")
-      (\v -> runTask ts (H.startTask $ Tagged v) >>= print)
-      (UUID.fromString $ Text.unpack ref)
-
-
-runRemove :: [H.Task] -> Text.Text -> IO ()
-runRemove ts ref
-  = maybe
-      (print "no")
-      (\v -> runTask ts (H.deleteTask $ Tagged v) >>= print)
-      (UUID.fromString $ Text.unpack ref)
-
+runList :: [H.Task] -> IO ()
+runList = mapM_ nicePrint
 
 
 nicePrint :: H.Task -> IO ()
 nicePrint t = putStrLn
-  (  show (untag $ H.taskRef t)
-  <> " | "
-  <> (Text.unpack $ H.description t)
+  (  --show (untag $ H.taskRef t)
+  -- <> " | "
+  symbolFor t
+  <> " "
+  <> showDescription t
   )
+
+
+symbolFor :: H.Task -> String
+symbolFor t
+  = case H.status t of
+      H.Pending    -> "."
+      H.InProgress -> ">"
+      H.Complete   -> "✓"
+      H.Abandoned  -> "-"
+
+showDescription :: H.Task -> String
+showDescription t
+  =  statusColor (Just $ H.status t)
+  <> Text.unpack (H.description t)
+  <> statusColor Nothing
+
+
+statusColor :: Maybe H.TaskStatus -> String
+statusColor Nothing             = "\x1b[0m"  -- Clear
+statusColor (Just H.Pending)    = "\x1b[34m" -- Blue
+statusColor (Just H.InProgress) = "\x1b[33m" -- Yellow
+statusColor (Just H.Complete)   = "\x1b[32m" -- Green
+statusColor (Just H.Abandoned)  = "\x1b[31m" -- Red
+
+
+runAdd :: Text.Text -> [H.Task] -> IO ()
+runAdd tex ts = do
+  k <- runTask (H.addTask tex) ts
+  print k
+
+
+runStart :: Text.Text -> [H.Task] -> IO ()
+runStart ref ts
+  = maybe
+      (print "no")
+      (\v -> runTask (H.startTask $ Tagged v) ts >>= print)
+      (UUID.fromString $ Text.unpack ref)
+
+
+runComplete :: Text.Text -> [H.Task] -> IO ()
+runComplete ref ts
+  = maybe
+      (print "no")
+      (\v -> runTask (H.completeTask $ Tagged v) ts >>= print)
+      (UUID.fromString $ Text.unpack ref)
+
+
+runRemove :: Text.Text -> [H.Task] -> IO ()
+runRemove ref ts
+  = maybe
+      (print "no")
+      (\v -> runTask (H.deleteTask $ Tagged v) ts >>= print)
+      (UUID.fromString $ Text.unpack ref)

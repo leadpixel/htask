@@ -33,6 +33,6 @@ main = do
 
   vs <- readTaskEvents "tasks.txt"
   xs <- prepTasks vs
-  ts <- runTask xs H.listTasks
+  ts <- runTask H.listTasks xs
 
-  runCommand (List.sortOn H.createdAt ts) options
+  runCommand options (List.sortOn H.createdAt ts)
