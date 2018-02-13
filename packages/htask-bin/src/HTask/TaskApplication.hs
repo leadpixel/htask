@@ -4,8 +4,8 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 module HTask.TaskApplication
-  ( TaskApplication
-  , runTaskApp
+  ( TaskApplication (..)
+  , runTaskApi
   ) where
 
 import qualified HTask as H
@@ -45,3 +45,7 @@ instance H.CanStoreEvent TaskApplication where
     . Lazy.toStrict
     . flip mappend "\n"
     . encode
+
+
+runTaskApi :: [H.Task] -> TaskApplication a -> IO a
+runTaskApi ts op = State.evalStateT (runTaskApp op) ts
