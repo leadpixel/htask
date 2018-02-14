@@ -2,13 +2,13 @@ module HTask.Runners.List
   ( runList
   ) where
 
+import Control.Monad.Reader
 import Data.List
 import Data.Semigroup ((<>))
 import Data.Tagged
 import HTask.Actions
 import HTask.TaskApplication
 import qualified Data.Text              as Text
-import qualified Data.UUID as UUID
 import qualified HTask as H
 
 
@@ -38,11 +38,11 @@ statusDisplayOrder   H.Complete    H.Abandoned    =   LT
 statusDisplayOrder   H.Abandoned   H.Abandoned    =   EQ
 
 
-runList :: DetailFlag -> FilePath -> IO ()
-runList d file
+runList :: DetailFlag -> TaskConfig ()
+runList d
   = do
-    ts <- runTask H.listTasks file
-    mapM_
+    ts <- runTask H.listTasks
+    lift $ mapM_
       (mapM_ (nicePrint d))
       (groupBy sameStatus $ sortBy taskDisplayOrder ts)
 
@@ -52,13 +52,13 @@ runList d file
 
 
 nicePrint :: DetailFlag -> H.Task -> IO ()
-nicePrint (HideDetail) t = putStrLn
+nicePrint HideDetail t = putStrLn
   (  symbolFor t
   <> " "
   <> showDescription t
   )
 
-nicePrint (ShowDetail) t = putStrLn
+nicePrint ShowDetail t = putStrLn
   (  show (untag $ H.taskRef t)
   <> " "
   <> symbolFor t

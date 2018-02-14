@@ -4,24 +4,30 @@ module HTask.Runners
   ( runCommand
   ) where
 
-import HTask.Runners.List
-import qualified HTask as H
-import HTask.Actions
-import Control.Monad
 import Data.Semigroup ((<>))
 import Data.Tagged
-import Data.List
+import HTask.Actions
+import HTask.CLI
+import HTask.Runners.Summary
+import HTask.Runners.List
 import HTask.TaskApplication
+import qualified Control.Monad.Reader as R
 import qualified Data.Text              as Text
 import qualified Data.UUID as UUID
+import qualified HTask as H
 
 
-runCommand :: Action -> FilePath -> IO ()
-runCommand (List d)       = runList d
-runCommand (Add tex)      = runAdd tex
-runCommand (Start ref)    = runStart ref
-runCommand (Complete ref) = runComplete ref
-runCommand (Remove ref)   = runRemove ref
+runCommand :: Options -> IO ()
+runCommand opts = R.runReaderT (runAction $ action opts) (taskfile opts)
+
+
+runAction :: Action -> TaskConfig ()
+runAction Summary        = runSummary
+runAction (List d)       = runList d
+runAction (Add tex)      = runAdd tex
+runAction (Start ref)    = runStart ref
+runAction (Complete ref) = runComplete ref
+runAction (Remove ref)   = runRemove ref
 
 
 justOne :: [a] -> Maybe a
@@ -36,27 +42,28 @@ findMatchingUUIDs ref ts = filter (ref `Text.isPrefixOf`) (fmap taskRefToText ts
     taskRefToText = UUID.toText . untag . H.taskRef
 
 
-runAdd :: Text.Text -> FilePath -> IO ()
-runAdd tex file = runTask (H.addTask tex) file >>= print
+runAdd :: Text.Text -> TaskConfig ()
+runAdd tex = runTask (H.addTask tex) >>= R.lift . putStrLn . show
 
 
-runWithMatch :: (Show a) => (H.TaskRef -> TaskApplication a) -> Text.Text -> FilePath -> IO ()
-runWithMatch f ref file
+runWithMatch :: (Show a) => (H.TaskRef -> TaskApplication a) -> Text.Text -> TaskConfig ()
+runWithMatch f ref
   = do
-    ts <- runTask H.listTasks file
-    maybe
-      (print $ "did not find unique match for: " <> ref)
-      (\v -> runTask (f $ Tagged v) file >>= print)
+    ts <- runTask H.listTasks
+    output <- maybe
+      (pure $ "did not find unique match for: " <> ref)
+      (\v -> (Text.pack . show) <$> runTask (f $ Tagged v))
       (justOne (findMatchingUUIDs ref ts) >>= UUID.fromText)
+    R.lift $ putStrLn (show output)
 
 
-runStart :: Text.Text -> FilePath -> IO ()
+runStart :: Text.Text -> TaskConfig ()
 runStart = runWithMatch H.startTask
 
 
-runComplete :: Text.Text -> FilePath -> IO ()
+runComplete :: Text.Text -> TaskConfig ()
 runComplete = runWithMatch H.completeTask
 
 
-runRemove :: Text.Text -> FilePath -> IO ()
+runRemove :: Text.Text -> TaskConfig ()
 runRemove = runWithMatch H.deleteTask

@@ -9,7 +9,8 @@ data DetailFlag = ShowDetail | HideDetail
 
 
 data Action
-  = List DetailFlag
+  = Summary
+  | List DetailFlag
   | Add Text.Text
   | Start Text.Text
   | Complete Text.Text

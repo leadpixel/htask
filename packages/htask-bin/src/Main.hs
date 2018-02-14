@@ -2,13 +2,11 @@ module Main
   ( main
   ) where
 
-import HTask.Runners
-import HTask.CLI
-import HTask.TaskApplication
+import qualified HTask.Runners as Runner
+import qualified HTask.CLI as CLI
 
 
 main :: IO ()
 main = do
-  options <- getOptions
-
-  runCommand options "tasks.txt"
+  options <- CLI.getOptions
+  Runner.runCommand options

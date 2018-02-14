@@ -7,14 +7,14 @@ import Data.Semigroup ((<>))
 
 
 listInfo :: ParserInfo Action
-listInfo = info listParser (progDesc "list one")
+listInfo = info listParser (progDesc "list tasks")
 
 
 listParser :: Parser Action
 listParser
   = List
   <$> flag HideDetail ShowDetail
-      ( long "long"
-      <> short 'l'
+      (  long "detail"
+      <> short 'd'
       <> help "show detail"
       )

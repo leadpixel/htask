@@ -111,3 +111,5 @@
 {"eventUuid":"efabb611-5876-4331-95a9-be7cbb1b5eea","eventType":{"intent":{"tag":"AddTask","contents":"temp"},"detailRef":"6027f715-818c-410b-a6e9-ae507b78cf8a"},"timestamp":"2018-02-14T12:40:22.489909Z"}
 {"eventUuid":"2c891600-50cd-4f9f-9b34-857b950abe6b","eventType":{"intent":{"tag":"DeleteTask","contents":"6027f715-818c-410b-a6e9-ae507b78cf8a"},"detailRef":"6027f715-818c-410b-a6e9-ae507b78cf8a"},"timestamp":"2018-02-14T12:40:39.669423Z"}
 {"eventUuid":"806300de-d7f7-4c76-8e2f-8d6f42842efe","eventType":{"intent":{"tag":"AddTask","contents":"create summary command as default"},"detailRef":"e2cd389c-f1fa-4f5e-9531-44d4660c05bd"},"timestamp":"2018-02-14T12:41:05.775817Z"}
+{"eventUuid":"b326e3f2-50fa-42e4-9b2a-d0872edcf35a","eventType":{"intent":{"tag":"CompleteTask","contents":"1b422da4-6fd1-4d14-a559-a616b4c3db73"},"detailRef":"1b422da4-6fd1-4d14-a559-a616b4c3db73"},"timestamp":"2018-02-14T14:12:22.213832Z"}
+{"eventUuid":"a6e64cff-31e6-4fdb-bb07-4ae8f7afc9c7","eventType":{"intent":{"tag":"StartTask","contents":"e2cd389c-f1fa-4f5e-9531-44d4660c05bd"},"detailRef":"e2cd389c-f1fa-4f5e-9531-44d4660c05bd"},"timestamp":"2018-02-14T14:12:54.079928Z"}
