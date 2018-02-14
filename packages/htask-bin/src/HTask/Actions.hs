@@ -15,5 +15,7 @@ data Action
   | Start Text.Text
   | Complete Text.Text
   | Remove Text.Text
+  | Pick
+  | Done
   deriving (Show, Read)
 

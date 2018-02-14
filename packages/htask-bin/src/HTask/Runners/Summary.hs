@@ -17,6 +17,10 @@ taskPriority :: H.Task -> H.Task -> Ordering
 taskPriority = compare `on` H.createdAt
 
 
+hasStatus :: H.TaskStatus -> H.Task -> Bool
+hasStatus s t = s == H.status t
+
+
 runSummary :: TaskConfig ()
 runSummary
   = runTask H.listTasks
@@ -24,10 +28,6 @@ runSummary
       displayCurrent ts
       putStrLn ""
       displayTopPending ts
-
-
-hasStatus :: H.TaskStatus -> H.Task -> Bool
-hasStatus s t = s == H.status t
 
 
 displayCurrent :: [H.Task] -> IO ()

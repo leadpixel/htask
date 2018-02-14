@@ -7,12 +7,14 @@ import Options.Applicative as Opts
 import Data.Semigroup ((<>))
 
 import HTask.Actions
-import HTask.CLI.Summary
-import HTask.CLI.List
 import HTask.CLI.Add
-import HTask.CLI.Start
 import HTask.CLI.Complete
+import HTask.CLI.Done
+import HTask.CLI.List
+import HTask.CLI.Pick
 import HTask.CLI.Remove
+import HTask.CLI.Start
+import HTask.CLI.Summary
 
 
 data Options = Options
@@ -33,6 +35,10 @@ actionParser = hsubparser
   <> command "start"    startInfo
   <> command "complete" completeInfo
   <> command "remove"   removeInfo
+
+  <> command "pick"     pickInfo
+  <> command "done"     doneInfo
+
   <> command "ls"       listInfo
   )
 
