@@ -54,7 +54,7 @@ runWithMatch f ref
       (pure $ "did not find unique match for: " <> ref)
       (\v -> (Text.pack . show) <$> runTask (f $ Tagged v))
       (justOne (findMatchingUUIDs ref ts) >>= UUID.fromText)
-    R.lift $ putStrLn (show output)
+    R.lift $ putStrLn (Text.unpack output)
 
 
 runStart :: Text.Text -> TaskConfig ()
