@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module HTask.Runners.List
   ( runList
   ) where
@@ -9,7 +11,9 @@ import Data.Semigroup ((<>))
 import Data.Tagged
 import HTask.Actions
 import HTask.TaskApplication
+import HTask.Formatters
 import qualified Data.Text              as Text
+import qualified Data.UUID              as UUID
 import qualified HTask as H
 
 
@@ -49,45 +53,17 @@ runList d
 
   where
     sameStatus :: H.Task -> H.Task -> Bool
-    sameStatus a b = H.status a == H.status b
+    sameStatus = (==) `on` H.status
 
 
 nicePrint :: DetailFlag -> H.Task -> IO ()
-nicePrint HideDetail t = putStrLn
-  (  symbolFor t
+nicePrint d t = putStrLn $ Text.unpack
+  (  printDetail d
+  <> statusSymbol (H.status t)
   <> " "
-  <> showDescription t
+  <> withStatusColor (H.status t) (H.description t)
   )
 
-nicePrint ShowDetail t = putStrLn
-  (  show (untag $ H.taskRef t)
-  <> " "
-  <> symbolFor t
-  <> " "
-  <> showDescription t
-  )
-
-
-symbolFor :: H.Task -> String
-symbolFor t
-  = case H.status t of
-      H.Pending    -> "."
-      H.InProgress -> ">"
-      H.Complete   -> "✓"
-      H.Abandoned  -> "-"
-
-
-showDescription :: H.Task -> String
-showDescription t
-  =  statusColor (Just $ H.status t)
-  <> Text.unpack (H.description t)
-  <> statusColor Nothing
-
-
-statusColor :: Maybe H.TaskStatus -> String
-statusColor Nothing             = "\x1b[0m"  -- Clear
-statusColor (Just H.Pending)    = "\x1b[34m" -- Blue
-statusColor (Just H.InProgress) = "\x1b[33m" -- Yellow
-statusColor (Just H.Complete)   = "\x1b[32m" -- Green
-statusColor (Just H.Abandoned)  = "\x1b[31m" -- Red
-
+  where
+    printDetail ShowDetail = UUID.toText (untag (H.taskRef t)) <> " "
+    printDetail HideDetail = ""

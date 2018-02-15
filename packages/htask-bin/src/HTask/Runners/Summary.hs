@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module HTask.Runners.Summary
   ( runSummary
   ) where
@@ -7,8 +9,9 @@ import Data.Function
 import Control.Monad.Reader
 import Data.Semigroup ((<>))
 import Data.Tagged
-import Data.UUID
+import qualified Data.UUID as UUID
 import HTask.TaskApplication
+import HTask.Formatters
 import qualified Data.Text              as Text
 import qualified HTask as H
 
@@ -37,23 +40,7 @@ displayCurrent ts = do
      then putStrLn "No current task"
      else do
        putStrLn "Current task:"
-       mapM_ showCurrentTask ps
-
-  where
-    showCurrentTask t = do
-      putStrLn ("  > " <> showDescription t)
-      putStrLn ("    " <> showRef t)
-
-
-showDescription :: H.Task -> String
-showDescription t
-  =  statusColor (Just $ H.status t)
-  <> Text.unpack (H.description t)
-  <> statusColor Nothing
-
-
-showRef :: H.Task -> String
-showRef = toString . untag . H.taskRef
+       mapM_ printTaskForSummary ps
 
 
 displayTopPending :: [H.Task] -> IO ()
@@ -61,7 +48,7 @@ displayTopPending ts = do
   let ps = sortBy taskPriority (filter (hasStatus H.Pending) ts)
   let xs = take 5 ps
   putStrLn (pendingMessage (length xs) (length ps))
-  mapM_ showPendingTask xs
+  mapM_ printTaskForSummary xs
 
   where
     pendingMessage x p
@@ -70,14 +57,17 @@ displayTopPending ts = do
         , " (" , show (p - x) , " hidden):"
         ]
 
-    showPendingTask t = do
-      putStrLn ("  . " <> showDescription t)
-      putStrLn ("    " <> showRef t)
 
 
-statusColor :: Maybe H.TaskStatus -> String
-statusColor Nothing             = "\x1b[0m"  -- Clear
-statusColor (Just H.Pending)    = "\x1b[34m" -- Blue
-statusColor (Just H.InProgress) = "\x1b[33m" -- Yellow
-statusColor (Just H.Complete)   = "\x1b[32m" -- Green
-statusColor (Just H.Abandoned)  = "\x1b[31m" -- Red
+printTaskForSummary :: H.Task -> IO ()
+printTaskForSummary t = do
+  putStrLn (Text.unpack $ indent $ printDescription t)
+  putStrLn (Text.unpack $ indent $ indent $ printRef t)
+
+  where
+    printDescription t
+      =  statusSymbol (H.status t)
+      <> " "
+      <> withStatusColor (H.status t) (H.description t)
+
+    printRef = UUID.toText . untag . H.taskRef
