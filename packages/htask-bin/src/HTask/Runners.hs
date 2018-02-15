@@ -10,6 +10,8 @@ import HTask.Actions
 import HTask.CLI
 import HTask.Runners.Summary
 import HTask.Runners.List
+import HTask.Runners.Pick
+import HTask.Runners.Done
 import HTask.TaskApplication
 import qualified Control.Monad.Reader as R
 import qualified Data.Text              as Text
@@ -28,6 +30,8 @@ runAction (Add tex)      = runAdd tex
 runAction (Start ref)    = runStart ref
 runAction (Complete ref) = runComplete ref
 runAction (Remove ref)   = runRemove ref
+runAction Pick           = runPick
+runAction Done           = runDone
 
 
 justOne :: [a] -> Maybe a
@@ -54,7 +58,7 @@ runWithMatch f ref
       (pure $ "did not find unique match for: " <> ref)
       (\v -> (Text.pack . show) <$> runTask (f $ Tagged v))
       (justOne (findMatchingUUIDs ref ts) >>= UUID.fromText)
-    R.lift $ putStrLn (show output)
+    R.lift $ putStrLn (Text.unpack output)
 
 
 runStart :: Text.Text -> TaskConfig ()

@@ -2,6 +2,8 @@ module HTask.Runners.Summary
   ( runSummary
   ) where
 
+import Data.List
+import Data.Function
 import Control.Monad.Reader
 import Data.Semigroup ((<>))
 import Data.Tagged
@@ -11,24 +13,36 @@ import qualified Data.Text              as Text
 import qualified HTask as H
 
 
+taskPriority :: H.Task -> H.Task -> Ordering
+taskPriority = compare `on` H.createdAt
+
+
+hasStatus :: H.TaskStatus -> H.Task -> Bool
+hasStatus s t = s == H.status t
+
+
 runSummary :: TaskConfig ()
 runSummary
-  = do
-    ts <- runTask H.listTasks
-    lift $ displayCurrent ts
-    -- lift $ displayTopPending ts
-    -- lift $ displayCompletedCount ts
+  = runTask H.listTasks
+  >>= \ts -> lift $ do
+      displayCurrent ts
+      putStrLn ""
+      displayTopPending ts
 
 
 displayCurrent :: [H.Task] -> IO ()
 displayCurrent ts = do
-  let ps = filter (isInProgress) ts
-  putStrLn "Current task:"
-  mapM_ (\t -> putStrLn ("  > " <> showDescription t)) ps
-  mapM_ (\t -> putStrLn ("    " <> toString (untag (H.taskRef t)))) ps
+  let ps = filter (hasStatus H.InProgress) ts
+  if Data.List.null ps
+     then putStrLn "No current task"
+     else do
+       putStrLn "Current task:"
+       mapM_ showCurrentTask ps
 
-    where
-      isInProgress = (==) H.InProgress . H.status
+  where
+    showCurrentTask t = do
+      putStrLn ("  > " <> showDescription t)
+      putStrLn ("    " <> showRef t)
 
 
 showDescription :: H.Task -> String
@@ -36,6 +50,29 @@ showDescription t
   =  statusColor (Just $ H.status t)
   <> Text.unpack (H.description t)
   <> statusColor Nothing
+
+
+showRef :: H.Task -> String
+showRef = toString . untag . H.taskRef
+
+
+displayTopPending :: [H.Task] -> IO ()
+displayTopPending ts = do
+  let ps = sortBy taskPriority (filter (hasStatus H.Pending) ts)
+  let xs = take 5 ps
+  putStrLn (pendingMessage (length xs) (length ps))
+  mapM_ showPendingTask xs
+
+  where
+    pendingMessage x p
+      = mconcat
+        [ "Top " , show x , " pending"
+        , " (" , show (p - x) , " hidden):"
+        ]
+
+    showPendingTask t = do
+      putStrLn ("  . " <> showDescription t)
+      putStrLn ("    " <> showRef t)
 
 
 statusColor :: Maybe H.TaskStatus -> String
