@@ -113,3 +113,4 @@
 {"eventUuid":"806300de-d7f7-4c76-8e2f-8d6f42842efe","eventType":{"intent":{"tag":"AddTask","contents":"create summary command as default"},"detailRef":"e2cd389c-f1fa-4f5e-9531-44d4660c05bd"},"timestamp":"2018-02-14T12:41:05.775817Z"}
 {"eventUuid":"b326e3f2-50fa-42e4-9b2a-d0872edcf35a","eventType":{"intent":{"tag":"CompleteTask","contents":"1b422da4-6fd1-4d14-a559-a616b4c3db73"},"detailRef":"1b422da4-6fd1-4d14-a559-a616b4c3db73"},"timestamp":"2018-02-14T14:12:22.213832Z"}
 {"eventUuid":"a6e64cff-31e6-4fdb-bb07-4ae8f7afc9c7","eventType":{"intent":{"tag":"StartTask","contents":"e2cd389c-f1fa-4f5e-9531-44d4660c05bd"},"detailRef":"e2cd389c-f1fa-4f5e-9531-44d4660c05bd"},"timestamp":"2018-02-14T14:12:54.079928Z"}
+{"eventUuid":"85e09f6f-058f-4f7a-8430-ad569465ed25","eventType":{"intent":{"tag":"AddTask","contents":"apply current user as author? configure in global taskrc?"},"detailRef":"f7a894bc-d724-418d-a319-d755fffcc778"},"timestamp":"2018-02-14T14:35:40.577997Z"}
