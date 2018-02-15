@@ -49,7 +49,7 @@ fileParser = option str
   <> short 'f'
   <> showDefault
   <> help "path to tasks file"
-  <> value "tasks.txt"
+  <> value ".tasks"
   )
 
 
