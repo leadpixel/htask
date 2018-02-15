@@ -3,3 +3,4 @@ resolver: lts-10.4
 packages:
 - ./packages/htask-lib
 - ./packages/htask-bin
+- ./packages/htask-clean

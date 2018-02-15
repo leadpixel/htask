@@ -2,6 +2,7 @@
 
 module HTask
   ( module API
+  , module Event
   , module Lib
   , module Capabilities
   , module TaskContainer
@@ -11,6 +12,7 @@ module HTask
 
 import Lib
 import HTask.API as API
+import HTask.Event as Event
 import HTask.Capabilities as Capabilities
 import HTask.TaskContainer as TaskContainer
 import HTask.Task as Task
