@@ -11,9 +11,12 @@ import qualified Data.ByteString.Lazy as LBS
 import Data.Aeson as A
 import Data.Maybe
 import Data.List
+import Data.Semigroup
 
 
-type SomeEvent = H.Event Int
+-- TODO: remove TaskEventDetail
+-- TODO: read THEN write
+type SomeEvent = H.Event H.TaskEventDetail
 
 
 main :: IO ()
@@ -47,4 +50,7 @@ convertToJSON = fmap A.encode
 
 
 overwriteFile :: FilePath -> [LBS.ByteString] -> IO ()
-overwriteFile p ts = mapM_ (LBS.appendFile p) ts
+overwriteFile p ts = do
+  writeFile p ""
+  mapM_ (\x -> LBS.appendFile p $ x <> "\n") ts
+  appendFile p ""
