@@ -134,3 +134,4 @@
 {"eventUuid":"a7ecdea1-9217-4fe4-8d5b-ca572b5d4d97","eventType":{"intent":{"tag":"AddTask","contents":"option to add auto task deletion event in N days from creation"},"detailRef":"c645fda6-13f8-4ed6-a2df-045c811d6e5d"},"timestamp":"2018-02-19T11:58:49.009001Z"}
 {"eventUuid":"d1c48636-f482-4ab1-b9ef-f4bd12520696","eventType":{"intent":{"tag":"StartTask","contents":"f9bc06ae-adba-4521-bdd1-eac416f84e00"},"detailRef":"f9bc06ae-adba-4521-bdd1-eac416f84e00"},"timestamp":"2018-02-19T12:20:14.249505Z"}
 {"eventUuid":"7aba5401-ff92-4967-a5c4-3655a5b181d5","eventType":{"intent":{"tag":"AddTask","contents":"create hdesign to record design decisions"},"detailRef":"92c3381c-e9a2-43f5-9a63-8e178aab636b"},"timestamp":"2018-02-19T12:45:20.302725Z"}
+{"eventUuid":"4caf14b3-955b-4c7f-bb74-42edd6b3b59d","eventType":{"intent":{"tag":"AddTask","contents":"one"},"detailRef":"5893d923-4909-4bb2-9ca3-67069885c2c1"},"timestamp":"2018-02-19T12:45:39.974776Z"}
