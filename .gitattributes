@@ -1,1 +1,1 @@
-.tasks merge=append
+.tasks merge=union
