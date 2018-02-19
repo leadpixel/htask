@@ -61,13 +61,13 @@ displayTopPending ts = do
 
 printTaskForSummary :: H.Task -> IO ()
 printTaskForSummary t = do
-  putStrLn (Text.unpack $ indent $ printDescription t)
-  putStrLn (Text.unpack $ indent $ indent $ printRef t)
+  putStrLn (Text.unpack $ indent $ printDescription)
+  putStrLn (Text.unpack $ indent $ indent $ printRef)
 
   where
-    printDescription t
+    printDescription
       =  statusSymbol (H.status t)
       <> " "
       <> withStatusColor (H.status t) (H.description t)
 
-    printRef = UUID.toText . untag . H.taskRef
+    printRef = (UUID.toText . untag . H.taskRef) t

@@ -6,7 +6,6 @@ module Main
 
 import qualified HTask as H
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
-import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as LBS
 import Data.Aeson as A
 import Data.Maybe

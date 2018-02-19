@@ -1,6 +1,7 @@
 module HTask.API
   ( addTask
   , startTask
+  , stopTask
   , completeTask
   , deleteTask
   , listTasks
@@ -38,6 +39,14 @@ startTask
   => TaskRef -> m (Either TaskError TaskRef)
 startTask ref = do
   r <- applyIntentToTasks (StartTask ref)
+  maybeStore r
+
+
+stopTask
+  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
+  => TaskRef -> m (Either TaskError TaskRef)
+stopTask ref = do
+  r <- applyIntentToTasks (StopTask ref)
   maybeStore r
 
 

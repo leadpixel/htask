@@ -1,7 +1,7 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Lib
   ( TaskEvent
@@ -37,6 +37,7 @@ type TaskError = String
 data TaskIntent
   = AddTask Text.Text
   | StartTask TaskRef
+  | StopTask TaskRef
   | CompleteTask TaskRef
   | DeleteTask TaskRef
   deriving (Show, Generic)
@@ -78,6 +79,10 @@ applyRawEvent ev _ = do
       _p <- updateExistingTask ref $ setTaskStatus InProgress
       getTasks
 
+    (StopTask ref) -> do
+      _p <- updateExistingTask ref $ setTaskStatus Pending
+      getTasks
+
     (CompleteTask ref) -> do
       _p <- updateExistingTask ref $ setTaskStatus Complete
       getTasks
@@ -102,6 +107,12 @@ applyIntentToTasks itx =
 
     (StartTask ref) -> do
       p <- updateExistingTask ref $ setTaskStatus InProgress
+      pure $ if p
+        then Right (TaskEventDetail ref itx)
+        else Left "could not find matching id"
+
+    (StopTask ref) -> do
+      p <- updateExistingTask ref $ setTaskStatus Pending
       pure $ if p
         then Right (TaskEventDetail ref itx)
         else Left "could not find matching id"

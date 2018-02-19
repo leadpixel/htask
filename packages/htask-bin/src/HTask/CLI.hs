@@ -10,10 +10,12 @@ import HTask.Actions
 import HTask.CLI.Add
 import HTask.CLI.Complete
 import HTask.CLI.Done
+import HTask.CLI.Drop
 import HTask.CLI.List
 import HTask.CLI.Pick
 import HTask.CLI.Remove
 import HTask.CLI.Start
+import HTask.CLI.Stop
 import HTask.CLI.Summary
 
 
@@ -33,10 +35,12 @@ actionParser = hsubparser
   <> command "list"     listInfo
   <> command "add"      addInfo
   <> command "start"    startInfo
+  <> command "stop"     stopInfo
   <> command "complete" completeInfo
   <> command "remove"   removeInfo
 
   <> command "pick"     pickInfo
+  <> command "drop"     dropInfo
   <> command "done"     doneInfo
 
   <> command "ls"       listInfo

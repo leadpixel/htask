@@ -4,6 +4,8 @@ module HTask.Actions
 import qualified Data.Text as Text
 
 
+type TaskReference = Text.Text
+
 data DetailFlag = ShowDetail | HideDetail
   deriving (Show, Read)
 
@@ -11,11 +13,16 @@ data DetailFlag = ShowDetail | HideDetail
 data Action
   = Summary
   | List DetailFlag
+
   | Add Text.Text
-  | Start Text.Text
-  | Complete Text.Text
-  | Remove Text.Text
+  | Start TaskReference
+  | Stop TaskReference
+  | Complete TaskReference
+  | Remove TaskReference
+
   | Pick
+  | Drop
   | Done
+
   deriving (Show, Read)
 

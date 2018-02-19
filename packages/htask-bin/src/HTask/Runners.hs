@@ -12,6 +12,7 @@ import HTask.Runners.Summary
 import HTask.Runners.List
 import HTask.Runners.Pick
 import HTask.Runners.Done
+import HTask.Runners.Drop
 import HTask.TaskApplication
 import qualified Control.Monad.Reader as R
 import qualified Data.Text              as Text
@@ -28,9 +29,11 @@ runAction Summary        = runSummary
 runAction (List d)       = runList d
 runAction (Add tex)      = runAdd tex
 runAction (Start ref)    = runStart ref
+runAction (Stop ref)     = runStop ref
 runAction (Complete ref) = runComplete ref
 runAction (Remove ref)   = runRemove ref
 runAction Pick           = runPick
+runAction Drop           = runDrop
 runAction Done           = runDone
 
 
@@ -63,6 +66,10 @@ runWithMatch f ref
 
 runStart :: Text.Text -> TaskConfig ()
 runStart = runWithMatch H.startTask
+
+
+runStop :: Text.Text -> TaskConfig ()
+runStop = runWithMatch H.stopTask
 
 
 runComplete :: Text.Text -> TaskConfig ()

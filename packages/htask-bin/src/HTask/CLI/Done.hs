@@ -6,7 +6,7 @@ import Options.Applicative
 
 
 doneInfo :: ParserInfo Action
-doneInfo = info doneParser (progDesc "done things")
+doneInfo = info doneParser (progDesc "Marks the current task as completed")
 
 
 doneParser :: Parser Action
