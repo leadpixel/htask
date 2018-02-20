@@ -6,13 +6,13 @@ import qualified Data.Text as Text
 
 type TaskReference = Text.Text
 
-data DetailFlag = ShowDetail | HideDetail
-  deriving (Show, Read)
+type ShowUUID = Bool
+type IncludeDeleted = Bool
 
 
 data Action
   = Summary
-  | List DetailFlag
+  | List ShowUUID IncludeDeleted
 
   | Add Text.Text
   | Start TaskReference

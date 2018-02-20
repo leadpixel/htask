@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module HTask.Runners.List
   ( runList
@@ -43,27 +45,50 @@ statusDisplayOrder  H.Complete    H.Abandoned   =  LT
 statusDisplayOrder  H.Abandoned   H.Abandoned   =  EQ
 
 
-runList :: DetailFlag -> TaskConfig ()
-runList d
+class CanPrint m where
+  runPrint :: (Traversable t) => t DocumentBlock -> m ()
+
+
+instance CanPrint IO where
+  runPrint = mapM_ (putStrLn . Text.unpack)
+
+
+instance CanPrint (ReaderT FilePath IO) where
+  runPrint = lift . runPrint
+
+
+type DocumentBlock = Text.Text
+
+
+runList :: ShowUUID -> IncludeDeleted -> TaskConfig ()
+runList showUUID showDeleted
   = do
     ts <- runTask H.listTasks
-    lift $ mapM_
-      (mapM_ (nicePrint d))
-      (groupBy sameStatus $ sortBy taskDisplayOrder ts)
+    let ks = fmap printTask (selectTasks ts)
+    runPrint ks
 
   where
-    sameStatus :: H.Task -> H.Task -> Bool
-    sameStatus = (==) `on` H.status
+    printTask :: H.Task -> DocumentBlock
+    printTask = nicePrint showUUID
+
+    selectTasks :: [H.Task] -> [H.Task]
+    selectTasks
+      = sortBy taskDisplayOrder
+      . (if showDeleted
+            then id
+            else filter notAbandoned
+        )
+
+    notAbandoned :: H.Task -> Bool
+    notAbandoned t = H.status t /= H.Abandoned
 
 
-nicePrint :: DetailFlag -> H.Task -> IO ()
-nicePrint d t = putStrLn $ Text.unpack
-  (  printDetail d
+nicePrint :: ShowUUID -> H.Task -> DocumentBlock
+nicePrint d t
+  =  ( if d then printUUID else "" )
   <> statusSymbol (H.status t)
   <> " "
   <> withStatusColor (H.status t) (H.description t)
-  )
 
   where
-    printDetail ShowDetail = UUID.toText (untag (H.taskRef t)) <> " "
-    printDetail HideDetail = ""
+    printUUID = UUID.toText (untag (H.taskRef t)) <> " "

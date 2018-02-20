@@ -88,7 +88,7 @@ applyRawEvent ev _ = do
       getTasks
 
     (DeleteTask ref) -> do
-      _p <- removeTask ref
+      _p <- updateExistingTask ref $ setTaskStatus Abandoned
       getTasks
 
 

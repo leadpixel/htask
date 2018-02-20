@@ -26,7 +26,7 @@ runCommand opts = R.runReaderT (runAction $ action opts) (taskfile opts)
 
 runAction :: Action -> TaskConfig ()
 runAction Summary        = runSummary
-runAction (List d)       = runList d
+runAction (List d k)     = runList d k
 runAction (Add tex)      = runAdd tex
 runAction (Start ref)    = runStart ref
 runAction (Stop ref)     = runStop ref
