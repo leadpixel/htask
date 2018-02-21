@@ -61,8 +61,8 @@ displayTopPending ts = do
 
 printTaskForSummary :: H.Task -> IO ()
 printTaskForSummary t = do
-  putStrLn (Text.unpack $ indent $ printDescription)
-  putStrLn (Text.unpack $ indent $ indent $ printRef)
+  putStrLn (Text.unpack $ indent printDescription)
+  putStrLn (Text.unpack $ indent $ indent printRef)
 
   where
     printDescription

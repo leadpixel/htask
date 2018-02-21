@@ -1,12 +1,12 @@
 module HTask.CLI
-  ( Options (..)
-  , getOptions
+  ( getOptions
   ) where
 
 import Options.Applicative as Opts
 import Data.Semigroup ((<>))
 
 import HTask.Actions
+import HTask.Config
 import HTask.CLI.Add
 import HTask.CLI.Complete
 import HTask.CLI.Done
@@ -17,12 +17,6 @@ import HTask.CLI.Remove
 import HTask.CLI.Start
 import HTask.CLI.Stop
 import HTask.CLI.Summary
-
-
-data Options = Options
-  { taskfile :: FilePath
-  , action :: Action
-  }
 
 
 defaultAction :: Parser Action
@@ -57,8 +51,22 @@ fileParser = option str
   )
 
 
+formatterParser :: Parser Formatter
+formatterParser = option auto
+  (  long "format"
+  <> short 'o'
+  <> showDefault
+  <> help "Select an output format"
+  <> value Default
+  )
+
+
+globalsParser :: Parser GlobalOptions
+globalsParser = GlobalOptions <$> fileParser <*> formatterParser
+
+
 optionsParser :: Parser Options
-optionsParser = Options <$> fileParser <*> (actionParser <|> defaultAction)
+optionsParser = Options <$> globalsParser <*> (actionParser <|> defaultAction)
 
 
 optionsInfo :: ParserInfo Options

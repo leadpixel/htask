@@ -11,6 +11,7 @@ module HTask.TaskApplication
   ) where
 
 import qualified HTask as H
+import HTask.Config
 import Conduit
 import Data.Aeson
 import qualified Control.Monad.Reader   as R
@@ -21,7 +22,7 @@ import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import Data.Maybe
 
 
-type TaskConfig = R.ReaderT FilePath IO
+type TaskConfig = R.ReaderT GlobalOptions IO
 
 newtype TaskApplication a = TaskApp
   { unwrapTaskApp :: S.StateT H.Tasks TaskConfig a
@@ -46,19 +47,22 @@ instance H.CanUuid TaskApplication where
 
 instance H.CanStoreEvent TaskApplication where
   appendEvent ev
-    = TaskApp $ lift (R.ask >>= \p -> lift $ k p ev)
+    = TaskApp $ lift (R.ask >>= lift . flip k ev)
 
     where
-      k :: FilePath -> H.TaskEvent -> IO ()
-      k file
-        = BS.appendFile file
+      k :: GlobalOptions -> H.TaskEvent -> IO ()
+      k opts
+        = BS.appendFile (taskfile opts)
         . Lazy.toStrict
         . flip mappend "\n"
         . encode
 
 
 readTaskEvents :: TaskConfig [H.TaskEvent]
-readTaskEvents = R.ask >>= \p -> (parseLines . lines) <$> lift (readFile p)
+readTaskEvents = R.ask >>= liftIO . k
+  where
+    k :: GlobalOptions -> IO [H.TaskEvent]
+    k opts = (parseLines . lines) <$> readFile (taskfile opts)
 
 
 parseLines :: [String] -> [H.TaskEvent]

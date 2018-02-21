@@ -7,7 +7,7 @@ module HTask.Runners
 import Data.Semigroup ((<>))
 import Data.Tagged
 import HTask.Actions
-import HTask.CLI
+import HTask.Config
 import HTask.Runners.Summary
 import HTask.Runners.List
 import HTask.Runners.Pick
@@ -21,7 +21,7 @@ import qualified HTask as H
 
 
 runCommand :: Options -> IO ()
-runCommand opts = R.runReaderT (runAction $ action opts) (taskfile opts)
+runCommand opts = R.runReaderT (runAction $ action opts) (globals opts)
 
 
 runAction :: Action -> TaskConfig ()
@@ -50,7 +50,7 @@ findMatchingUUIDs ref ts = filter (ref `Text.isPrefixOf`) (fmap taskRefToText ts
 
 
 runAdd :: Text.Text -> TaskConfig ()
-runAdd tex = runTask (H.addTask tex) >>= R.lift . putStrLn . show
+runAdd tex = runTask (H.addTask tex) >>= R.lift . print
 
 
 runWithMatch :: (Show a) => (H.TaskRef -> TaskApplication a) -> Text.Text -> TaskConfig ()

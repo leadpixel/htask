@@ -53,7 +53,7 @@ instance CanPrint IO where
   runPrint = mapM_ (putStrLn . Text.unpack)
 
 
-instance CanPrint (ReaderT FilePath IO) where
+instance CanPrint (ReaderT a IO) where
   runPrint = lift . runPrint
 
 

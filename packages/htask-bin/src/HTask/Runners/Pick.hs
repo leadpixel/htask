@@ -31,8 +31,8 @@ runPick = do
   k <- lift $ randomSelectOne ps
   maybe
     (lift $ putStrLn "no task to pick")
-    (startTask)
-    (k)
+    startTask
+    k
   pure ()
 
   where
