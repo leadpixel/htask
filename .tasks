@@ -164,3 +164,5 @@
 {"eventUuid":"35e2c512-f7ea-4453-a78a-cc0958a8baf4","eventType":{"intent":{"tag":"StopTask","contents":"082feeed-1752-440d-b621-9b3490224444"},"detailRef":"082feeed-1752-440d-b621-9b3490224444"},"timestamp":"2018-02-23T07:39:41.466051306Z"}
 {"eventUuid":"4635e507-4ad2-4c1c-b602-a0bfe2a8d8ec","eventType":{"intent":{"tag":"AddTask","contents":"s3 backend for task file"},"detailRef":"d5d56ec7-353c-427d-bbba-9aeb80288cf6"},"timestamp":"2018-02-23T07:39:55.784334758Z"}
 {"eventUuid":"19b907ec-60e8-4182-a8bc-2ce083645c4e","eventType":{"intent":{"tag":"AddTask","contents":"recurse up for task file"},"detailRef":"8c98eb25-419c-4977-b909-0b04265dad69"},"timestamp":"2018-02-23T07:45:35.314049364Z"}
+{"eventUuid":"137e1615-2078-4b0c-a852-af87901572a6","eventType":{"intent":{"tag":"AddTask","contents":"task file over ssh"},"detailRef":"081b3f28-740b-4b8d-88eb-5d94a2e85949"},"timestamp":"2018-02-23T08:20:21.59473821Z"}
+{"eventUuid":"e3cf694f-b5d1-419c-bc2e-f05effa057f5","eventType":{"intent":{"tag":"AddTask","contents":"custom colors"},"detailRef":"f1a7a9ca-4078-4b22-84f4-f8c214a1190b"},"timestamp":"2018-02-23T08:22:05.258688946Z"}
