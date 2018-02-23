@@ -13,12 +13,12 @@ listInfo = info listParser (progDesc "list tasks")
 listParser :: Parser Action
 listParser
   = List
-  <$> flag False True
+  <$> switch
       (  long "show-uuid"
       <> short 'u'
       <> help "Show UUID for tasks"
       )
-  <*> flag False True
+  <*> switch
       (  long "include-deleted"
       <> short 'a'
       <> help "Include deleted tasks"

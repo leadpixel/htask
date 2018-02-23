@@ -22,6 +22,8 @@ dependencies:
 - operational
 - optparse-applicative
 - pretty
+- pandoc
+- pandoc-types
 - pretty-show
 - random
 - tagged

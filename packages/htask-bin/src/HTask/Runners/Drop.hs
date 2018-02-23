@@ -5,9 +5,9 @@ module HTask.Runners.Drop
   ) where
 
 import HTask.TaskApplication
+import HTask.Output
 import qualified HTask as H
-import qualified Data.Text as Text
-import Control.Monad.Trans
+import Control.Monad
 import Data.Semigroup ((<>))
 
 
@@ -15,12 +15,12 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runDrop :: TaskConfig ()
+runDrop :: TaskConfig Output
 runDrop
   = runTask H.listTasks
-  >>= mapM_ stopTask . filter (hasStatus H.InProgress)
+  >>= fmap join . mapM stopTask . filter (hasStatus H.InProgress)
 
   where
     stopTask t = do
       _ <- runTask $ H.stopTask $ H.taskRef t
-      lift $ putStrLn (Text.unpack $ "stopping task: " <> H.description t)
+      pure ([ line $ "stopping task: " <> H.description t ])

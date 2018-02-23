@@ -6,12 +6,12 @@ module HTask.Runners.List
   ( runList
   ) where
 
-import Control.Monad.Reader
 import Data.List
 import Data.Function
 import Data.Semigroup ((<>))
 import Data.Tagged
 import HTask.Actions
+import HTask.Output
 import HTask.TaskApplication
 import HTask.Formatters
 import qualified Data.Text              as Text
@@ -45,31 +45,14 @@ statusDisplayOrder  H.Complete    H.Abandoned   =  LT
 statusDisplayOrder  H.Abandoned   H.Abandoned   =  EQ
 
 
-class CanPrint m where
-  runPrint :: (Traversable t) => t DocumentBlock -> m ()
-
-
-instance CanPrint IO where
-  runPrint = mapM_ (putStrLn . Text.unpack)
-
-
-instance CanPrint (ReaderT a IO) where
-  runPrint = lift . runPrint
-
-
-type DocumentBlock = Text.Text
-
-
-runList :: ShowUUID -> IncludeDeleted -> TaskConfig ()
-runList showUUID showDeleted
-  = do
-    ts <- runTask H.listTasks
-    let ks = fmap printTask (selectTasks ts)
-    runPrint ks
+runList :: ShowUUID -> IncludeDeleted -> TaskConfig Output
+runList showUUID showDeleted = do
+  ts <- runTask H.listTasks
+  pure $ fmap formatOutput (selectTasks ts)
 
   where
-    printTask :: H.Task -> DocumentBlock
-    printTask = nicePrint showUUID
+    -- formatOutput :: H.Task -> Block
+    formatOutput = line . nicePrint showUUID
 
     selectTasks :: [H.Task] -> [H.Task]
     selectTasks
@@ -83,7 +66,7 @@ runList showUUID showDeleted
     notAbandoned t = H.status t /= H.Abandoned
 
 
-nicePrint :: ShowUUID -> H.Task -> DocumentBlock
+nicePrint :: ShowUUID -> H.Task -> Text.Text
 nicePrint d t
   =  ( if d then printUUID else "" )
   <> statusSymbol (H.status t)

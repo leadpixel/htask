@@ -7,9 +7,9 @@ module HTask.Runners.Pick
 import System.Random
 import Control.Monad.Reader
 import HTask.TaskApplication
+import HTask.Output
 import Data.Semigroup ((<>))
 import qualified HTask as H
-import qualified Data.Text as Text
 
 
 class (Monad m) => CanRandom m where
@@ -24,21 +24,20 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runPick :: TaskConfig ()
+runPick :: TaskConfig Output
 runPick = do
   ts <- runTask H.listTasks
   let ps = filter (hasStatus H.Pending) ts
   k <- lift $ randomSelectOne ps
-  maybe
-    (lift $ putStrLn "no task to pick")
+  pure <$> maybe
+    (pure $ line "no task to pick")
     startTask
     k
-  pure ()
 
   where
     startTask t = do
       _ <- runTask $ H.startTask $ H.taskRef t
-      lift $ putStrLn (Text.unpack $ "picking task: " <> H.description t)
+      pure $ line ("picking task: " <> H.description t)
 
 
 randomSelectOne :: (CanRandom m) => [a] -> m (Maybe a)

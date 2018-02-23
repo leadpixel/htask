@@ -62,11 +62,11 @@ readTaskEvents :: TaskConfig [H.TaskEvent]
 readTaskEvents = R.ask >>= liftIO . k
   where
     k :: GlobalOptions -> IO [H.TaskEvent]
-    k opts = (parseLines . lines) <$> readFile (taskfile opts)
+    k opts = (parselines . lines) <$> readFile (taskfile opts)
 
 
-parseLines :: [String] -> [H.TaskEvent]
-parseLines = catMaybes . fmap (decode . UTF8.fromString)
+parselines :: [String] -> [H.TaskEvent]
+parselines = catMaybes . fmap (decode . UTF8.fromString)
 
 
 prepTasks :: [H.TaskEvent] -> TaskConfig [H.Task]

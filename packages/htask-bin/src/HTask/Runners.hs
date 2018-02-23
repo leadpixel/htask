@@ -8,6 +8,7 @@ import Data.Semigroup ((<>))
 import Data.Tagged
 import HTask.Actions
 import HTask.Config
+import HTask.Output
 import HTask.Runners.Summary
 import HTask.Runners.List
 import HTask.Runners.Pick
@@ -21,10 +22,12 @@ import qualified HTask as H
 
 
 runCommand :: Options -> IO ()
-runCommand opts = R.runReaderT (runAction $ action opts) (globals opts)
+runCommand opts
+  = R.runReaderT (runAction $ action opts) (globals opts)
+  >>= renderOutput (formatter $ globals opts)
 
 
-runAction :: Action -> TaskConfig ()
+runAction :: Action -> TaskConfig Output
 runAction Summary        = runSummary
 runAction (List d k)     = runList d k
 runAction (Add tex)      = runAdd tex
@@ -49,11 +52,13 @@ findMatchingUUIDs ref ts = filter (ref `Text.isPrefixOf`) (fmap taskRefToText ts
     taskRefToText = UUID.toText . untag . H.taskRef
 
 
-runAdd :: Text.Text -> TaskConfig ()
-runAdd tex = runTask (H.addTask tex) >>= R.lift . print
+runAdd :: Text.Text -> TaskConfig Output
+runAdd tex
+  = runTask (H.addTask tex)
+  >>= \x -> pure [ line $ Text.pack (show x) ]
 
 
-runWithMatch :: (Show a) => (H.TaskRef -> TaskApplication a) -> Text.Text -> TaskConfig ()
+runWithMatch :: (Show a) => (H.TaskRef -> TaskApplication a) -> Text.Text -> TaskConfig Output
 runWithMatch f ref
   = do
     ts <- runTask H.listTasks
@@ -61,20 +66,20 @@ runWithMatch f ref
       (pure $ "did not find unique match for: " <> ref)
       (\v -> (Text.pack . show) <$> runTask (f $ Tagged v))
       (justOne (findMatchingUUIDs ref ts) >>= UUID.fromText)
-    R.lift $ putStrLn (Text.unpack output)
+    pure [ line output ]
 
 
-runStart :: Text.Text -> TaskConfig ()
+runStart :: Text.Text -> TaskConfig Output
 runStart = runWithMatch H.startTask
 
 
-runStop :: Text.Text -> TaskConfig ()
+runStop :: Text.Text -> TaskConfig Output
 runStop = runWithMatch H.stopTask
 
 
-runComplete :: Text.Text -> TaskConfig ()
+runComplete :: Text.Text -> TaskConfig Output
 runComplete = runWithMatch H.completeTask
 
 
-runRemove :: Text.Text -> TaskConfig ()
+runRemove :: Text.Text -> TaskConfig Output
 runRemove = runWithMatch H.deleteTask

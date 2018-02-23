@@ -1,4 +1,4 @@
-  module HTask.Config
+module HTask.Config
   ( Options (..)
   , GlobalOptions (..)
   , Formatter (..)
@@ -12,6 +12,16 @@ data Formatter
   | JSON
   | Porcelain
   deriving (Show, Read)
+
+
+-- instance Show Formatter where
+--   show Default = "default"
+--   show JSON = "json"
+--   show Porcelain = "porcelain"
+
+
+-- instance Read Formatter where
+--   readsPrec = undefined
 
 
 data GlobalOptions = GlobalOptions
