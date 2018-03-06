@@ -11,7 +11,6 @@ import Data.Tagged
 import qualified Data.UUID as UUID
 import HTask.TaskApplication
 import HTask.Output
-import HTask.Formatters
 import qualified Data.Text              as Text
 import qualified HTask as H
 
@@ -24,27 +23,29 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runSummary :: TaskConfig Output
+runSummary :: TaskConfig Document
 runSummary
-  = runTask H.listTasks
-  >>= \ts -> pure $ do
-      displayCurrent ts
-      <> [ line "" ]
-      <> displayTopPending ts
+  = renderSummary <$> runTask H.listTasks
 
 
-displayCurrent :: [H.Task] -> Output
+renderSummary :: [H.Task] -> Document
+renderSummary ts = Document
+  $ displayCurrent ts
+  <> (line "" : displayTopPending ts)
+
+
+displayCurrent :: [H.Task] -> [Block]
 displayCurrent ts = do
   let ps = filter (hasStatus H.InProgress) ts
   if Data.List.null ps
      then
-      [ line "No current task" ]
+       [ line "No current task" ]
      else
        line "Current task:"
        : concatMap printTaskForSummary ps
 
 
-displayTopPending :: [H.Task] -> Output
+displayTopPending :: [H.Task] -> [Block]
 displayTopPending ts
   = pendingMessage (length xs) (length ps)
   : concatMap printTaskForSummary xs
@@ -60,8 +61,7 @@ displayTopPending ts
     tInt = Text.pack . show
 
 
-
-printTaskForSummary :: H.Task -> Output
+printTaskForSummary :: H.Task -> [Block]
 printTaskForSummary t =
   [ line (indent printDescription)
   , line (indent $ indent printRef)

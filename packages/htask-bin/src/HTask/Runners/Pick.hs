@@ -24,20 +24,26 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runPick :: TaskConfig Output
+runPick :: TaskConfig Document
 runPick = do
   ts <- runTask H.listTasks
   let ps = filter (hasStatus H.Pending) ts
   k <- lift $ randomSelectOne ps
-  pure <$> maybe
-    (pure $ line "no task to pick")
+  Document <$> maybe
+    emptyMessage
     startTask
     k
 
   where
+    startTask :: H.Task -> TaskConfig [Block]
     startTask t = do
       _ <- runTask $ H.startTask $ H.taskRef t
-      pure $ line ("picking task: " <> H.description t)
+      pure $ [ line ("picking task: " <> H.description t)]
+
+
+    emptyMessage :: TaskConfig [Block]
+    emptyMessage
+      = pure [ line "no task to pick" ]
 
 
 randomSelectOne :: (CanRandom m) => [a] -> m (Maybe a)

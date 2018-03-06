@@ -15,12 +15,25 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runDone :: TaskConfig Output
+runDone :: TaskConfig Document
 runDone
-  = runTask H.listTasks
-  >>= fmap join . mapM completeTask . filter (hasStatus H.InProgress)
+  = Document
+  <$> ( runTask H.listTasks
+      >>= fmap join . mapM completeTask . filter (hasStatus H.InProgress)
+      )
 
   where
+    completeTask :: H.Task -> TaskConfig [Block]
     completeTask t = do
-      _ <- runTask $ H.completeTask $ H.taskRef t
-      pure ([ line $ "completing task: " <> H.description t ])
+      _ <- execDone t
+      pure $ formatDone t
+
+
+execDone :: H.Task -> TaskConfig (Either String H.TaskRef)
+execDone
+  = runTask . H.completeTask . H.taskRef
+
+
+formatDone :: H.Task -> [Block]
+formatDone t
+  = [ line $ "completing task: " <> H.description t ]

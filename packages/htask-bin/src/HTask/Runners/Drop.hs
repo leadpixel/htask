@@ -15,12 +15,15 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runDrop :: TaskConfig Output
+runDrop :: TaskConfig Document
 runDrop
-  = runTask H.listTasks
-  >>= fmap join . mapM stopTask . filter (hasStatus H.InProgress)
+  = Document <$>
+    ( runTask H.listTasks
+    >>= fmap join . mapM stopTask . filter (hasStatus H.InProgress)
+    )
 
-  where
-    stopTask t = do
-      _ <- runTask $ H.stopTask $ H.taskRef t
-      pure ([ line $ "stopping task: " <> H.description t ])
+
+stopTask :: H.Task -> TaskConfig [Block]
+stopTask t = do
+  _ <- runTask $ H.stopTask $ H.taskRef t
+  pure [ line $ "stopping task: " <> H.description t ]

@@ -22,7 +22,7 @@ class HasTasks m where
 
   addNewTask :: Task -> m Bool
   updateExistingTask :: TaskRef -> (Task -> Task) -> m Bool
-  removeTask :: TaskRef -> m Bool
+  removeTaskRef :: TaskRef -> m Bool
 
 
 instance (Monad m) => HasTasks (State.StateT Tasks m) where
@@ -48,7 +48,7 @@ instance (Monad m) => HasTasks (State.StateT Tasks m) where
         pure True)
       (findTask ts ref)
 
-  removeTask ref = do
+  removeTaskRef ref = do
     ts <- getTasks
     maybe
       (pure False)
@@ -63,7 +63,7 @@ instance (Monad m, MonadTrans t) => HasTasks (t (State.StateT Tasks m)) where
   putTasks = lift . putTasks
   addNewTask = lift . addNewTask
   updateExistingTask ref = lift . updateExistingTask ref
-  removeTask = lift . removeTask
+  removeTaskRef = lift . removeTaskRef
 
 
 removeRef :: Tasks -> TaskRef -> Tasks

@@ -34,7 +34,7 @@ instance H.HasTasks TaskApplication where
   putTasks = TaskApp . H.putTasks
   addNewTask = TaskApp . H.addNewTask
   updateExistingTask ref = TaskApp . H.updateExistingTask ref
-  removeTask = TaskApp . H.removeTask
+  removeTaskRef = TaskApp . H.removeTaskRef
 
 
 instance H.CanTime TaskApplication where
@@ -62,11 +62,11 @@ readTaskEvents :: TaskConfig [H.TaskEvent]
 readTaskEvents = R.ask >>= liftIO . k
   where
     k :: GlobalOptions -> IO [H.TaskEvent]
-    k opts = (parselines . lines) <$> readFile (taskfile opts)
+    k opts = (parseLines . lines) <$> readFile (taskfile opts)
 
 
-parselines :: [String] -> [H.TaskEvent]
-parselines = catMaybes . fmap (decode . UTF8.fromString)
+parseLines :: [String] -> [H.TaskEvent]
+parseLines = catMaybes . fmap (decode . UTF8.fromString)
 
 
 prepTasks :: [H.TaskEvent] -> TaskConfig [H.Task]
@@ -77,6 +77,7 @@ prepTasks vs
 
 
 runTask :: TaskApplication a -> TaskConfig a
-runTask op = do
-  ts <- readTaskEvents >>= prepTasks
-  S.evalStateT (unwrapTaskApp op) ts
+runTask op
+  = readTaskEvents
+  >>= prepTasks
+  >>= S.evalStateT (unwrapTaskApp op)

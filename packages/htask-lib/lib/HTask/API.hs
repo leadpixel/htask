@@ -3,7 +3,7 @@ module HTask.API
   , startTask
   , stopTask
   , completeTask
-  , deleteTask
+  , removeTask
   , listTasks
   ) where
 
@@ -14,24 +14,31 @@ import HTask.TaskContainer
 import HTask.Task
 
 
-addTask
-  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
-  => Text.Text -> m (Either TaskError TaskRef)
-addTask t = do
-  r <- applyIntentToTasks (AddTask t)
-  maybeStore r
-
-
 maybeStore
   :: (CanCreateEvent m, CanStoreEvent m)
   => Either TaskError TaskEventDetail -> m (Either TaskError TaskRef)
 maybeStore r
   = case r of
       Left e -> pure (Left e)
-      Right v -> do
-        k <- createEvent v
-        appendEvent k
-        pure (Right $ detailRef v)
+      Right v -> Right <$> funk v
+
+
+funk
+  :: (CanCreateEvent m, CanStoreEvent m)
+  => TaskEventDetail -> m TaskRef
+funk v = do
+  createEvent v >>= appendEvent
+  pure (detailRef v)
+
+
+addTask
+  :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
+  => Text.Text -> m (Either TaskError TaskRef)
+addTask t = do
+  r <- applyIntentToTasks (AddTask t)
+  case r of
+    Left e -> pure (Left e)
+    Right v -> maybeStore r
 
 
 startTask
@@ -58,11 +65,11 @@ completeTask ref = do
   maybeStore r
 
 
-deleteTask
+removeTask
   :: (HasTasks m, CanCreateEvent m, CanStoreEvent m)
   => TaskRef -> m (Either TaskError TaskRef)
-deleteTask ref = do
-  r <- applyIntentToTasks (DeleteTask ref)
+removeTask ref = do
+  r <- applyIntentToTasks (RemoveTask ref)
   maybeStore r
 
 

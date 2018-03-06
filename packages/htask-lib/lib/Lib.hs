@@ -39,7 +39,7 @@ data TaskIntent
   | StartTask TaskRef
   | StopTask TaskRef
   | CompleteTask TaskRef
-  | DeleteTask TaskRef
+  | RemoveTask TaskRef
   deriving (Show, Generic)
 
 instance ToJSON TaskIntent
@@ -87,7 +87,7 @@ applyRawEvent ev _ = do
       _p <- updateExistingTask ref $ setTaskStatus Complete
       getTasks
 
-    (DeleteTask ref) -> do
+    (RemoveTask ref) -> do
       _p <- updateExistingTask ref $ setTaskStatus Abandoned
       getTasks
 
@@ -123,8 +123,8 @@ applyIntentToTasks itx =
         then Right (TaskEventDetail ref itx)
         else Left "could not find matching id"
 
-    (DeleteTask ref) -> do
-      p <- removeTask ref
+    (RemoveTask ref) -> do
+      p <- removeTaskRef ref
       pure $ if p
         then Right (TaskEventDetail ref itx)
         else Left "unknown fuckup"

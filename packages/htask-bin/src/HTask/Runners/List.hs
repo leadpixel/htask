@@ -13,7 +13,6 @@ import Data.Tagged
 import HTask.Actions
 import HTask.Output
 import HTask.TaskApplication
-import HTask.Formatters
 import qualified Data.Text              as Text
 import qualified Data.UUID              as UUID
 import qualified HTask as H
@@ -45,10 +44,10 @@ statusDisplayOrder  H.Complete    H.Abandoned   =  LT
 statusDisplayOrder  H.Abandoned   H.Abandoned   =  EQ
 
 
-runList :: ShowUUID -> IncludeDeleted -> TaskConfig Output
+runList :: ShowUUID -> IncludeDeleted -> TaskConfig Document
 runList showUUID showDeleted = do
   ts <- runTask H.listTasks
-  pure $ fmap formatOutput (selectTasks ts)
+  pure $ Document $ fmap formatOutput (selectTasks ts)
 
   where
     -- formatOutput :: H.Task -> Block
