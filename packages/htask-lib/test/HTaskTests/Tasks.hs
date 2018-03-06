@@ -102,5 +102,5 @@ deletingTask = testCase "deleting a task" $ do
     ref <- H.addTask "some task"
     case ref of
       Left e -> pure (Left e)
-      Right v -> H.deleteTask v
+      Right v -> H.removeTask v
   assertEqual "expecting no tasks" 0 (length ts)
