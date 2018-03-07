@@ -23,6 +23,7 @@ dependencies:
 - pretty
 - pretty-show
 - random
+- resourcet
 - tagged
 - text
 - time
@@ -30,7 +31,7 @@ dependencies:
 - uuid
 
 executables:
-  htaskclean:
+  htask-clean:
     main:                Main.hs
     source-dirs:         src
     dependencies:

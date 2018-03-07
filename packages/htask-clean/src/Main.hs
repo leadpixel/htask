@@ -4,52 +4,65 @@ module Main
   ( main
   ) where
 
-import qualified HTask as H
-import qualified Data.ByteString.Lazy.UTF8 as UTF8
-import qualified Data.ByteString.Lazy as LBS
-import Data.Aeson as A
-import Data.Maybe
+import Control.Monad.Trans.Resource
+import Data.Conduit as C
 import Data.List
-import Data.Semigroup
+import Data.Maybe
+import Data.Semigroup ((<>))
+import qualified Data.Aeson as Aeson
+import qualified Data.ByteString as S
+import qualified Data.ByteString.Lazy as L
+import qualified Data.Conduit.Combinators as Cx
+import qualified HTask as H
 
 
--- TODO: remove TaskEventDetail
--- TODO: read THEN write
-type SomeEvent = H.Event H.TaskEventDetail
+type SomeEvent = H.Event K
+
+
+data K = K Aeson.Value
+  deriving (Show)
+
+instance Aeson.ToJSON K where
+  toJSON (K v) = v
+
+instance Aeson.FromJSON K where
+  parseJSON x = pure (K x)
 
 
 main :: IO ()
-main = do
-  let file = ".tasks"
+main
+  = readEvents file
+  >>= pure . sortEvents
+  >>= writeEvents file
 
-  content <- readContent file
-
-  let es = parseEvents content
-  let ps = sortByTimestamp es
-  let qs = convertToJSON ps
-
-  overwriteFile ".tasks2" qs
+  where
+    file = ".tasks"
 
 
+readEvents :: FilePath -> IO [Maybe SomeEvent]
+readEvents file = do
+  content <- runResourceT
+    $ Cx.sourceFile file
+    $= splitLines
+    $$ Cx.sinkList
 
-readContent :: FilePath -> IO [String]
-readContent p = lines <$> readFile p
-
-
-parseEvents :: [String] -> [SomeEvent]
-parseEvents = catMaybes . fmap (decode . UTF8.fromString)
-
-
-sortByTimestamp :: [SomeEvent] -> [SomeEvent]
-sortByTimestamp = sortOn H.timestamp
+  pure (Aeson.decodeStrict <$> content)
 
 
-convertToJSON :: [SomeEvent] -> [LBS.ByteString]
-convertToJSON = fmap A.encode
+writeEvents :: FilePath -> [SomeEvent] -> IO ()
+writeEvents file xs
+  = runResourceT
+    $ Cx.yieldMany (convert <$> xs)
+    $$ Cx.sinkFile file
+
+  where
+    convert :: SomeEvent -> S.ByteString
+    convert e = L.toStrict (Aeson.encode e) <> "\n"
 
 
-overwriteFile :: FilePath -> [LBS.ByteString] -> IO ()
-overwriteFile p ts = do
-  writeFile p ""
-  mapM_ (\x -> LBS.appendFile p $ x <> "\n") ts
-  appendFile p ""
+splitLines :: Conduit S.ByteString (ResourceT IO) S.ByteString
+splitLines = Cx.linesUnboundedAscii
+
+
+sortEvents :: [Maybe (H.Event a)] -> [H.Event a]
+sortEvents = sortOn H.timestamp . catMaybes
