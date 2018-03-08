@@ -16,23 +16,12 @@ import qualified Data.Conduit.Combinators as Cx
 import qualified HTask as H
 
 
-type SomeEvent = H.Event K
-
-
-data K = K Aeson.Value
-  deriving (Show)
-
-instance Aeson.ToJSON K where
-  toJSON (K v) = v
-
-instance Aeson.FromJSON K where
-  parseJSON x = pure (K x)
+type SomeEvent = H.Event Aeson.Value
 
 
 main :: IO ()
 main
-  = readEvents file
-  >>= pure . sortEvents
+  = (sortEvents <$> readEvents file)
   >>= writeEvents file
 
   where
