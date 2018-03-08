@@ -1,0 +1,49 @@
+name:                event
+version:             0.1.0.0
+github:              "palf/htask"
+license:             BSD3
+author:              "Jack Palfrey"
+maintainer:          "jack.palf@gmail.com"
+copyright:           "2018 Jack Palfrey"
+
+description:         Please see the README on Github at <https://github.com/palf/htask#readme>
+
+ghc-options: -Wall
+
+dependencies:
+- base >= 4.7 && < 5
+- aeson
+- bytestring
+- conduit
+- conduit-combinators
+- containers
+- mtl
+- operational
+- random
+- text
+- pretty
+- pretty-show
+- tagged
+- time
+- transformers
+- uuid
+
+library:
+  source-dirs: lib
+  exposed-modules: Event
+
+tests:
+  ev#ent-test:
+    main:                Main.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - event
+    - tasty
+    - tasty-hunit
+    - tasty-quickcheck
+    - QuickCheck
+    - HUnit
