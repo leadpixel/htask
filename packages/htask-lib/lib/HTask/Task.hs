@@ -9,7 +9,7 @@ module HTask.Task
   , setTaskStatus
   ) where
 
-import HTask.Capabilities
+import Event
 import qualified Data.Text as Text
 import qualified Data.UUID as UUID
 import Data.Tagged

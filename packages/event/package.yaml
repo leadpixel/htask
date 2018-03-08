@@ -33,7 +33,7 @@ library:
   exposed-modules: Event
 
 tests:
-  ev#ent-test:
+  event-test:
     main:                Main.hs
     source-dirs:         test
     ghc-options:

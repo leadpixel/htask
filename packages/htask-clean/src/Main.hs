@@ -9,14 +9,14 @@ import Data.Conduit as C
 import Data.List
 import Data.Maybe
 import Data.Semigroup ((<>))
+import Event
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString as S
 import qualified Data.ByteString.Lazy as L
 import qualified Data.Conduit.Combinators as Cx
-import qualified HTask as H
 
 
-type SomeEvent = H.Event Aeson.Value
+type SomeEvent = Event Aeson.Value
 
 
 main :: IO ()
@@ -53,5 +53,5 @@ splitLines :: Conduit S.ByteString (ResourceT IO) S.ByteString
 splitLines = Cx.linesUnboundedAscii
 
 
-sortEvents :: [Maybe (H.Event a)] -> [H.Event a]
-sortEvents = sortOn H.timestamp . catMaybes
+sortEvents :: [Maybe (Event a)] -> [Event a]
+sortEvents = sortOn timestamp . catMaybes

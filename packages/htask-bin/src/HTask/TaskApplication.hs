@@ -13,6 +13,7 @@ module HTask.TaskApplication
 
 import qualified HTask as H
 import HTask.Config
+import Event
 import Conduit
 import Data.Aeson
 import qualified Control.Monad.Reader   as R
@@ -50,12 +51,12 @@ instance H.HasTasks TaskApplication where
   removeTaskRef = TaskApp . H.removeTaskRef
 
 
-instance H.CanTime TaskApplication where
-  now = TaskApp $ lift $ lift H.now
+instance CanTime TaskApplication where
+  now = TaskApp $ lift $ lift now
 
 
-instance H.CanUuid TaskApplication where
-  uuidGen = TaskApp $ lift $ lift H.uuidGen
+instance CanUuid TaskApplication where
+  uuidGen = TaskApp $ lift $ lift uuidGen
 
 
 instance H.CanStoreEvent TaskApplication where
@@ -64,8 +65,8 @@ instance H.CanStoreEvent TaskApplication where
 
 
 class EventBackend m a where
-  readEvents :: (FromJSON a) => m [H.Event a]
-  writeEvent :: (ToJSON a) => H.Event a -> m ()
+  readEvents :: (FromJSON a) => m [Event a]
+  writeEvent :: (ToJSON a) => Event a -> m ()
 
 
 instance EventBackend FileBackend a where
@@ -73,14 +74,14 @@ instance EventBackend FileBackend a where
   writeEvent = writeEventFile
 
 
-readEventFile :: (FromJSON a) => FileBackend [H.Event a]
+readEventFile :: (FromJSON a) => FileBackend [Event a]
 readEventFile = R.ask >>= liftIO . y
   where
-    y :: (FromJSON b) => FilePath -> IO [H.Event b]
+    y :: (FromJSON b) => FilePath -> IO [Event b]
     y = fmap (catMaybes . fmap (decode . UTF8.fromString) . lines) .  readFile
 
 
-writeEventFile :: (ToJSON a) => H.Event a -> FileBackend ()
+writeEventFile :: (ToJSON a) => Event a -> FileBackend ()
 writeEventFile ev = R.ask >>= \z -> liftIO (t z ev)
   where
     t :: (ToJSON b) => FilePath -> b -> IO ()

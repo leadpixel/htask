@@ -9,7 +9,7 @@ module HTask.API
 
 import Lib
 import qualified Data.Text as Text
-import HTask.Event
+import Event
 import HTask.TaskContainer
 import HTask.Task
 

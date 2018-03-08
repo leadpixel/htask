@@ -1,4 +1,4 @@
-module HTask.Capabilities.UUID
+module Capabilities.UUID
   ( CanUuid (uuidGen)
   ) where
 

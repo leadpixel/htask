@@ -16,6 +16,7 @@ dependencies:
 - bytestring
 - conduit
 - utf8-string
+- event
 - conduit-combinators
 - containers
 - mtl
@@ -35,5 +36,4 @@ executables:
     main:                Main.hs
     source-dirs:         src
     dependencies:
-    - htask-lib
     - optparse-applicative

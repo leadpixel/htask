@@ -14,6 +14,7 @@ dependencies:
 - base >= 4.7 && < 5
 - aeson
 - bytestring
+- event
 - conduit
 - conduit-combinators
 - containers

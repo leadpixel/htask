@@ -3,7 +3,7 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module HTaskTests.Log
+module EventTests.Log
   ( test_log
   ) where
 
@@ -12,7 +12,7 @@ import Test.Tasty.HUnit
 import qualified Control.Monad.State as S
 import Data.Tagged
 import qualified Control.Monad.Writer as W
-import qualified HTask as H
+import qualified Event as H
 import qualified Data.UUID as UUID
 
 

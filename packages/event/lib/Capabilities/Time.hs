@@ -1,4 +1,4 @@
-module HTask.Capabilities.Time
+module Capabilities.Time
   ( Timestamp
   , CanTime (now)
   ) where

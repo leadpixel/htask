@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module HTask.Event
+module Event.Event
   ( Event (..)
   , CanCreateEvent
   , createEvent
@@ -10,8 +10,7 @@ module HTask.Event
 import Data.Aeson
 import Data.Tagged
 import GHC.Generics
-import HTask.Capabilities.Time
-import HTask.Capabilities.UUID
+import Capabilities
 import qualified Data.UUID as UUID
 
 

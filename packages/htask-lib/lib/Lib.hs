@@ -15,7 +15,7 @@ module Lib
 
 import Data.Aeson
 import GHC.Generics
-import HTask.Event
+import Event
 import HTask.TaskContainer
 import HTask.Task
 import Control.Monad

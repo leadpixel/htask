@@ -1,10 +1,10 @@
-module HTaskTests
+module EventTests
   ( allTests
   ) where
 
 import Test.Tasty
-import HTaskTests.Tasks
-import HTaskTests.Log
+import EventTests.Tasks
+import EventTests.Log
 
 
 allTests :: TestTree

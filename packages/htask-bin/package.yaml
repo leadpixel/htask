@@ -19,6 +19,7 @@ dependencies:
 - conduit-combinators
 - containers
 - mtl
+- event
 - operational
 - optparse-applicative
 - pretty

@@ -3,7 +3,7 @@ module Main
   ) where
 
 import Test.Tasty
-import HTaskTests
+import EventTests
 
 
 main :: IO ()
