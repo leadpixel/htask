@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 
@@ -23,6 +24,18 @@ import Data.Maybe
 
 
 type TaskConfig = R.ReaderT GlobalOptions IO
+type FileBackend = R.ReaderT FilePath IO
+
+
+runWithFile :: FileBackend a -> TaskConfig a
+runWithFile = R.withReaderT taskfile
+
+
+
+
+-- runReadBackend :: (EventBackend m) => m a -> TaskConfig a
+-- runReadBackend op =
+
 
 newtype TaskApplication a = TaskApp
   { unwrapTaskApp :: S.StateT H.Tasks TaskConfig a
@@ -47,26 +60,34 @@ instance H.CanUuid TaskApplication where
 
 instance H.CanStoreEvent TaskApplication where
   appendEvent ev
-    = TaskApp $ lift (R.ask >>= lift . flip k ev)
+    = TaskApp $ lift (runWithFile $ writeEvent ev)
 
-    where
-      k :: GlobalOptions -> H.TaskEvent -> IO ()
-      k opts
-        = BS.appendFile (taskfile opts)
+
+class EventBackend m a where
+  readEvents :: (FromJSON a) => m [H.Event a]
+  writeEvent :: (ToJSON a) => H.Event a -> m ()
+
+
+instance EventBackend FileBackend a where
+  readEvents = readEventFile
+  writeEvent = writeEventFile
+
+
+readEventFile :: (FromJSON a) => FileBackend [H.Event a]
+readEventFile = R.ask >>= liftIO . y
+  where
+    y :: (FromJSON b) => FilePath -> IO [H.Event b]
+    y = fmap (catMaybes . fmap (decode . UTF8.fromString) . lines) .  readFile
+
+
+writeEventFile :: (ToJSON a) => H.Event a -> FileBackend ()
+writeEventFile ev = R.ask >>= \z -> liftIO (t z ev)
+  where
+    t :: (ToJSON b) => FilePath -> b -> IO ()
+    t f = BS.appendFile f
         . Lazy.toStrict
         . flip mappend "\n"
         . encode
-
-
-readTaskEvents :: TaskConfig [H.TaskEvent]
-readTaskEvents = R.ask >>= liftIO . k
-  where
-    k :: GlobalOptions -> IO [H.TaskEvent]
-    k opts = (parseLines . lines) <$> readFile (taskfile opts)
-
-
-parseLines :: [String] -> [H.TaskEvent]
-parseLines = catMaybes . fmap (decode . UTF8.fromString)
 
 
 prepTasks :: [H.TaskEvent] -> TaskConfig [H.Task]
@@ -78,6 +99,6 @@ prepTasks vs
 
 runTask :: TaskApplication a -> TaskConfig a
 runTask op
-  = readTaskEvents
+  = runWithFile readEvents
   >>= prepTasks
   >>= S.evalStateT (unwrapTaskApp op)

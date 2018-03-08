@@ -38,7 +38,7 @@ runPick = do
     startTask :: H.Task -> TaskConfig [Block]
     startTask t = do
       _ <- runTask $ H.startTask $ H.taskRef t
-      pure $ [ line ("picking task: " <> H.description t)]
+      pure [ line ("picking task: " <> H.description t)]
 
 
     emptyMessage :: TaskConfig [Block]

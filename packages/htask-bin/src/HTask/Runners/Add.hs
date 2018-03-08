@@ -8,7 +8,6 @@ import qualified Data.Text as Text
 import qualified HTask as H
 import HTask.TaskApplication
 import HTask.Output
-import HTask.Runners.Common
 import Data.Semigroup ((<>))
 
 

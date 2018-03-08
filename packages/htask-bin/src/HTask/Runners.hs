@@ -1,11 +1,7 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module HTask.Runners
   ( runCommand
   ) where
 
-import Data.Semigroup ((<>))
-import Data.Tagged
 import HTask.Actions
 import HTask.Config
 import HTask.Output
@@ -21,8 +17,6 @@ import HTask.Runners.Done
 import HTask.Runners.Drop
 import HTask.TaskApplication
 import qualified Control.Monad.Reader as R
-import qualified Data.Text              as Text
-import qualified HTask as H
 
 
 runCommand :: Options -> IO ()
