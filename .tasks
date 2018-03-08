@@ -170,3 +170,4 @@
 {"eventUuid":"5793c32c-a555-49e0-bd08-a1224fda99d1","eventType":{"intent":{"tag":"StartTask","contents":"f3b52b44-5274-4380-86ab-cc043b2c6b41"},"detailRef":"f3b52b44-5274-4380-86ab-cc043b2c6b41"},"timestamp":"2018-03-07T18:05:28.01476843Z"}
 {"eventUuid":"f5169aa8-9eb7-4350-ae4f-aa5aeebe199a","eventType":{"intent":{"tag":"CompleteTask","contents":"f3b52b44-5274-4380-86ab-cc043b2c6b41"},"detailRef":"f3b52b44-5274-4380-86ab-cc043b2c6b41"},"timestamp":"2018-03-07T18:05:32.318515649Z"}
 {"eventUuid":"0c926b3e-d852-4c39-8b39-cc3f50a59bdd","eventType":{"intent":{"tag":"CompleteTask","contents":"8b0a6640-8784-442c-9fab-a1ba49747315"},"detailRef":"8b0a6640-8784-442c-9fab-a1ba49747315"},"timestamp":"2018-03-07T18:05:59.366431114Z"}
+{"eventUuid":"e0daf38e-e211-4dca-ac98-46ae30f7d491","eventType":{"intent":{"tag":"AddTask","contents":"version flag"},"detailRef":"73b41264-3380-41b1-a018-b752cd32130f"},"timestamp":"2018-03-08T11:15:27.614194273Z"}
