@@ -1,8 +1,8 @@
-# htask
+# HTask
 
 A command-line utility for task management
 
-## Motivation
+## Motivation
 
 I work on the command line. I want my task management to be handled there too.
 
@@ -107,21 +107,7 @@ htask stop $(htask list --show-uuid | fzf --ansi | cut -f 1 -d " ")
 
 ### Complete
 
-The default; gets invoked when you run `htask` without an argument
-Prints the current tasks and the top pending tasks
-
-```sh
-htask summary
-```
-
 ### Remove
-
-The default; gets invoked when you run `htask` without an argument
-Prints the current tasks and the top pending tasks
-
-```sh
-htask summary
-```
 
 ## Useful aliases
 ```sh
