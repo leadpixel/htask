@@ -13,14 +13,13 @@ import qualified Data.Text as Text
 import HTask.Output.Formatters
 import HTask.Output.Document
 import HTask.Output.Renderers
-import Data.String (IsString)
 import Data.Semigroup ((<>))
 
 
-formatError :: String -> Document
-formatError e = Document
+formatError :: Text.Text -> Document
+formatError t = Document
   [ line (withColor Red "Error" <> ":")
-  , line (Text.pack e)
+  , line t
   ]
 
 

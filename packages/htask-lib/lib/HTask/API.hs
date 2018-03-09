@@ -38,7 +38,7 @@ addTask t = do
   r <- applyIntentToTasks (AddTask t)
   case r of
     Left e -> pure (Left e)
-    Right v -> maybeStore r
+    Right _v -> maybeStore r
 
 
 startTask

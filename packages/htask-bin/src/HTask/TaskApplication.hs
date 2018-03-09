@@ -24,18 +24,37 @@ import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import Data.Maybe
 
 
-type TaskConfig = R.ReaderT GlobalOptions IO
 type FileBackend = R.ReaderT FilePath IO
+
+
+instance EventBackend FileBackend where
+  readEvents = fileReadEvents
+  writeEvent = fileWriteEvent
+
+
+fileReadEvents :: (FromJSON a) => FileBackend [Event a]
+fileReadEvents = R.ask >>= liftIO . y
+  where
+    y :: (FromJSON b) => FilePath -> IO [Event b]
+    y = fmap (catMaybes . fmap (decode . UTF8.fromString) . lines) .  readFile
+
+
+fileWriteEvent :: (ToJSON a) => Event a -> FileBackend ()
+fileWriteEvent ev = R.ask >>= \z -> liftIO (t z ev)
+  where
+    t :: (ToJSON b) => FilePath -> b -> IO ()
+    t f = BS.appendFile f
+        . Lazy.toStrict
+        . flip mappend "\n"
+        . encode
+
+
+
+type TaskConfig = R.ReaderT GlobalOptions IO
 
 
 runWithFile :: FileBackend a -> TaskConfig a
 runWithFile = R.withReaderT taskfile
-
-
-
-
--- runReadBackend :: (EventBackend m) => m a -> TaskConfig a
--- runReadBackend op =
 
 
 newtype TaskApplication a = TaskApp
@@ -62,33 +81,6 @@ instance CanUuid TaskApplication where
 instance H.CanStoreEvent TaskApplication where
   appendEvent ev
     = TaskApp $ lift (runWithFile $ writeEvent ev)
-
-
-class EventBackend m a where
-  readEvents :: (FromJSON a) => m [Event a]
-  writeEvent :: (ToJSON a) => Event a -> m ()
-
-
-instance EventBackend FileBackend a where
-  readEvents = readEventFile
-  writeEvent = writeEventFile
-
-
-readEventFile :: (FromJSON a) => FileBackend [Event a]
-readEventFile = R.ask >>= liftIO . y
-  where
-    y :: (FromJSON b) => FilePath -> IO [Event b]
-    y = fmap (catMaybes . fmap (decode . UTF8.fromString) . lines) .  readFile
-
-
-writeEventFile :: (ToJSON a) => Event a -> FileBackend ()
-writeEventFile ev = R.ask >>= \z -> liftIO (t z ev)
-  where
-    t :: (ToJSON b) => FilePath -> b -> IO ()
-    t f = BS.appendFile f
-        . Lazy.toStrict
-        . flip mappend "\n"
-        . encode
 
 
 prepTasks :: [H.TaskEvent] -> TaskConfig [H.Task]

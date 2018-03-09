@@ -1,10 +1,12 @@
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE DeriveGeneric #-}
 
 module Event.Event
   ( Event (..)
   , CanCreateEvent
   , createEvent
+  , EventBackend (..)
   ) where
 
 import Data.Aeson
@@ -37,3 +39,8 @@ createEvent x
   = (\u m -> Event u m x)
   <$> (Tagged <$> uuidGen)
   <*> now
+
+
+class EventBackend m where
+  readEvents :: (FromJSON a) => m [Event a]
+  writeEvent :: (ToJSON a) => Event a -> m ()

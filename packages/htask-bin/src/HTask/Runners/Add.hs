@@ -19,7 +19,7 @@ runAdd tex
 formatAdd :: Text.Text -> Either String a -> Document
 formatAdd t x
   = case x of
-      Left e -> formatError e
+      Left e -> formatError (Text.pack e)
       Right _ -> formatSuccessAdd t
 
 
