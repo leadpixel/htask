@@ -7,22 +7,23 @@ module HTaskTests.Tasks
   ( test_tasks
   ) where
 
+import Data.Tagged
+import Event
 import Test.Tasty
 import Test.Tasty.HUnit
 import qualified Control.Monad.State as S
 import qualified Control.Monad.Writer as W
-import qualified HTask as H
 import qualified Data.UUID as UUID
-import Data.Tagged
+import qualified HTask as H
 
 
 type TaskTestMonad = W.WriterT [H.TaskEvent] (S.StateT H.Tasks IO)
 
-instance H.CanTime TaskTestMonad where
-  now = W.lift (S.lift H.now)
+instance CanTime TaskTestMonad where
+  now = W.lift (S.lift now)
 
-instance H.CanUuid TaskTestMonad where
-  uuidGen = W.lift (S.lift H.uuidGen)
+instance CanUuid TaskTestMonad where
+  uuidGen = W.lift (S.lift uuidGen)
 
 
 extractTasks :: TaskTestMonad a -> IO H.Tasks

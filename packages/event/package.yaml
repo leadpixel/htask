@@ -31,19 +31,3 @@ dependencies:
 library:
   source-dirs: lib
   exposed-modules: Event
-
-tests:
-  event-test:
-    main:                Main.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - event
-    - tasty
-    - tasty-hunit
-    - tasty-quickcheck
-    - QuickCheck
-    - HUnit

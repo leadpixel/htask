@@ -39,15 +39,3 @@ executables:
     source-dirs:         src
     dependencies:
     - htask-lib
-
-tests:
-  htask-test:
-    main:                Main.hs
-    source-dirs:         test
-    dependencies:
-    - htask-lib
-    - tasty
-    - tasty-hunit
-    - tasty-quickcheck
-    - QuickCheck
-    - HUnit

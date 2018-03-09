@@ -7,22 +7,23 @@ module HTaskTests.Log
   ( test_log
   ) where
 
+import Data.Tagged
+import Event
 import Test.Tasty
 import Test.Tasty.HUnit
 import qualified Control.Monad.State as S
-import Data.Tagged
 import qualified Control.Monad.Writer as W
-import qualified HTask as H
 import qualified Data.UUID as UUID
+import qualified HTask as H
 
 
 type LogTestMonad = W.WriterT [H.TaskEvent] (S.StateT H.Tasks IO)
 
-instance H.CanTime LogTestMonad where
-  now = W.lift (S.lift H.now)
+instance CanTime LogTestMonad where
+  now = W.lift (S.lift now)
 
-instance H.CanUuid LogTestMonad where
-  uuidGen = W.lift (S.lift H.uuidGen)
+instance CanUuid LogTestMonad where
+  uuidGen = W.lift (S.lift uuidGen)
 
 
 extractLog :: LogTestMonad a -> IO [H.TaskEvent]
@@ -40,7 +41,7 @@ test_log = testGroup "logs"
   , startingTask
   , startingNonTask
   , completingTask
-  , deletingTask
+  , removingTask
   ]
 
 
@@ -95,8 +96,8 @@ completingTask = testCase "completing a task" $ do
   -- assertEqual "expecting started task" H.Complete (H.status $ head ts)
 
 
-deletingTask :: TestTree
-deletingTask = testCase "deleting a task" $ do
+removingTask :: TestTree
+removingTask = testCase "deleting a task" $ do
   ts <- extractLog $ do
     ref <- H.addTask "some task"
     case ref of
