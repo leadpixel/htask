@@ -24,21 +24,32 @@ defaultAction = pure Summary
 
 
 actionParser :: Parser Action
-actionParser = hsubparser
-  (  command "summary"  summaryInfo
-  <> command "list"     listInfo
-  <> command "add"      addInfo
-  <> command "start"    startInfo
-  <> command "stop"     stopInfo
-  <> command "complete" completeInfo
-  <> command "remove"   removeInfo
+actionParser = infoCommands <|> taskCommands <|> shortcutCommands
+  where
+    infoCommands
+      = hsubparser
+      $ commandGroup "Info"
+        <> command "summary"  summaryInfo
+        <> command "list"     listInfo
 
-  <> command "pick"     pickInfo
-  <> command "drop"     dropInfo
-  <> command "done"     doneInfo
+    taskCommands
+      = hsubparser
+      $ commandGroup "Tasks"
+        <> command "add"      addInfo
+        <> command "start"    startInfo
+        <> command "stop"     stopInfo
+        <> command "complete" completeInfo
+        <> command "remove"   removeInfo
+        <> hidden
 
-  <> command "ls"       listInfo
-  )
+    shortcutCommands
+      = hsubparser
+      $ commandGroup "Shortcuts"
+        <> command "ls"       listInfo
+        <> command "pick"     pickInfo
+        <> command "drop"     dropInfo
+        <> command "done"     doneInfo
+        <> hidden
 
 
 fileParser :: Parser FilePath

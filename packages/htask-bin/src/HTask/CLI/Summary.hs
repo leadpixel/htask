@@ -6,7 +6,7 @@ import Options.Applicative
 
 
 summaryInfo :: ParserInfo Action
-summaryInfo = info summaryParser (progDesc "Summary")
+summaryInfo = info summaryParser (progDesc "A short summary of current tasks")
 
 
 summaryParser :: Parser Action
