@@ -64,7 +64,7 @@ htask summary
 ### List
 
 Prints a list of active tasks
-Optionally shows deleted tasks
+Optionally shows completed and removed tasks
 Optionally shows task ids
 
 ```sh
@@ -72,12 +72,13 @@ htask list
 htask ls
 
 htask list (-u|--show-uuid) # shows task id for use with other commands
-htask list (-a|--all) # show all tasks, including deleted
+htask list (-a|--show-all) # show all tasks (including hidden)
 ```
 
 ### Add
 
-Adds a task
+Adds a task; requires a task description
+Task descriptions can be empty strings and can contain newlines
 
 ```sh
 htask add "some task description"
@@ -86,28 +87,43 @@ htask add "some task description"
 ### Start
 
 Starts a task selected by uuid
-It's a pain to type out the uuid, so using [fzf](https://github.com/junegunn/fzf) can make this easier
+See [Selecting Tasks](#selecting-tasks) for a handy shortcut
 
 ```sh
 
-htask start SOME_LONG_UUID
-htask start $(htask list --show-uuid | fzf --ansi | cut -f 1 -d " ")
+htask start SOME_TASK_UUID
 ```
 
 ### Stop
 
 Stops a task selected by uuid
-It's a pain to type out the uuid, so using [fzf](https://github.com/junegunn/fzf) can make this easier
 
 ```sh
-
-htask stop SOME_LONG_UUID
-htask stop $(htask list --show-uuid | fzf --ansi | cut -f 1 -d " ")
+htask stop SOME_TASK_UUID
 ```
 
 ### Complete
 
+Marks a task as completed
+
+```sh
+htask complete SOME_TASK_UUID
+```
+
 ### Remove
+
+Marks a task as abandoned
+
+```sh
+htask remove SOME_TASK_UUID
+```
+
+## Selecting Tasks
+
+It's a pain to type out the uuid, so using [fzf](https://github.com/junegunn/fzf) can make this easier
+```sh
+htask [COMMAND] $(htask list --show-uuid | fzf --ansi | cut -f 1 -d " ")
+```
 
 ## Useful aliases
 ```sh
