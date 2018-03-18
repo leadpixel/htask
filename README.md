@@ -19,22 +19,22 @@ And I want to keep a history of task changes to understand how I and collaborato
 - install [Stack](https://docs.haskellstack.org/en/stable/README/)
 - checkout the repo and verify:
 ```sh
-git clone https://github.com/leadpixel/htask.git
-cd htask
-stack test --pedantic
+$ git clone https://github.com/leadpixel/htask.git
+$ cd htask
+$ stack test --pedantic
 ```
 
 - build and install:
 ```sh
-stack install
+$ stack install
 ```
 
 You should see output like `Copied executables to /some/local/path`; check this is on your `$PATH`
 
 - first run:
 ```sh
-touch .tasks
-htask
+$ touch .tasks
+$ htask
 ```
 
 You should see output like `No current task`; then you're good to go!
@@ -45,8 +45,8 @@ You should see output like `No current task`; then you're good to go!
 `-f, --file ARG`: path to a tasks file
 
 ```sh
-htask --help # for top-level help
-htask [CMD] --help # for command-specific help (replace [CMD] with list, for example)
+$ htask --help # for top-level help
+$ htask [CMD] --help # for command-specific help (replace [CMD] with list, for example)
 ```
 
 ## Commands
@@ -57,8 +57,8 @@ The default; gets invoked when you run `htask` without an argument
 Prints the current tasks and the top pending tasks
 
 ```sh
-htask
-htask summary
+$ htask
+$ htask summary
 ```
 
 ### List
@@ -68,11 +68,11 @@ Optionally shows completed and removed tasks
 Optionally shows task ids
 
 ```sh
-htask list
-htask ls
+$ htask list
+$ htask ls
 
-htask list (-u|--show-uuid) # shows task id for use with other commands
-htask list (-a|--show-all) # show all tasks (including hidden)
+$ htask list (-u|--show-uuid) # shows task id for use with other commands
+$ htask list (-a|--show-all) # show all tasks (including hidden)
 ```
 
 ### Add
@@ -81,7 +81,9 @@ Adds a task; requires a task description
 Task descriptions can be empty strings and can contain newlines
 
 ```sh
-htask add "some task description"
+$ htask add "some task description"
+# Success!
+# added task: some task description
 ```
 
 ### Start
@@ -90,8 +92,9 @@ Starts a task selected by uuid
 See [Selecting Tasks](#selecting-tasks) for a handy shortcut
 
 ```sh
-
-htask start SOME_TASK_UUID
+$ htask start SOME_TASK_UUID
+# Success!
+# starting task: some task description
 ```
 
 ### Stop
@@ -99,7 +102,9 @@ htask start SOME_TASK_UUID
 Stops a task selected by uuid
 
 ```sh
-htask stop SOME_TASK_UUID
+$ htask stop SOME_TASK_UUID
+# Success!
+# stopping task: some task description
 ```
 
 ### Complete
@@ -107,7 +112,9 @@ htask stop SOME_TASK_UUID
 Marks a task as completed
 
 ```sh
-htask complete SOME_TASK_UUID
+$ htask complete SOME_TASK_UUID
+# Success!
+# completing task: some task description
 ```
 
 ### Remove
@@ -115,20 +122,22 @@ htask complete SOME_TASK_UUID
 Marks a task as abandoned
 
 ```sh
-htask remove SOME_TASK_UUID
+$ htask remove SOME_TASK_UUID
+# Success!
+# removing task: some task description
 ```
 
 ## Selecting Tasks
 
 It's a pain to type out the uuid, so using [fzf](https://github.com/junegunn/fzf) can make this easier
 ```sh
-htask [COMMAND] $(htask list --show-uuid | fzf --ansi | cut -f 1 -d " ")
+$ htask [CMD] $(htask list --show-uuid | fzf --ansi | cut -f 1 -d " ")
 ```
 
 ## Useful aliases
 ```sh
-alias h=htask
-alias g='htask --file ~/.tasks'
+$ alias h=htask
+$ alias g='htask --file ~/.tasks'
 ```
 
 ## Git Merges
@@ -138,14 +147,14 @@ Conflicts can occur when events are created in multiple branches. As the task li
 First, we need to configure a merge driver that will provide this behaviour:
 
 ```sh
-git config merge.union.name "merge by union"
-git config merge.union.driver "git merge-file --union -L %P %A %O %B"
+$ git config merge.union.name "merge by union"
+$ git config merge.union.driver "git merge-file --union -L %P %A %O %B"
 ```
 
 Then we tell Git to use this driver for the task list file:
 
 ```sh
-echo ".tasks merge=union" >> .gitattributes
+$ echo ".tasks merge=union" >> .gitattributes
 ```
 
 Done! Now merges should not cause conflicts; if they do, please raise an [issue](https://github.com/leadpixel/htask/issues)
