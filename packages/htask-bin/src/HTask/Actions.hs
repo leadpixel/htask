@@ -7,12 +7,12 @@ import qualified Data.Text as Text
 type TaskReference = Text.Text
 
 type ShowUUID = Bool
-type IncludeDeleted = Bool
+type ShowAll = Bool
 
 
 data Action
   = Summary
-  | List ShowUUID IncludeDeleted
+  | List ShowUUID ShowAll
 
   | Add Text.Text
   | Start TaskReference

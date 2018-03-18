@@ -44,8 +44,8 @@ statusDisplayOrder  H.Complete    H.Abandoned   =  LT
 statusDisplayOrder  H.Abandoned   H.Abandoned   =  EQ
 
 
-runList :: ShowUUID -> IncludeDeleted -> TaskConfig Document
-runList showUUID showDeleted = do
+runList :: ShowUUID -> ShowAll -> TaskConfig Document
+runList showUUID showAll = do
   ts <- runTask H.listTasks
   pure $ Document $ fmap formatOutput (selectTasks ts)
 
@@ -56,13 +56,22 @@ runList showUUID showDeleted = do
     selectTasks :: [H.Task] -> [H.Task]
     selectTasks
       = sortBy taskDisplayOrder
-      . (if showDeleted
+      . (if showAll
             then id
-            else filter notAbandoned
+            else justActive
         )
+
+    justActive :: [H.Task] -> [H.Task]
+    justActive = filter (ork notAbandoned notCompleted)
+
+    ork :: (a -> Bool) -> (a -> Bool) -> (a -> Bool)
+    ork f g x = f x && g x
 
     notAbandoned :: H.Task -> Bool
     notAbandoned t = H.status t /= H.Abandoned
+
+    notCompleted :: H.Task -> Bool
+    notCompleted t = H.status t /= H.Complete
 
 
 nicePrint :: ShowUUID -> H.Task -> Text.Text
