@@ -6,7 +6,7 @@ import Options.Applicative
 
 
 dropInfo :: ParserInfo Action
-dropInfo = info dropParser (progDesc "Drops the current in progress tasks")
+dropInfo = info dropParser (progDesc "Drops the current tasks in progress")
 
 
 dropParser :: Parser Action

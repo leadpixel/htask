@@ -6,7 +6,7 @@ import Options.Applicative
 
 
 startInfo :: ParserInfo Action
-startInfo = info startParser (progDesc "Starts a task")
+startInfo = info startParser (progDesc "Starts a given task")
 
 
 startParser :: Parser Action

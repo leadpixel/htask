@@ -6,7 +6,7 @@ import Options.Applicative
 
 
 pickInfo :: ParserInfo Action
-pickInfo = info pickParser (progDesc "pick things")
+pickInfo = info pickParser (progDesc "Picks the next task by priority")
 
 
 pickParser :: Parser Action

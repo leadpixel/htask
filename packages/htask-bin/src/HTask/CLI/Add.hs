@@ -3,15 +3,11 @@ module HTask.CLI.Add
 
 import HTask.Actions
 import Options.Applicative
-import Data.Text as Text
 
 
 addInfo :: ParserInfo Action
-addInfo = info addParser (progDesc "add things")
+addInfo = info addParser (progDesc "Add a task description")
 
 
 addParser :: Parser Action
-addParser = Add <$> argument k (metavar "DESCRIPTION")
-  where
-    k :: ReadM Text
-    k = str
+addParser = Add <$> argument str (metavar "DESCRIPTION")
