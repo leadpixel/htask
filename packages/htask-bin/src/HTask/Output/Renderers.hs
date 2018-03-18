@@ -14,7 +14,7 @@ unLine (Line t)
 
 
 renderDocument :: Formatter -> Document -> IO ()
-renderDocument Default   = renderToConsole
+renderDocument Terminal  = renderToConsole
 renderDocument JSON      = renderToJSON
 renderDocument Porcelain = renderToPorcelain
 

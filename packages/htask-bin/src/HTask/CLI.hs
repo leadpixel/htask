@@ -62,21 +62,22 @@ fileParser = option str
   )
 
 
-parseFormatter :: String -> Formatter
-parseFormatter "porcelain" = Porcelain
-parseFormatter "json"      = JSON
-parseFormatter _           = Default
+-- parseFormatter :: String -> Formatter
+-- parseFormatter "porcelain" = Porcelain
+-- parseFormatter "json"      = JSON
+-- parseFormatter _           = Terminal
 
 
 formatterParser :: Parser Formatter
-formatterParser = parseFormatter <$> strOption
-  (  long "format"
-  <> short 'o'
-  <> showDefault
-  <> help "Select an output format"
-  <> value "default"
-  <> completeWith ["default", "json", "porcelain"]
-  )
+formatterParser = pure Terminal
+-- formatterParser = parseFormatter <$> strOption
+--   (  long "format"
+--   <> short 'o'
+--   <> showDefault
+--   <> help "Select an output format"
+--   <> value "terminal"
+--   <> completeWith ["terminal", "json", "porcelain"]
+--   )
 
 
 globalsParser :: Parser GlobalOptions

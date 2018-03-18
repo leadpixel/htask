@@ -19,7 +19,7 @@ listParser
       <> help "Show UUID for tasks"
       )
   <*> switch
-      (  long "include-removed"
+      (  long "show-all"
       <> short 'a'
-      <> help "Include removed tasks"
+      <> help "Include completed and removed tasks"
       )
