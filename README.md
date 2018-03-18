@@ -1,6 +1,6 @@
 # HTask
 
-A command-line utility for task management
+A command-line utility for task management.
 
 ## Motivation
 
@@ -53,8 +53,9 @@ $ htask [CMD] --help # for command-specific help (replace [CMD] with list, for 
 
 ### Summary
 
-The default; gets invoked when you run `htask` without an argument
-Prints the current tasks and the top pending tasks
+The default; gets invoked when you run `htask` without an argument.
+
+Prints the current tasks and the top pending tasks.
 
 ```sh
 $ htask
@@ -63,9 +64,11 @@ $ htask summary
 
 ### List
 
-Prints a list of active tasks
-Optionally shows completed and removed tasks
-Optionally shows task ids
+Prints a list of active tasks.
+
+Optionally shows completed and removed tasks.
+
+Optionally shows task ids.
 
 ```sh
 $ htask list
@@ -77,8 +80,9 @@ $ htask list (-a|--show-all) # show all tasks (including hidden)
 
 ### Add
 
-Adds a task; requires a task description
-Task descriptions can be empty strings and can contain newlines
+Adds a task; requires a task description.
+
+Task descriptions can be empty strings and can contain newlines.
 
 ```sh
 $ htask add "some task description"
@@ -88,8 +92,9 @@ $ htask add "some task description"
 
 ### Start
 
-Starts a task selected by uuid
-See [Selecting Tasks](#selecting-tasks) for a handy shortcut
+Starts a task selected by uuid.
+
+See [Selecting Tasks](#selecting-tasks) for a handy shortcut.
 
 ```sh
 $ htask start SOME_TASK_UUID
@@ -99,7 +104,9 @@ $ htask start SOME_TASK_UUID
 
 ### Stop
 
-Stops a task selected by uuid
+Stops a task selected by uuid.
+
+See [Selecting Tasks](#selecting-tasks) for a handy shortcut.
 
 ```sh
 $ htask stop SOME_TASK_UUID
@@ -109,7 +116,9 @@ $ htask stop SOME_TASK_UUID
 
 ### Complete
 
-Marks a task as completed
+Marks a task as completed.
+
+See [Selecting Tasks](#selecting-tasks) for a handy shortcut.
 
 ```sh
 $ htask complete SOME_TASK_UUID
@@ -119,7 +128,9 @@ $ htask complete SOME_TASK_UUID
 
 ### Remove
 
-Marks a task as abandoned
+Marks a task as abandoned.
+
+See [Selecting Tasks](#selecting-tasks) for a handy shortcut.
 
 ```sh
 $ htask remove SOME_TASK_UUID
@@ -127,20 +138,29 @@ $ htask remove SOME_TASK_UUID
 # removing task: some task description
 ```
 
-## Selecting Tasks
+## Tips
+### Selecting Tasks
 
 It's a pain to type out the uuid, so using [fzf](https://github.com/junegunn/fzf) can make this easier
 ```sh
 $ htask [CMD] $(htask list --show-uuid | fzf --ansi | cut -f 1 -d " ")
 ```
 
-## Useful aliases
+This is easier with an alias:
 ```sh
-$ alias h=htask
+$ alias hpick="htask list --show-uuid | fzf --ansi | cut -f 1 -d ' '"
+$ htask [CMD] $(hpick)
+```
+
+### Global Tasks
+
+It can be helpful to have project-level tasks as well as global-level tasks. By specifying the location of a task file, you can create distinct sets of tasks.
+
+```sh
 $ alias g='htask --file ~/.tasks'
 ```
 
-## Git Merges
+### Git Merges
 
 Conflicts can occur when events are created in multiple branches. As the task list is an append-only log, we can simplify the merging behaviour. We know we want to keep all events, ordered by timestamp.
 
