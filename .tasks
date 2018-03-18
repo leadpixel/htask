@@ -175,3 +175,4 @@
 {"eventUuid":"820ca2fd-d8a9-474b-8c72-2e82a2189091","eventType":{"intent":{"tag":"CompleteTask","contents":"407980ee-9714-4acf-8442-3067c97387e8"},"detailRef":"407980ee-9714-4acf-8442-3067c97387e8"},"timestamp":"2018-03-18T21:03:08.45252626Z"}
 {"eventUuid":"3b907dd1-d9dd-4546-8b8a-1e3112945d9f","eventType":{"intent":{"tag":"AddTask","contents":"remove uuid from events"},"detailRef":"31766311-bd6b-4d61-944c-6b206e5dee11"},"timestamp":"2018-03-18T21:03:42.122571249Z"}
 {"eventUuid":"0e10dbed-f66f-47f7-88de-12f10bdb4d70","eventType":{"intent":{"tag":"AddTask","contents":"record task author/owner"},"detailRef":"b864c0e7-81f0-4b28-af60-b6124c6c05b6"},"timestamp":"2018-03-18T21:11:32.656428393Z"}
+{"eventUuid":"a7698d35-6194-4c3c-8c3e-06a8ef306571","eventType":{"intent":{"tag":"AddTask","contents":"error output"},"detailRef":"9e5bd22e-6fa7-4bd3-9f22-19cba9ab519e"},"timestamp":"2018-03-18T21:24:56.888644683Z"}
