@@ -2,6 +2,6 @@ resolver: lts-10.4
 
 packages:
 - ./packages/event
+- ./packages/event-clean
 - ./packages/htask-lib
 - ./packages/htask-bin
-- ./packages/htask-clean

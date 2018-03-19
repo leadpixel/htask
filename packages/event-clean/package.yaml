@@ -1,4 +1,4 @@
-name:                htask-clean
+name:                event-clean
 version:             0.1.0.0
 github:              "palf/htask"
 license:             BSD3
@@ -32,7 +32,7 @@ dependencies:
 - uuid
 
 executables:
-  htask-clean:
+  event-clean:
     main:                Main.hs
     source-dirs:         src
     dependencies:
