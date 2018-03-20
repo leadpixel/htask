@@ -7,10 +7,10 @@ module Main
   ( main
   ) where
 
-import qualified Control.Monad.Trans.Resource as R
-import qualified Data.Aeson                   as Aeson
-import qualified Data.ByteString              as S
-import qualified Data.ByteString.Lazy         as L
+import qualified Control.Monad.Trans.Resource as Rt
+import qualified Data.Aeson                   as A
+import qualified Data.ByteString              as BS
+import qualified Data.ByteString.Lazy         as BL
 import qualified Data.Conduit                 as C
 import qualified Data.Conduit.Combinators     as Cx
 import qualified Data.List                    as List
@@ -21,7 +21,7 @@ import Data.Semigroup ((<>))
 import Data.Conduit (($$), ($=))
 
 
-type SomeEvent = Event Aeson.Value
+type SomeEvent = Event A.Value
 
 
 main :: IO ()
@@ -35,26 +35,26 @@ main
 
 conduitReadEvents :: FilePath -> IO [Maybe SomeEvent]
 conduitReadEvents file = do
-  content <- R.runResourceT
+  content <- Rt.runResourceT
     $ Cx.sourceFile file
     $= splitLines
     $$ Cx.sinkList
 
-  pure (Aeson.decodeStrict <$> content)
+  pure (A.decodeStrict <$> content)
 
 
 conduitWriteEvents :: FilePath -> [SomeEvent] -> IO ()
 conduitWriteEvents file xs
-  = R.runResourceT
+  = Rt.runResourceT
     $ Cx.yieldMany (convert <$> xs)
     $$ Cx.sinkFile file
 
   where
-    convert :: SomeEvent -> S.ByteString
-    convert e = L.toStrict (Aeson.encode e) <> "\n"
+    convert :: SomeEvent -> BS.ByteString
+    convert e = BL.toStrict (A.encode e) <> "\n"
 
 
-splitLines :: C.Conduit S.ByteString (R.ResourceT IO) S.ByteString
+splitLines :: C.Conduit BS.ByteString (Rt.ResourceT IO) BS.ByteString
 splitLines = Cx.linesUnboundedAscii
 
 

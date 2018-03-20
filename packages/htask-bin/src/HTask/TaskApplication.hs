@@ -1,9 +1,8 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE TypeSynonymInstances       #-}
 
 module HTask.TaskApplication
   ( TaskApplication (..)
@@ -11,43 +10,11 @@ module HTask.TaskApplication
   , runTask
   ) where
 
-import qualified HTask as H
-import HTask.Config
 import Event
-import Conduit
-import Data.Aeson
-import qualified Control.Monad.Reader   as R
-import qualified Control.Monad.State    as S
-import qualified Data.ByteString        as BS
-import qualified Data.ByteString.Lazy   as Lazy
-import qualified Data.ByteString.Lazy.UTF8 as UTF8
-import Data.Maybe
-
-
-type FileBackend = R.ReaderT FilePath IO
-
-
-instance EventBackend FileBackend where
-  readEvents = fileReadEvents
-  writeEvent = fileWriteEvent
-
-
-fileReadEvents :: (FromJSON a) => FileBackend [Event a]
-fileReadEvents = R.ask >>= liftIO . y
-  where
-    y :: (FromJSON b) => FilePath -> IO [Event b]
-    y = fmap (catMaybes . fmap (decode . UTF8.fromString) . lines) .  readFile
-
-
-fileWriteEvent :: (ToJSON a) => Event a -> FileBackend ()
-fileWriteEvent ev = R.ask >>= \z -> liftIO (t z ev)
-  where
-    t :: (ToJSON b) => FilePath -> b -> IO ()
-    t f = BS.appendFile f
-        . Lazy.toStrict
-        . flip mappend "\n"
-        . encode
-
+import HTask.Config
+import qualified Control.Monad.Reader as R
+import qualified Control.Monad.State  as S
+import qualified HTask                as H
 
 
 type TaskConfig = R.ReaderT GlobalOptions IO
@@ -71,16 +38,29 @@ instance H.HasTasks TaskApplication where
 
 
 instance CanTime TaskApplication where
-  now = TaskApp $ lift $ lift now
+  now = TaskApp $ S.lift $ R.lift now
 
 
 instance CanUuid TaskApplication where
-  uuidGen = TaskApp $ lift $ lift uuidGen
+  uuidGen = TaskApp $ S.lift $ R.lift uuidGen
 
 
-instance H.CanStoreEvent TaskApplication where
-  appendEvent ev
-    = TaskApp $ lift (runWithFile $ writeEvent ev)
+-- instance HasEventSink TaskApplication where
+--   writeEvent ev
+--     = TaskApp $ S.lift (runWithConduit $ writeEvent ev)
+
+
+-- runWithConduit :: ConduitBackend a -> E.ExceptT String TaskConfig a
+-- runWithConduit k
+--   = do
+--     c <- ask
+--     let c' = taskfile c
+
+--     let k' = R.runReaderT c'
+
+instance HasEventSink TaskApplication where
+  writeEvent ev
+    = TaskApp $ S.lift (runWithFile $ writeEvent ev)
 
 
 prepTasks :: [H.TaskEvent] -> TaskConfig [H.Task]

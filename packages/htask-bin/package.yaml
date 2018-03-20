@@ -25,6 +25,7 @@ dependencies:
 - pretty
 - pandoc
 - pandoc-types
+- resourcet
 - pretty-show
 - random
 - tagged

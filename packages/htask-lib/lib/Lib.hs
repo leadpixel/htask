@@ -5,8 +5,6 @@
 
 module Lib
   ( TaskEvent
-  , TaskError
-  , CanStoreEvent (..)
   , TaskEventDetail (..)
   , TaskIntent (..)
   , applyIntentToTasks
@@ -19,7 +17,6 @@ import Event
 import HTask.TaskContainer
 import HTask.Task
 import Control.Monad
-import qualified Control.Monad.Writer as Writer
 import qualified Data.Text as Text
 
 
@@ -30,8 +27,6 @@ data TaskEventDetail = TaskEventDetail
 
 
 type TaskEvent = Event TaskEventDetail
-type EventLog = [TaskEvent]
-type TaskError = String
 
 
 data TaskIntent
@@ -46,13 +41,6 @@ instance ToJSON TaskIntent
 instance ToJSON TaskEventDetail
 instance FromJSON TaskIntent
 instance FromJSON TaskEventDetail
-
-
-class CanStoreEvent m where
-  appendEvent :: TaskEvent -> m ()
-
-instance (Monad m) => CanStoreEvent (Writer.WriterT EventLog m) where
-  appendEvent x = Writer.tell [x]
 
 
 replayEventLog
@@ -95,7 +83,7 @@ applyRawEvent ev _ = do
 
 applyIntentToTasks
   :: (Monad m, CanCreateTask m, HasTasks m)
-  => TaskIntent -> m (Either TaskError TaskEventDetail)
+  => TaskIntent -> m (Either String TaskEventDetail)
 applyIntentToTasks itx =
   case itx of
     (AddTask text) -> do

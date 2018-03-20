@@ -2,7 +2,7 @@ module HTask.Output.Renderers
   ( renderDocument
   ) where
 
-import qualified Data.Aeson as Aeson
+import qualified Data.Aeson as A
 import qualified Data.Text as Text
 import HTask.Config
 import HTask.Output.Document
@@ -26,7 +26,7 @@ renderToConsole
 
 renderToJSON :: Document -> IO ()
 renderToJSON
-  = print . Aeson.encode . fmap unLine . undoc
+  = print . A.encode . fmap unLine . undoc
 
 
 renderToPorcelain :: Document -> IO ()

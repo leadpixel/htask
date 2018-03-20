@@ -29,8 +29,8 @@ findMatch ref
 
  where
    filterMatchesUUID :: Text.Text -> [H.Task] -> [H.Task]
-   filterMatchesUUID ref
-     = filter (Text.isPrefixOf ref . taskRefToText)
+   filterMatchesUUID t
+     = filter (Text.isPrefixOf t . taskRefToText)
 
 
 runWithMatch
@@ -46,12 +46,12 @@ runWithMatch f ref
 
   where
     formatNoMatchError :: Text.Text -> Document
-    formatNoMatchError ref
-      = formatError ("did not find unique match for " <> ref)
+    formatNoMatchError t
+      = formatError ("did not find unique match for " <> t)
 
     j :: (Show a) => (H.TaskRef -> TaskApplication a) -> H.Task -> TaskConfig a
-    j f v
-      = runTask (f $ H.taskRef v)
+    j f' v
+      = runTask (f' $ H.taskRef v)
 
     coerceToSuccess :: (Show a) => a -> Document
     coerceToSuccess = formatSuccess . Text.pack . show
