@@ -29,6 +29,7 @@ import qualified Data.Maybe as Mb
 import Event.Event
 import Data.Semigroup ((<>))
 import Data.Conduit (($$), ($=))
+import System.Exit
 
 
 class HasEventSource  m where
@@ -50,37 +51,61 @@ instance HasEventSink FileBackend where
   writeEvent = fileWriteEvent
 
 
-fileReadEvents :: (A.FromJSON a) => FileBackend [Event a]
-fileReadEvents = do
-  q <- R.ask
-  xs <- R.liftIO (kkk q)
 
-  case xs of
-    Left e -> undefined
-    Right v -> pure (y v)
+handleReadError :: IOError -> Maybe ReadError
+handleReadError e = Just (ReadError $ show e)
 
-  where
-    y :: (A.FromJSON b) => String -> [Event b]
-    y = Mb.catMaybes . fmap (A.decode . UTF8.fromString) . lines
 
-    kkk :: FilePath -> IO (Either ReadError String)
-    kkk f = tryJust j (readFile f)
+handleWriteError :: IOError -> Maybe ReadError
+handleWriteError _ = Just (ReadError "fuck")
 
-    j :: PermissionDenied -> Maybe ReadError
-    j = undefined
 
 
 newtype ReadError = ReadError String
+  deriving (Show)
+
+
+fileReadEvents :: (A.FromJSON a) => FileBackend [Event a]
+fileReadEvents = do
+  file <- R.ask
+  R.liftIO $ print "before read"
+  xs <- R.liftIO (readCatch file)
+  R.liftIO $ print "after read"
+
+  case xs of
+    Left e -> do
+      R.liftIO $ print "left"
+      R.liftIO $ exitFailure
+
+    Right v ->
+      pure (decodeEvents v)
+
+  where
+    decodeEvents :: (A.FromJSON b) => String -> [Event b]
+    decodeEvents = Mb.catMaybes . fmap (A.decode . UTF8.fromString) . lines
+
+    readCatch :: FilePath -> IO (Either ReadError String)
+    readCatch f = tryJust handleReadError (readFile f)
 
 
 fileWriteEvent :: (A.ToJSON a) => Event a -> FileBackend ()
-fileWriteEvent ev = R.ask >>= \z -> R.liftIO (t z ev)
+fileWriteEvent ev = do
+  let xs = bsEncode ev
+
+  file <- R.ask
+  R.liftIO $ print "before append"
+  R.liftIO (appendCatch file xs)
+  R.liftIO $ print "after append"
+
   where
-    t :: (A.ToJSON b) => FilePath -> b -> IO ()
-    t f = BS.appendFile f
-        . BL.toStrict
-        . flip mappend "\n"
-        . A.encode
+    bsEncode :: (A.ToJSON b) => b -> BS.ByteString
+    bsEncode
+      = BL.toStrict
+      . flip mappend "\n"
+      . A.encode
+
+    appendCatch :: FilePath -> BS.ByteString -> IO (Either ReadError ())
+    appendCatch f x = tryJust handleWriteError (BS.appendFile f x)
 
 
 
