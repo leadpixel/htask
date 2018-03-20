@@ -10,12 +10,12 @@
 module Event.Backends
   ( HasEventSource (..)
   , HasEventSink (..)
-  , EventBackend (..)
 
   , FileBackend (..)
   -- , ConduitBackend (..)
   ) where
 
+import Control.Exception
 import qualified Control.Monad.Trans.Resource as Rt
 import qualified Data.Aeson                   as A
 import qualified Data.Conduit                 as C
@@ -38,9 +38,6 @@ class HasEventSink m where
   writeEvent :: (A.ToJSON a) => Event a -> m ()
 
 
-type EventBackend m = (HasEventSource m, HasEventSink m)
-
-
 
 
 type FileBackend = R.ReaderT FilePath IO
@@ -54,10 +51,26 @@ instance HasEventSink FileBackend where
 
 
 fileReadEvents :: (A.FromJSON a) => FileBackend [Event a]
-fileReadEvents = R.ask >>= R.liftIO . y
+fileReadEvents = do
+  q <- R.ask
+  xs <- R.liftIO (kkk q)
+
+  case xs of
+    Left e -> undefined
+    Right v -> pure (y v)
+
   where
-    y :: (A.FromJSON b) => FilePath -> IO [Event b]
-    y = fmap (Mb.catMaybes . fmap (A.decode . UTF8.fromString) . lines) .  readFile
+    y :: (A.FromJSON b) => String -> [Event b]
+    y = Mb.catMaybes . fmap (A.decode . UTF8.fromString) . lines
+
+    kkk :: FilePath -> IO (Either ReadError String)
+    kkk f = tryJust j (readFile f)
+
+    j :: PermissionDenied -> Maybe ReadError
+    j = undefined
+
+
+newtype ReadError = ReadError String
 
 
 fileWriteEvent :: (A.ToJSON a) => Event a -> FileBackend ()
@@ -75,8 +88,10 @@ fileWriteEvent ev = R.ask >>= \z -> R.liftIO (t z ev)
 -- type ConduitBackend = R.ReaderT FilePath IO
 
 
--- instance EventBackend ConduitBackend where
+-- instance HasEventSource ConduitBackend where
 --   readEvents = conduitReadEvents
+--
+-- instance HasEventSink ConduitBackend where
 --   writeEvent = conduitWriteEvent
 
 
