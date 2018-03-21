@@ -19,10 +19,6 @@ headSafe [x] = Just x
 headSafe _ = Nothing
 
 
-taskRefToText :: H.Task -> Text.Text
-taskRefToText = UUID.toText . untag . H.taskRef
-
-
 findMatch :: Text.Text -> TaskConfig (Maybe H.Task)
 findMatch ref
   = (headSafe . filterMatchesUUID ref) <$> runTask H.listTasks
@@ -30,7 +26,7 @@ findMatch ref
  where
    filterMatchesUUID :: Text.Text -> [H.Task] -> [H.Task]
    filterMatchesUUID t
-     = filter (Text.isPrefixOf t . taskRefToText)
+     = filter (Text.isPrefixOf t . H.taskRefText . H.taskRef)
 
 
 runWithMatch

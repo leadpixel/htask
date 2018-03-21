@@ -7,6 +7,7 @@ module HTask.Task
   , CanCreateTask
   , createTask
   , setTaskStatus
+  , taskRefText
   ) where
 
 import Event
@@ -47,3 +48,7 @@ createTask tex
 
 setTaskStatus :: TaskStatus -> Task -> Task
 setTaskStatus s t = t { status = s }
+
+
+taskRefText :: TaskRef -> Text.Text
+taskRefText = UUID.toText . untag
