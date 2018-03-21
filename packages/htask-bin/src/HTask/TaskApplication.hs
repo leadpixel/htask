@@ -21,7 +21,7 @@ type TaskConfig = R.ReaderT GlobalOptions IO
 
 
 runWithFile :: FileBackend a -> TaskConfig a
-runWithFile = R.withReaderT taskfile
+runWithFile (F x) = R.withReaderT taskfile x
 
 
 newtype TaskApplication a = TaskApp
@@ -47,11 +47,11 @@ instance CanUuid TaskApplication where
 
 -- instance HasEventSink TaskApplication where
 --   writeEvent ev
---     = TaskApp $ S.lift (runWithConduit $ writeEvent ev)
+--     = TaskApp $ S.lift (runWithFile $ writeEvent ev)
 
 
--- runWithConduit :: ConduitBackend a -> E.ExceptT String TaskConfig a
--- runWithConduit k
+-- runWithFile :: ConduitBackend a -> E.ExceptT String TaskConfig a
+-- runWithFile k
 --   = do
 --     c <- ask
 --     let c' = taskfile c

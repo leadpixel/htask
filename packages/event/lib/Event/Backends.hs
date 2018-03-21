@@ -1,18 +1,10 @@
-{-# LANGUAGE ConstraintKinds            #-}
-{-# LANGUAGE DeriveFunctor              #-}
-{-# LANGUAGE FlexibleInstances          #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE ScopedTypeVariables        #-}
-{-# LANGUAGE TypeSynonymInstances       #-}
 
 module Event.Backends
   ( HasEventSource (..)
   , HasEventSink (..)
 
   , FileBackend (..)
-  -- , ConduitBackend (..)
   ) where
 
 import Control.Exception
@@ -30,6 +22,9 @@ import Event.Event
 import Data.Semigroup ((<>))
 import Data.Conduit (($$), ($=))
 import System.Exit
+import System.IO.Error
+import qualified System.IO                   as IO
+import GHC.IO.Exception
 
 
 class HasEventSource  m where
@@ -39,121 +34,83 @@ class HasEventSink m where
   writeEvent :: (A.ToJSON a) => Event a -> m ()
 
 
-
-
-type FileBackend = R.ReaderT FilePath IO
-
-
-instance HasEventSource FileBackend where
-  readEvents = fileReadEvents
-
-instance HasEventSink FileBackend where
-  writeEvent = fileWriteEvent
-
-
-
-handleReadError :: IOError -> Maybe ReadError
-handleReadError e = Just (ReadError $ show e)
-
-
-handleWriteError :: IOError -> Maybe ReadError
-handleWriteError _ = Just (ReadError "fuck")
-
-
-
-newtype ReadError = ReadError String
+newtype FileError = FileError String
   deriving (Show)
 
 
-fileReadEvents :: (A.FromJSON a) => FileBackend [Event a]
-fileReadEvents = do
-  file <- R.ask
-  R.liftIO $ print "before read"
-  xs <- R.liftIO (readCatch file)
-  R.liftIO $ print "after read"
-
-  case xs of
-    Left e -> do
-      R.liftIO $ print "left"
-      R.liftIO $ exitFailure
-
-    Right v ->
-      pure (decodeEvents v)
-
-  where
-    decodeEvents :: (A.FromJSON b) => String -> [Event b]
-    decodeEvents = Mb.catMaybes . fmap (A.decode . UTF8.fromString) . lines
-
-    readCatch :: FilePath -> IO (Either ReadError String)
-    readCatch f = tryJust handleReadError (readFile f)
+handleFileError :: IOException -> Maybe FileError
+handleFileError e
+  = Just $ case ioeGetErrorType e of
+      AlreadyExists     -> FileError "AlreadyExists"
+      NoSuchThing       -> FileError "NoSuchThing"
+      ResourceBusy      -> FileError "ResourceBusy"
+      ResourceExhausted -> FileError "ResourceExhausted"
+      EOF               -> FileError "EOF"
+      IllegalOperation  -> FileError "IllegalOperation"
+      PermissionDenied  -> FileError "PermissionDenied"
+      UserError         -> FileError "UserError"
 
 
-fileWriteEvent :: (A.ToJSON a) => Event a -> FileBackend ()
-fileWriteEvent ev = do
-  let xs = bsEncode ev
+newtype FileBackend a = F (R.ReaderT FilePath IO a)
 
-  file <- R.ask
-  R.liftIO $ print "before append"
-  R.liftIO (appendCatch file xs)
-  R.liftIO $ print "after append"
+
+instance HasEventSource FileBackend where
+  readEvents = conduitReadEvents
+
+instance HasEventSink FileBackend where
+  writeEvent = conduitWriteEvent
+
+
+conduitReadEvents :: (A.FromJSON a) => FileBackend [Event a]
+conduitReadEvents
+  = F $ R.ask >>= \file
+  -> R.liftIO $ handleReadFile file >>= orDie decodeEvents
 
   where
-    bsEncode :: (A.ToJSON b) => b -> BS.ByteString
-    bsEncode
-      = BL.toStrict
-      . flip mappend "\n"
-      . A.encode
+    handleReadFile :: FilePath -> IO (Either FileError [BS.ByteString])
+    handleReadFile = runFileOp loadFileLines
 
-    appendCatch :: FilePath -> BS.ByteString -> IO (Either ReadError ())
-    appendCatch f x = tryJust handleWriteError (BS.appendFile f x)
+    loadFileLines :: FilePath -> IO [BS.ByteString]
+    loadFileLines file
+      = Rt.runResourceT
+        $ Cx.sourceFile file
+        $= splitLines
+        $$ Cx.sinkList
 
-
-
-
--- type ConduitBackend = R.ReaderT FilePath IO
-
-
--- instance HasEventSource ConduitBackend where
---   readEvents = conduitReadEvents
---
--- instance HasEventSink ConduitBackend where
---   writeEvent = conduitWriteEvent
+    decodeEvents :: (A.FromJSON a) => [BS.ByteString] -> [Event a]
+    decodeEvents = Mb.catMaybes . fmap A.decodeStrict
 
 
+conduitWriteEvent :: (A.ToJSON a) => Event a -> FileBackend ()
+conduitWriteEvent x
+  = F $ R.ask >>= \file
+  -> R.liftIO $ handleWriteFile file >>= orDie (const ())
 
--- conduitReadEvents
---   :: (A.FromJSON a)
---   => R.ReaderT FilePath IO [Event a]
--- conduitReadEvents
---   = R.ask >>= \file
---   -> R.lift
---     $ t <$> Rt.runResourceT
---       (  Cx.sourceFile file
---       $= splitLines
---       $$ Cx.sinkList
---       )
+  where
+    handleWriteFile :: FilePath -> IO (Either FileError ())
+    handleWriteFile = runFileOp (fileAppend $ encodeEvent x)
 
---   where
---     t :: (A.FromJSON a) => [BS.ByteString] -> [Event a]
---     t = Mb.catMaybes . fmap A.decodeStrict
+    fileAppend :: BS.ByteString -> FilePath -> IO ()
+    fileAppend x' file
+      = Rt.runResourceT
+        $ C.yield x'
+        $$ sinkFileAppend file
 
+    encodeEvent :: (A.ToJSON a) => Event a -> BS.ByteString
+    encodeEvent e = BL.toStrict (A.encode e) <> "\n"
 
--- conduitWriteEvent
---   :: (A.ToJSON a)
---   => Event a
---   -> R.ReaderT FilePath IO ()
--- conduitWriteEvent x
---   = R.ask >>= \file
---   -> R.lift
---     $ Rt.runResourceT
---       $ C.yield (convert x)
---       $$ Cx.sinkFile file
-
---   where
---     convert :: (A.ToJSON a) => Event a -> BS.ByteString
---     convert e = BL.toStrict (A.encode e) <> "\n"
+    sinkFileAppend fp
+      = Cx.sinkIOHandle (IO.openBinaryFile fp IO.AppendMode)
 
 
+splitLines :: C.Conduit BS.ByteString (Rt.ResourceT IO) BS.ByteString
+splitLines = Cx.linesUnboundedAscii
 
--- splitLines :: C.Conduit BS.ByteString (Rt.ResourceT IO) BS.ByteString
--- splitLines = Cx.linesUnboundedAscii
+
+runFileOp :: (FilePath -> IO a) -> FilePath -> IO (Either FileError a)
+runFileOp t = tryJust handleFileError . t
+
+
+orDie :: (a -> b) -> Either FileError a -> IO b
+orDie _ (Left e) = die (show e)
+orDie f (Right v) = pure (f v)
