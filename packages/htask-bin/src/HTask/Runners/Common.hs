@@ -1,8 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module HTask.Runners.Common
-  ( runWithMatch
-  , findMatch
+  ( withMatch
   ) where
 
 import qualified Data.Text as Text
@@ -27,25 +26,11 @@ findMatch ref
      = filter (Text.isPrefixOf t . H.taskRefText . H.taskRef)
 
 
-runWithMatch
-  :: (Show a)
-  => (H.TaskRef -> TaskApplication a)
-  -> Text.Text
-  -> TaskConfig Document
-runWithMatch f ref
-  = findMatch ref
-  >>= maybe
-      (pure $ formatNoMatchError ref)
-      ((fmap . fmap) coerceToSuccess (j f))
+withMatch :: (H.Task -> TaskConfig Document) -> Text.Text -> TaskConfig Document
+withMatch op t
+  = findMatch t
+  >>= maybe (pure $ formatErrorMatch t) op
 
   where
-    formatNoMatchError :: Text.Text -> Document
-    formatNoMatchError t
-      = formatError ("did not find unique match for " <> t)
-
-    j :: (Show a) => (H.TaskRef -> TaskApplication a) -> H.Task -> TaskConfig a
-    j f' v
-      = runTask (f' $ H.taskRef v)
-
-    coerceToSuccess :: (Show a) => a -> Document
-    coerceToSuccess = formatSuccess . Text.pack . show
+    formatErrorMatch t'
+      = formatError ("did not find unique match for " <> t')

@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module HTask.Runners.Start
   ( runStart
   ) where
@@ -7,7 +9,21 @@ import qualified HTask as H
 import HTask.Runners.Common
 import HTask.TaskApplication
 import HTask.Output
+import Data.Semigroup ((<>))
 
 
 runStart :: Text.Text -> TaskConfig Document
-runStart = runWithMatch H.startTask
+runStart = withMatch
+  (\tx -> runTask
+    $   formatOutcome tx
+    <$> H.startTask (H.taskRef tx)
+  )
+
+  where
+    formatOutcome tx
+      = either
+          (formatError . Text.pack)
+          (const $ formatSuccessStart tx)
+
+    formatSuccessStart tx
+      = formatSuccess ("starting task: " <> H.description tx)

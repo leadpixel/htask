@@ -12,17 +12,17 @@ import Data.Semigroup ((<>))
 
 
 runAdd :: Text.Text -> TaskConfig Document
-runAdd tex
-  = formatAdd tex <$> runTask (H.addTask tex)
+runAdd t
+  = formatOutcome t <$> runTask (H.addTask t)
 
+  where
+    formatOutcome t'
+      = either
+          (formatError . Text.pack)
+          (formatSuccessAdd t')
 
-formatAdd :: Text.Text -> Either String H.TaskRef -> Document
-formatAdd t x
-  = case x of
-      Left e -> formatError (Text.pack e)
-      Right v -> formatSuccessAdd t v
-
-
-formatSuccessAdd :: Text.Text -> H.TaskRef -> Document
-formatSuccessAdd t v
-  = formatSuccess ("added task: " <> t <> "\nref: " <> H.taskRefText v)
+    formatSuccessAdd t' ref
+      = formatSuccess
+          (  "added task: " <> t' <> "\n"
+          <> "ref: " <> H.taskRefText ref
+          )
