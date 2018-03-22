@@ -9,9 +9,7 @@ import qualified Data.Text as Text
 import qualified HTask as H
 import HTask.TaskApplication
 import HTask.Output
-import qualified Data.UUID as UUID
 import Data.Semigroup ((<>))
-import Data.Tagged
 
 
 headSafe :: [a] -> Maybe a

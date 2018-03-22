@@ -14,7 +14,6 @@ import qualified Data.Conduit                 as C
 import qualified Control.Monad.Reader         as R
 import qualified Data.ByteString              as BS
 import qualified Data.ByteString.Lazy         as BL
-import qualified Data.ByteString.Lazy.UTF8    as UTF8
 import qualified Data.Conduit.Combinators     as Cx
 import qualified Data.Maybe as Mb
 
