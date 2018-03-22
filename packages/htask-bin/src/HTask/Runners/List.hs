@@ -19,59 +19,62 @@ import qualified HTask as H
 
 
 taskDisplayOrder :: H.Task -> H.Task -> Ordering
-taskDisplayOrder = statusDisplayOrder `on` H.status
+taskDisplayOrder a b
+  = byStatus `mappend` byTimestamp
+
+  where
+    byStatus
+      = on statusDisplayOrder H.status a b
+
+    byTimestamp
+      = on compare H.createdAt a b
 
 
 statusDisplayOrder :: H.TaskStatus -> H.TaskStatus -> Ordering
-statusDisplayOrder  H.InProgress  H.InProgress  =  EQ
-statusDisplayOrder  H.Pending     H.InProgress  =  GT
-statusDisplayOrder  H.Complete    H.InProgress  =  GT
-statusDisplayOrder  H.Abandoned   H.InProgress  =  GT
-
-statusDisplayOrder  H.InProgress  H.Pending     =  LT
-statusDisplayOrder  H.Pending     H.Pending     =  EQ
-statusDisplayOrder  H.Complete    H.Pending     =  GT
-statusDisplayOrder  H.Abandoned   H.Pending     =  GT
-
-statusDisplayOrder  H.InProgress  H.Complete    =  LT
-statusDisplayOrder  H.Pending     H.Complete    =  LT
-statusDisplayOrder  H.Complete    H.Complete    =  EQ
-statusDisplayOrder  H.Abandoned   H.Complete    =  GT
-
 statusDisplayOrder  H.InProgress  H.Abandoned   =  LT
+statusDisplayOrder  H.InProgress  H.Complete    =  LT
+statusDisplayOrder  H.InProgress  H.Pending     =  LT
+statusDisplayOrder  H.InProgress  H.InProgress  =  EQ
+
 statusDisplayOrder  H.Pending     H.Abandoned   =  LT
+statusDisplayOrder  H.Pending     H.Complete    =  LT
+statusDisplayOrder  H.Pending     H.Pending     =  EQ
+statusDisplayOrder  H.Pending     H.InProgress  =  GT
+
 statusDisplayOrder  H.Complete    H.Abandoned   =  LT
+statusDisplayOrder  H.Complete    H.Complete    =  EQ
+statusDisplayOrder  H.Complete    H.InProgress  =  GT
+statusDisplayOrder  H.Complete    H.Pending     =  GT
+
 statusDisplayOrder  H.Abandoned   H.Abandoned   =  EQ
+statusDisplayOrder  H.Abandoned   H.Complete    =  GT
+statusDisplayOrder  H.Abandoned   H.InProgress  =  GT
+statusDisplayOrder  H.Abandoned   H.Pending     =  GT
 
 
 runList :: ShowUUID -> ShowAll -> TaskConfig Document
-runList showUUID showAll = do
-  ts <- runTask H.listTasks
-  pure $ Document $ fmap formatOutput (selectTasks ts)
+runList showUUID showAll
+  = ( Document . fmap formatOutput . selectTasks )
+  <$> runTask H.listTasks
 
   where
-    -- formatOutput :: H.Task -> Block
-    formatOutput = line . nicePrint showUUID
+    formatOutput
+      = line . nicePrint showUUID
 
-    selectTasks :: [H.Task] -> [H.Task]
     selectTasks
       = sortBy taskDisplayOrder
       . (if showAll
             then id
-            else justActive
+            else filterActive
         )
 
-    justActive :: [H.Task] -> [H.Task]
-    justActive = filter (ork notAbandoned notCompleted)
+    filterActive
+      = filter (justActive . H.status)
 
-    ork :: (a -> Bool) -> (a -> Bool) -> (a -> Bool)
-    ork f g x = f x && g x
-
-    notAbandoned :: H.Task -> Bool
-    notAbandoned t = H.status t /= H.Abandoned
-
-    notCompleted :: H.Task -> Bool
-    notCompleted t = H.status t /= H.Complete
+    justActive H.Pending    = True
+    justActive H.InProgress = True
+    justActive H.Complete   = False
+    justActive H.Abandoned  = False
 
 
 nicePrint :: ShowUUID -> H.Task -> Text.Text
