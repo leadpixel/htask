@@ -192,3 +192,4 @@
 {"eventUuid":"b95518d5-59e6-488d-8ae2-7f0b9caa2307","eventType":{"intent":{"tag":"RemoveTask","contents":"f856b048-0e4e-49ce-8c4d-465255d22388"},"detailRef":"f856b048-0e4e-49ce-8c4d-465255d22388"},"timestamp":"2018-03-22T08:52:17.552462129Z"}
 {"eventUuid":"fdec31af-7ab6-4bec-ba73-68cd90dd12b2","eventType":{"intent":{"tag":"RemoveTask","contents":"f856b048-0e4e-49ce-8c4d-465255d22388"},"detailRef":"f856b048-0e4e-49ce-8c4d-465255d22388"},"timestamp":"2018-03-22T08:52:21.742914665Z"}
 {"eventUuid":"70dfdd6d-459c-46fc-b3fa-dca93774c037","eventType":{"intent":{"tag":"AddTask","contents":"failure on removing already removed task -> state transition?"},"detailRef":"2254ba3f-95c2-484e-bbdf-3d6370e5b8cd"},"timestamp":"2018-03-22T08:52:36.423654626Z"}
+{"eventType":{"intent":{"tag":"StartTask","contents":"31766311-bd6b-4d61-944c-6b206e5dee11"},"detailRef":"31766311-bd6b-4d61-944c-6b206e5dee11"},"timestamp":"2018-03-31T20:45:25.998579395Z"}
