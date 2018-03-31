@@ -11,10 +11,6 @@ module Event.Event
 import Data.Aeson
 import GHC.Generics
 import Capabilities
-import qualified Data.UUID as UUID
-
-
-type EventIdent = ()
 
 
 data Event a = Event
