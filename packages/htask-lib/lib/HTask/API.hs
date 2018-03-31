@@ -17,7 +17,7 @@ import HTask.Task
 
 
 maybeStore
-  :: (CanCreateEvent m, HasEventSink m)
+  :: (CanCreateTask m, HasEventSink m)
   => Either String TaskEventDetail -> m (Either String TaskRef)
 maybeStore r
   = case r of
@@ -26,7 +26,7 @@ maybeStore r
 
 
 funk
-  :: (CanCreateEvent m, HasEventSink m)
+  :: (CanCreateTask m, HasEventSink m)
   => TaskEventDetail -> m TaskRef
 funk v = do
   createEvent v >>= writeEvent
@@ -34,7 +34,7 @@ funk v = do
 
 
 addTask
-  :: (HasTasks m, CanCreateEvent m, HasEventSink m)
+  :: (HasTasks m, CanCreateTask m, HasEventSink m)
   => Text.Text -> m (Either String TaskRef)
 addTask t = do
   r <- applyIntentToTasks (AddTask t)
@@ -44,7 +44,7 @@ addTask t = do
 
 
 startTask
-  :: (HasTasks m, CanCreateEvent m, HasEventSink m)
+  :: (HasTasks m, CanCreateTask m, HasEventSink m)
   => TaskRef -> m (Either String TaskRef)
 startTask ref = do
   r <- applyIntentToTasks (StartTask ref)
@@ -52,7 +52,7 @@ startTask ref = do
 
 
 stopTask
-  :: (HasTasks m, CanCreateEvent m, HasEventSink m)
+  :: (HasTasks m, CanCreateTask m, HasEventSink m)
   => TaskRef -> m (Either String TaskRef)
 stopTask ref = do
   r <- applyIntentToTasks (StopTask ref)
@@ -60,7 +60,7 @@ stopTask ref = do
 
 
 completeTask
-  :: (HasTasks m, CanCreateEvent m, HasEventSink m)
+  :: (HasTasks m, CanCreateTask m, HasEventSink m)
   => TaskRef -> m (Either String TaskRef)
 completeTask ref = do
   r <- applyIntentToTasks (CompleteTask ref)
@@ -68,7 +68,7 @@ completeTask ref = do
 
 
 removeTask
-  :: (HasTasks m, CanCreateEvent m, HasEventSink m)
+  :: (HasTasks m, CanCreateTask m, HasEventSink m)
   => TaskRef -> m (Either String TaskRef)
 removeTask ref = do
   r <- applyIntentToTasks (RemoveTask ref)
