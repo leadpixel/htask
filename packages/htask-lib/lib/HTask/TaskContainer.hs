@@ -18,8 +18,6 @@ type Tasks = [Task]
 
 class HasTasks m where
   getTasks :: m Tasks
-  putTasks :: Tasks -> m ()
-
   addNewTask :: Task -> m Bool
   updateExistingTask :: TaskRef -> (Task -> Task) -> m Bool
   removeTaskRef :: TaskRef -> m Bool
@@ -27,14 +25,13 @@ class HasTasks m where
 
 instance (Monad m) => HasTasks (State.StateT Tasks m) where
   getTasks = State.get
-  putTasks = State.put
 
   addNewTask t = do
     ts <- getTasks
     let p = findTask ts (taskRef t)
     if isNothing p
        then do
-         putTasks (t : ts)
+         State.put (t : ts)
          pure True
        else pure False
 
@@ -44,7 +41,7 @@ instance (Monad m) => HasTasks (State.StateT Tasks m) where
       (pure False)
       (\t -> do
         let k = op t
-        putTasks (k : removeRef ts ref)
+        State.put (k : removeTaskByRef ts ref)
         pure True)
       (findTask ts ref)
 
@@ -53,21 +50,20 @@ instance (Monad m) => HasTasks (State.StateT Tasks m) where
     maybe
       (pure False)
       (\_t -> do
-        putTasks (removeRef ts ref)
+        State.put (removeTaskByRef ts ref)
         pure True)
       (findTask ts ref)
 
 
 instance (Monad m, MonadTrans t) => HasTasks (t (State.StateT Tasks m)) where
   getTasks = lift getTasks
-  putTasks = lift . putTasks
   addNewTask = lift . addNewTask
   updateExistingTask ref = lift . updateExistingTask ref
   removeTaskRef = lift . removeTaskRef
 
 
-removeRef :: Tasks -> TaskRef -> Tasks
-removeRef ts ref = filter (\k -> taskRef k /= ref) ts
+removeTaskByRef :: Tasks -> TaskRef -> Tasks
+removeTaskByRef ts ref = filter (\k -> taskRef k /= ref) ts
 
 
 emptyTasks :: Tasks

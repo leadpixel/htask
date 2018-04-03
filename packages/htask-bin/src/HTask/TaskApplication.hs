@@ -31,7 +31,6 @@ newtype TaskApplication a = TaskApp
 
 instance H.HasTasks TaskApplication where
   getTasks = TaskApp H.getTasks
-  putTasks = TaskApp . H.putTasks
   addNewTask = TaskApp . H.addNewTask
   updateExistingTask ref = TaskApp . H.updateExistingTask ref
   removeTaskRef = TaskApp . H.removeTaskRef

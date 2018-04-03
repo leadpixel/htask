@@ -45,16 +45,15 @@ instance FromJSON TaskEventDetail
 
 replayEventLog
   :: (Monad m, HasTasks m)
-  => [TaskEvent] -> m ()
+  => [TaskEvent] -> m [Task]
 replayEventLog vs = do
   ts <- getTasks
-  ks <- foldM (flip applyRawEvent) ts vs
-  putTasks ks
+  foldM (flip applyRawEvent) ts vs
 
 
 applyRawEvent
   :: (Monad m, HasTasks m)
-  => TaskEvent -> a -> m Tasks
+  => TaskEvent -> a -> m [Task]
 applyRawEvent ev _ = do
   let td = eventType ev
   case intent td of
