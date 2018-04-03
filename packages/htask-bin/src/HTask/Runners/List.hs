@@ -20,7 +20,7 @@ import qualified HTask as H
 
 taskDisplayOrder :: H.Task -> H.Task -> Ordering
 taskDisplayOrder a b
-  = byStatus `mappend` byTimestamp
+  = byStatus <> byTimestamp
 
   where
     byStatus
