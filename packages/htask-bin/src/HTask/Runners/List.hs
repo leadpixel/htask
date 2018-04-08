@@ -54,7 +54,7 @@ statusDisplayOrder  H.Abandoned   H.Pending     =  GT
 
 runList :: ShowUUID -> ShowAll -> TaskConfig Document
 runList showUUID showAll
-  = ( Document . fmap formatOutput . selectTasks )
+  =   Document . fmap formatOutput . selectTasks
   <$> runTask H.listTasks
 
   where

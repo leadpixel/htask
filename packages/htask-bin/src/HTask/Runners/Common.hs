@@ -18,7 +18,8 @@ headSafe _ = Nothing
 
 findMatch :: Text.Text -> TaskConfig (Maybe H.Task)
 findMatch ref
-  = (headSafe . filterMatchesUUID ref) <$> runTask H.listTasks
+  =   headSafe . filterMatchesUUID ref
+  <$> runTask H.listTasks
 
  where
    filterMatchesUUID :: Text.Text -> [H.Task] -> [H.Task]
