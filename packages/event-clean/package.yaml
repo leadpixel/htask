@@ -15,10 +15,9 @@ dependencies:
 - aeson
 - bytestring
 - conduit
-- utf8-string
-- event
 - conduit-combinators
 - containers
+- event
 - mtl
 - operational
 - pretty
@@ -29,6 +28,7 @@ dependencies:
 - text
 - time
 - transformers
+- utf8-string
 - uuid
 
 executables:

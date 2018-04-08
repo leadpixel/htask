@@ -11,16 +11,26 @@ import HTask.Output
 import Data.Semigroup ((<>))
 
 
+type AddOutput = Either String H.TaskRef
+
+
 runAdd :: Text.Text -> TaskConfig Document
 runAdd t
-  = formatOutcome t <$> runTask (H.addTask t)
+  = presentAdd t <$> executeAdd t
+
+
+executeAdd :: Text.Text -> TaskConfig AddOutput
+executeAdd
+  = runTask . H.addTask
+
+
+presentAdd :: Text.Text -> AddOutput -> Document
+presentAdd t
+  = either
+      (formatError . Text.pack)
+      (formatSuccessAdd t)
 
   where
-    formatOutcome t'
-      = either
-          (formatError . Text.pack)
-          (formatSuccessAdd t')
-
     formatSuccessAdd t' ref
       = formatSuccess
           (  "added task: " <> t' <> "\n"

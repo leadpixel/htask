@@ -14,17 +14,17 @@ dependencies:
 - base >= 4.7 && < 5
 - aeson
 - bytestring
-- event
 - conduit
 - conduit-combinators
 - containers
+- event
 - mtl
 - operational
-- random
-- text
 - pretty
 - pretty-show
+- random
 - tagged
+- text
 - time
 - transformers
 - uuid

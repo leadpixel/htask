@@ -15,23 +15,23 @@ dependencies:
 - aeson
 - bytestring
 - conduit
-- utf8-string
 - conduit-combinators
 - containers
-- mtl
 - event
+- mtl
 - operational
 - optparse-applicative
-- pretty
 - pandoc
 - pandoc-types
-- resourcet
+- pretty
 - pretty-show
 - random
+- resourcet
 - tagged
 - text
 - time
 - transformers
+- utf8-string
 - uuid
 
 executables:

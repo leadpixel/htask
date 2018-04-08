@@ -199,3 +199,4 @@
 {"eventType":{"intent":{"tag":"StartTask","contents":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"detailRef":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"timestamp":"2018-04-11T06:11:20.65280265Z"}
 {"eventType":{"intent":{"tag":"CompleteTask","contents":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"detailRef":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"timestamp":"2018-04-11T06:11:21.972750938Z"}
 {"eventType":{"intent":{"tag":"CompleteTask","contents":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"detailRef":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"timestamp":"2018-04-11T06:45:25.99429335Z"}
+{"eventType":{"intent":{"tag":"AddTask","contents":"back task file as gist"},"detailRef":"96d102f1-9855-490e-9539-55c5e18525ad"},"timestamp":"2018-04-06T19:34:56.948049469Z"}

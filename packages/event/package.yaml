@@ -15,19 +15,19 @@ dependencies:
 - aeson
 - bytestring
 - conduit
-- resourcet
-- utf8-string
 - conduit-combinators
 - containers
 - mtl
 - operational
-- random
-- text
 - pretty
 - pretty-show
+- random
+- resourcet
 - tagged
+- text
 - time
 - transformers
+- utf8-string
 - uuid
 
 library:
