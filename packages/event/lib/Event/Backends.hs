@@ -37,21 +37,7 @@ newtype FileError = FileError String
   deriving (Show)
 
 
-handleFileError :: IOException -> Maybe FileError
-handleFileError e
-  = Just $ case ioeGetErrorType e of
-      AlreadyExists     -> FileError "AlreadyExists"
-      NoSuchThing       -> FileError "NoSuchThing"
-      ResourceBusy      -> FileError "ResourceBusy"
-      ResourceExhausted -> FileError "ResourceExhausted"
-      EOF               -> FileError "EOF"
-      IllegalOperation  -> FileError "IllegalOperation"
-      PermissionDenied  -> FileError "PermissionDenied"
-      UserError         -> FileError "UserError"
-
-
 newtype FileBackend a = F (R.ReaderT FilePath IO a)
-
 
 instance HasEventSource FileBackend where
   readEvents = conduitReadEvents
@@ -108,6 +94,14 @@ splitLines = Cx.linesUnboundedAscii
 
 runFileOp :: (FilePath -> IO a) -> FilePath -> IO (Either FileError a)
 runFileOp t = tryJust handleFileError . t
+
+
+handleFileError :: IOException -> Maybe FileError
+handleFileError e
+  = Just $ case ioeGetErrorType e of
+      NoSuchThing      -> FileError "task file does not exist"
+      PermissionDenied -> FileError "unable to read file"
+      e'               -> FileError $ show e'
 
 
 orDie :: (a -> b) -> Either FileError a -> IO b

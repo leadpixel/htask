@@ -17,7 +17,7 @@ import qualified HTask as H
 
 
 newtype TaskTestMonad m a = TaskTest
-  { unTask :: (S.StateT H.Tasks m) a
+  { runTask :: (S.StateT H.Tasks m) a
   } deriving (Functor, Applicative, Monad)
 
 instance (Monad m, CanTime m) => CanTime (TaskTestMonad m) where
@@ -32,7 +32,6 @@ instance (Monad m) => H.HasTasks (TaskTestMonad m) where
   updateExistingTask t f = TaskTest $ H.updateExistingTask t f
   removeTaskRef t = TaskTest $ H.removeTaskRef t
 
-
 instance (Monad m) => HasEventSink (TaskTestMonad m) where
   writeEvent _k = pure ()
 
@@ -40,7 +39,7 @@ instance (Monad m) => HasEventSink (TaskTestMonad m) where
 extractTasks :: TaskTestMonad IO a -> IO H.Tasks
 extractTasks op
   = S.evalStateT
-      (unTask op >> H.listTasks)
+      (runTask op >> H.listTasks)
       H.emptyTasks
 
 
