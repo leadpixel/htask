@@ -1,36 +1,57 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings          #-}
 
 module HTaskTests.Log
   ( test_log
   ) where
 
+import Data.Maybe
 import Data.Tagged
 import Event
 import Test.Tasty
 import Test.Tasty.HUnit
-import qualified Control.Monad.State as S
+import qualified Control.Monad.Reader as R
 import qualified Control.Monad.Writer as W
+import qualified Data.Aeson as A
+import qualified Data.ByteString.Lazy as BS
 import qualified Data.UUID as UUID
 import qualified HTask as H
 
 
-type LogTestMonad = W.WriterT [H.TaskEvent] (S.StateT H.Tasks IO)
+newtype LogTestMonad m a = LogTest
+  { runLog :: R.ReaderT [H.Task] (W.WriterT [BS.ByteString] m) a
+  } deriving (Functor, Applicative, Monad)
 
-instance CanTime LogTestMonad where
-  now = W.lift (S.lift now)
+instance (Monad m, CanTime m) => CanTime (LogTestMonad m) where
+  now = LogTest $ R.lift $ W.lift now
 
-instance CanUuid LogTestMonad where
-  uuidGen = W.lift (S.lift uuidGen)
+instance (Monad m, CanUuid m) => CanUuid (LogTestMonad m) where
+  uuidGen = LogTest $ R.lift $ W.lift uuidGen
+
+instance (Monad m) => HasEventSink (LogTestMonad m) where
+  writeEvent ev = LogTest $ W.tell [ A.encode ev ]
+
+instance (Monad m) => H.HasTasks (LogTestMonad m) where
+  getTasks = LogTest R.ask
+  addNewTask _t = LogTest $ pure True
+  updateExistingTask r _f = LogTest $ R.asks (elem r . fmap H.taskRef)
+  removeTaskRef r = LogTest $ R.asks (elem r . fmap H.taskRef)
 
 
-extractLog :: LogTestMonad a -> IO [H.TaskEvent]
-extractLog op
-  = S.evalStateT
-      (W.execWriterT op)
-      H.emptyTasks
+extractLog :: (Monad m) => [H.Task] -> LogTestMonad m a -> m [H.TaskEvent]
+extractLog xs op
+  = catMaybes . fmap A.decode <$> W.execWriterT ( R.runReaderT (runLog op) xs )
+
+
+randomTask :: H.Task
+randomTask = H.Task
+  { H.taskRef = Tagged UUID.nil
+  , H.description = undefined
+  , H.createdAt = undefined
+  , H.status = H.Pending
+  }
 
 
 test_log :: TestTree
@@ -47,60 +68,50 @@ test_log = testGroup "logs"
 
 listingEmptyTasks :: TestTree
 listingEmptyTasks = testCase "listing empty tasks" $ do
-  ts <- extractLog $ pure ()
+  ts <- extractLog [] $ pure ()
   assertEqual "expecting no logs" 0 (length ts)
 
 
 adding01Tasks :: TestTree
 adding01Tasks = testCase "adding one task" $ do
-  ts <- extractLog $ H.addTask "some task"
+  ts <- extractLog [] $ H.addTask "some task"
   assertEqual "expecting one log entry" 1 (length ts)
+  assertEqual "expecting 'add-task' intent" (H.AddTask "some task") (H.intent $ eventType $ head ts)
 
 
 adding02Tasks :: TestTree
 adding02Tasks = testCase "adding two tasks" $ do
-  ts <- extractLog $ do
-    _ <- H.addTask "some task"
-    H.addTask "some other task"
+  ts <- extractLog [] $ H.addTask "some task" >> H.addTask "some other task"
   assertEqual "expecting two log entries" 2 (length ts)
+  assertEqual "expecting 'add-task' intent" (H.AddTask "some task") (H.intent $ eventType $ head ts)
+  assertEqual "expecting 'add-task' intent" (H.AddTask "some other task") (H.intent $ eventType $ ts !! 1)
 
 
 startingTask :: TestTree
 startingTask = testCase "starting a task" $ do
-  ts <- extractLog $ do
-    ref <- H.addTask "some task"
-    case ref of
-      Left e -> pure (Left e)
-      Right v -> H.startTask v
-  assertEqual "expecting two log entries" 2 (length ts)
-  -- assertEqual "expecting matching task" "some task" (show $ head ts)
-  -- assertEqual "expecting started task" H.InProgress (H.status $ head ts)
+  let ref = Tagged UUID.nil
+  ts <- extractLog [ randomTask ] $ H.startTask ref
+  assertEqual "expecting one log entry" 1 (length ts)
+  assertEqual "expecting 'start-task' intent" (H.StartTask ref) (H.intent $ eventType $ head ts)
 
 
 startingNonTask :: TestTree
-startingNonTask = testCase "starting non-existent task does not error" $ do
-  ts <- extractLog $
-    H.startTask (Tagged UUID.nil)
+startingNonTask = testCase "updating a non-event does not log the action" $ do
+  ts <- extractLog [] $ H.startTask (Tagged UUID.nil)
   assertEqual "expecting no log entries" 0 (length ts)
 
 
 completingTask :: TestTree
 completingTask = testCase "completing a task" $ do
-  ts <- extractLog $ do
-    ref <- H.addTask "some task"
-    case ref of
-      Left e -> pure (Left e)
-      Right v -> H.completeTask v
-  assertEqual "expecting two log entries" 2 (length ts)
-  -- assertEqual "expecting matching task" "some task" (H.description $ head ts)
-  -- assertEqual "expecting started task" H.Complete (H.status $ head ts)
+  let ref = Tagged UUID.nil
+  ts <- extractLog [ randomTask ] $ H.completeTask ref
+  assertEqual "expecting one log entry" 1 (length ts)
+  assertEqual "expecting 'complete-task' intent" (H.CompleteTask ref) (H.intent $ eventType $ head ts)
 
 
 removingTask :: TestTree
 removingTask = testCase "deleting a task" $ do
-  ts <- extractLog $ do
-    ref <- H.addTask "some task"
-    case ref of
-      Left e -> pure (Left e)
-      Right v -> H.removeTask v
-  assertEqual "expecting two log entries" 2 (length ts)
+  let ref = Tagged UUID.nil
+  ts <- extractLog [ randomTask ] $ H.removeTask ref
+  assertEqual "expecting one log entry" 1 (length ts)
+  assertEqual "expecting 'remove-task' intent" (H.RemoveTask ref) (H.intent $ eventType $ head ts)

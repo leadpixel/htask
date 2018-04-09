@@ -35,7 +35,7 @@ data TaskIntent
   | StopTask TaskRef
   | CompleteTask TaskRef
   | RemoveTask TaskRef
-  deriving (Show, Generic)
+  deriving (Show, Eq, Generic)
 
 instance ToJSON TaskIntent
 instance ToJSON TaskEventDetail

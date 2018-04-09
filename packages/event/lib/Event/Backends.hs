@@ -26,7 +26,7 @@ import qualified System.IO                   as IO
 import GHC.IO.Exception
 
 
-class HasEventSource  m where
+class HasEventSource m where
   readEvents :: (A.FromJSON a) => m [Event a]
 
 class HasEventSink m where

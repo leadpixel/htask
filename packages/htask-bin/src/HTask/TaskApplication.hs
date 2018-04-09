@@ -44,11 +44,6 @@ instance CanUuid TaskApplication where
   uuidGen = TaskApp $ S.lift $ R.lift uuidGen
 
 
--- instance HasEventSink TaskApplication where
---   writeEvent ev
---     = TaskApp $ S.lift (runWithFile $ writeEvent ev)
-
-
 -- runWithFile :: ConduitBackend a -> E.ExceptT String TaskConfig a
 -- runWithFile k
 --   = do

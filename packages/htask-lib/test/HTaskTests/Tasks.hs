@@ -1,7 +1,7 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE TypeSynonymInstances       #-}
 
 module HTaskTests.Tasks
   ( test_tasks
@@ -12,24 +12,35 @@ import Event
 import Test.Tasty
 import Test.Tasty.HUnit
 import qualified Control.Monad.State as S
-import qualified Control.Monad.Writer as W
 import qualified Data.UUID as UUID
 import qualified HTask as H
 
 
-type TaskTestMonad = W.WriterT [H.TaskEvent] (S.StateT H.Tasks IO)
+newtype TaskTestMonad m a = TaskTest
+  { unTask :: (S.StateT H.Tasks m) a
+  } deriving (Functor, Applicative, Monad)
 
-instance CanTime TaskTestMonad where
-  now = W.lift (S.lift now)
+instance (Monad m, CanTime m) => CanTime (TaskTestMonad m) where
+  now = TaskTest $ S.lift now
 
-instance CanUuid TaskTestMonad where
-  uuidGen = W.lift (S.lift uuidGen)
+instance (Monad m, CanUuid m) => CanUuid (TaskTestMonad m) where
+  uuidGen = TaskTest $ S.lift uuidGen
+
+instance (Monad m) => H.HasTasks (TaskTestMonad m) where
+  getTasks = TaskTest H.getTasks
+  addNewTask t = TaskTest $ H.addNewTask t
+  updateExistingTask t f = TaskTest $ H.updateExistingTask t f
+  removeTaskRef t = TaskTest $ H.removeTaskRef t
 
 
-extractTasks :: TaskTestMonad a -> IO H.Tasks
+instance (Monad m) => HasEventSink (TaskTestMonad m) where
+  writeEvent _k = pure ()
+
+
+extractTasks :: TaskTestMonad IO a -> IO H.Tasks
 extractTasks op
   = S.evalStateT
-      (fst <$> W.runWriterT (op >> H.listTasks))
+      (unTask op >> H.listTasks)
       H.emptyTasks
 
 
