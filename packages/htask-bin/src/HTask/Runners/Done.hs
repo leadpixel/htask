@@ -9,31 +9,36 @@ import HTask.Output
 import qualified HTask as H
 import Control.Monad
 import Data.Semigroup ((<>))
+import qualified Data.Text as Text
 
 
-hasStatus :: H.TaskStatus -> H.Task -> Bool
-hasStatus s t = s == H.status t
+type DoneOutput = [(H.Task, Either String H.TaskRef)]
 
 
 runDone :: TaskConfig Document
 runDone
-  = Document
-  <$> ( runTask H.listTasks
-      >>= fmap join . mapM completeTask . filter (hasStatus H.InProgress)
-      )
+  = formatOutcome <$> runTask doneTask
 
   where
-    completeTask :: H.Task -> TaskConfig [Block]
-    completeTask t = do
-      _ <- execDone t
-      pure $ formatDone t
 
+    doneTask :: TaskApplication DoneOutput
+    doneTask = do
+      xs <- H.listTasks
+      let ts = filter isCurrent xs
+      mapM execDone ts
 
-execDone :: H.Task -> TaskConfig (Either String H.TaskRef)
-execDone
-  = runTask . H.completeTask . H.taskRef
+    execDone t = do
+      x <- H.completeTask (H.taskRef t)
+      pure (t, x)
 
+    isCurrent t = H.status t == H.InProgress
 
-formatDone :: H.Task -> [Block]
-formatDone t
-  = [ line $ "completing task: " <> H.description t ]
+    formatOutcome :: DoneOutput -> Document
+    formatOutcome xs
+      = mconcat (formatDone <$> xs)
+
+    formatDone (_t, Left err) = formatError (Text.pack err)
+    formatDone (t, Right _ref) = formatSuccessComplete t
+
+    formatSuccessComplete tx
+      = formatSuccess ("completing task: " <> H.description tx)

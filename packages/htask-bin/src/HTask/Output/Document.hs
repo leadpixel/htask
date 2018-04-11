@@ -9,6 +9,10 @@ import qualified Data.Text as Text
 
 newtype Document = Document { undoc :: [Block] }
 
+instance Monoid Document where
+  mempty = Document []
+  mappend (Document a) (Document b) = Document (mappend a b)
+
 
 newtype Block
   = Line Text.Text

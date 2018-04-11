@@ -194,3 +194,8 @@
 {"eventType":{"intent":{"tag":"AddTask","contents":"failure on removing already removed task -> state transition?"},"detailRef":"2254ba3f-95c2-484e-bbdf-3d6370e5b8cd"},"timestamp":"2018-03-22T08:52:36.423654626Z"}
 {"eventType":{"intent":{"tag":"StartTask","contents":"31766311-bd6b-4d61-944c-6b206e5dee11"},"detailRef":"31766311-bd6b-4d61-944c-6b206e5dee11"},"timestamp":"2018-03-31T20:45:25.998579395Z"}
 {"eventType":{"intent":{"tag":"CompleteTask","contents":"31766311-bd6b-4d61-944c-6b206e5dee11"},"detailRef":"31766311-bd6b-4d61-944c-6b206e5dee11"},"timestamp":"2018-03-31T20:46:06.19099962Z"}
+{"eventType":{"intent":{"tag":"StartTask","contents":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"detailRef":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"timestamp":"2018-04-11T05:50:07.243708697Z"}
+{"eventType":{"intent":{"tag":"CompleteTask","contents":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"detailRef":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"timestamp":"2018-04-11T06:11:12.766715979Z"}
+{"eventType":{"intent":{"tag":"StartTask","contents":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"detailRef":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"timestamp":"2018-04-11T06:11:20.65280265Z"}
+{"eventType":{"intent":{"tag":"CompleteTask","contents":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"detailRef":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"timestamp":"2018-04-11T06:11:21.972750938Z"}
+{"eventType":{"intent":{"tag":"CompleteTask","contents":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"detailRef":"8fdd506a-e8ad-4478-8f23-42a9901b69ba"},"timestamp":"2018-04-11T06:45:25.99429335Z"}

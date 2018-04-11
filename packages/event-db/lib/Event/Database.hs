@@ -10,7 +10,7 @@
 {-# LANGUAGE TypeFamilies               #-}
 
 module Event.Database
-  ( PostgresBackend (..)
+  ( SQLBackend (..)
   , prepareDB
   , sqliteWriteEvent
   , sqliteReadAll
@@ -31,32 +31,22 @@ import qualified Data.Text                    as Text
 import qualified Event                        as V
 
 
-newtype PostgresBackend a = P (R.ReaderT ConnectionString IO a)
-
-instance V.HasEventSource PostgresBackend where
-  readEvents = postgresReadEvents
-
-instance V.HasEventSink PostgresBackend where
-  writeEvent = postgresWriteEvent
-
-
-postgresReadEvents :: (A.FromJSON a) => PostgresBackend [V.Event a]
-postgresReadEvents
- = undefined
-
-
-postgresWriteEvent :: (A.ToJSON a) => V.Event a -> PostgresBackend ()
-postgresWriteEvent
- = undefined
-
-
 share [mkMigrate "migrateAll", mkPersist sqlSettings] [persistLowerCase|
 EventRecord json
    payload          Text.Text
 |]
 
 
-sqliteReadAll :: (A.FromJSON a) => (Monad m, MonadIO m) => R.ReaderT SqlBackend m [V.Event a]
+type SQLBackend m = R.ReaderT SqlBackend m
+
+instance (MonadIO m) => V.HasEventSource (SQLBackend m) where
+  readEvents = sqliteReadAll
+
+instance (MonadIO m) => V.HasEventSink (SQLBackend m) where
+  writeEvent = sqliteWriteEvent
+
+
+sqliteReadAll :: (A.FromJSON a) => (Monad m, MonadIO m) => SQLBackend m [V.Event a]
 sqliteReadAll = do
     xs <- selectList [] []
     -- liftIO $ print (xs :: [Entity EventRecord])
@@ -72,7 +62,7 @@ sqliteReadAll = do
 
   -- runMigration migrateAll
 
-sqliteWriteEvent :: (Monad m, MonadIO m, A.ToJSON a) => V.Event a -> R.ReaderT SqlBackend m ()
+sqliteWriteEvent :: (Monad m, MonadIO m, A.ToJSON a) => V.Event a -> SQLBackend m ()
 sqliteWriteEvent v = do
   _ <- insert $ convert v
   pure ()
@@ -82,5 +72,5 @@ sqliteWriteEvent v = do
     convert v' = EventRecord (decodeUtf8 $ BL.toStrict $ A.encode v')
 
 
-prepareDB :: (MonadIO m) => R.ReaderT SqlBackend m ()
+prepareDB :: (MonadIO m) => SQLBackend m ()
 prepareDB = runMigration migrateAll
