@@ -16,18 +16,10 @@ dependencies:
 - bytestring
 - conduit
 - conduit-combinators
-- containers
 - mtl
-- operational
-- pretty
-- pretty-show
-- random
 - resourcet
-- tagged
-- text
 - time
 - transformers
-- utf8-string
 - uuid
 
 library:

@@ -19,7 +19,7 @@ import Control.Monad.IO.Class
 import Data.Maybe
 import Data.Text.Encoding
 import Database.Persist
-import Database.Persist.Postgresql
+import Database.Persist.Sql
 import Database.Persist.TH
 
 import qualified Control.Monad.Reader         as R

@@ -16,24 +16,10 @@ dependencies:
 - bytestring
 - conduit
 - conduit-combinators
-- containers
 - event
-- mtl
-- operational
-- pretty
-- pretty-show
-- random
 - resourcet
-- tagged
-- text
-- time
-- transformers
-- utf8-string
-- uuid
 
 executables:
   event-clean:
     main:                Main.hs
     source-dirs:         src
-    dependencies:
-    - optparse-applicative

@@ -13,25 +13,13 @@ ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
 dependencies:
 - base >= 4.7 && < 5
 - aeson
-- bytestring
-- conduit
-- conduit-combinators
-- containers
 - event
 - mtl
-- operational
 - optparse-applicative
-- pandoc
-- pandoc-types
-- pretty
-- pretty-show
 - random
-- resourcet
 - tagged
 - text
-- time
 - transformers
-- utf8-string
 - uuid
 
 executables:

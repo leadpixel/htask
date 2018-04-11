@@ -13,25 +13,18 @@ ghc-options: -Wall
 dependencies:
 - base >= 4.7 && < 5
 - aeson
-- bytestring
-- conduit
-- conduit-combinators
-- containers
-- event
 - mtl
-- operational
-- pretty
-- pretty-show
-- random
 - tagged
-- text
-- time
 - transformers
+- event
 - uuid
 
 library:
   source-dirs: lib
   exposed-modules: HTask
+  dependencies:
+  - conduit-combinators
+  - text
 
 tests:
   htask-test:
@@ -43,8 +36,6 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - htask-lib
+    - bytestring
     - tasty
     - tasty-hunit
-    - tasty-quickcheck
-    - QuickCheck
-    - HUnit

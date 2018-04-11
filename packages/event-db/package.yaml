@@ -12,30 +12,20 @@ ghc-options: -Wall
 
 dependencies:
 - base >= 4.7 && < 5
-- aeson
-- bytestring
-- conduit
-- conduit-combinators
-- containers
 - event
-- mtl
-- operational
-- persistent
-- persistent-postgresql
-- persistent-sqlite
-- persistent-template
-- random
-- resourcet
-- tagged
-- text
-- time
-- transformers
-- utf8-string
-- uuid
 
 library:
   source-dirs: lib
   exposed-modules: Event.Database
+  dependencies:
+  - aeson
+  - bytestring
+  - containers
+  - mtl
+  - persistent
+  - persistent-template
+  - text
+  - transformers
 
 executables:
   event-db-run:
@@ -43,3 +33,4 @@ executables:
     source-dirs:         src
     dependencies:
     - event-db
+    - persistent-sqlite

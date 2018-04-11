@@ -16,27 +16,12 @@ dependencies:
 - bytestring
 - conduit
 - conduit-combinators
-- containers
 - event
 - event-db
-- mtl
-- operational
-- persistent
-- persistent-postgresql
 - persistent-sqlite
-- persistent-template
-- random
 - resourcet
-- tagged
-- text
-- time
-- transformers
-- utf8-string
-- uuid
 
 executables:
   event-migrate:
     main:                Main.hs
     source-dirs:         src
-    dependencies:
-    - optparse-applicative
