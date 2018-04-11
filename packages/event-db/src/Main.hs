@@ -12,10 +12,9 @@ run :: IO ()
 run = do
   event01 <- V.createEvent ("fish" :: String)
 
-  xs <- S.runSqlite "tasks.db" $ do
-    prepareDB
-    writeEvent event01
-    readEvents
+  xs <- S.runSqlite "tasks.db"
+    $ runSql
+    $ prepareDB >> writeEvent event01 >> readEvents
 
   print (xs :: [V.Event String])
 

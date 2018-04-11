@@ -33,5 +33,5 @@ presentComplete tx
       (const $ formatSuccessComplete tx)
 
   where
-    formatSuccessComplete tx
-      = formatSuccess ("completing task: " <> H.description tx)
+    formatSuccessComplete tx'
+      = formatSuccess ("completing task: " <> H.description tx')

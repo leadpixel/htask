@@ -10,10 +10,9 @@
 {-# LANGUAGE TypeFamilies               #-}
 
 module Event.Database
-  ( SQLBackend (..)
+  ( SQLEventBackend
   , prepareDB
-  , sqliteWriteEvent
-  , sqliteReadAll
+  , runSql
   ) where
 
 import Control.Monad.IO.Class
@@ -36,17 +35,19 @@ EventRecord json
 |]
 
 
-type SQLBackend m = R.ReaderT SqlBackend m
+newtype SQLEventBackend m a = S
+  { runSql :: R.ReaderT SqlBackend m a
+  } deriving (Functor, Applicative, Monad)
 
-instance (MonadIO m) => V.HasEventSource (SQLBackend m) where
+instance (MonadIO m) => V.HasEventSource (SQLEventBackend m) where
   readEvents = sqliteReadAll
 
-instance (MonadIO m) => V.HasEventSink (SQLBackend m) where
+instance (MonadIO m) => V.HasEventSink (SQLEventBackend m) where
   writeEvent = sqliteWriteEvent
 
 
-sqliteReadAll :: (A.FromJSON a) => (Monad m, MonadIO m) => SQLBackend m [V.Event a]
-sqliteReadAll = do
+sqliteReadAll :: (A.FromJSON a) => (MonadIO m) => SQLEventBackend m [V.Event a]
+sqliteReadAll = S $ do
     xs <- selectList [] []
     -- liftIO $ print (xs :: [Entity EventRecord])
     pure (catMaybes (prep <$> xs))
@@ -61,8 +62,8 @@ sqliteReadAll = do
 
   -- runMigration migrateAll
 
-sqliteWriteEvent :: (Monad m, MonadIO m, A.ToJSON a) => V.Event a -> SQLBackend m ()
-sqliteWriteEvent v = do
+sqliteWriteEvent :: (MonadIO m, A.ToJSON a) => V.Event a -> SQLEventBackend m ()
+sqliteWriteEvent v = S $ do
   _ <- insert $ convert v
   pure ()
 
@@ -71,5 +72,5 @@ sqliteWriteEvent v = do
     convert v' = EventRecord (decodeUtf8 $ BL.toStrict $ A.encode v')
 
 
-prepareDB :: (MonadIO m) => SQLBackend m ()
-prepareDB = runMigration migrateAll
+prepareDB :: (MonadIO m) => SQLEventBackend m ()
+prepareDB = S $ runMigration migrateAll
