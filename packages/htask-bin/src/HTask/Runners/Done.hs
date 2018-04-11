@@ -7,9 +7,8 @@ module HTask.Runners.Done
 import HTask.TaskApplication
 import HTask.Output
 import qualified HTask as H
-import Control.Monad
-import Data.Semigroup ((<>))
 import qualified Data.Text as Text
+import Data.Semigroup ((<>))
 
 
 type DoneOutput = [(H.Task, Either String H.TaskRef)]

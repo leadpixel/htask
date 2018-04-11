@@ -1,0 +1,42 @@
+name:                event-migrate
+version:             0.1.0.0
+github:              "palf/htask"
+license:             BSD3
+author:              "Jack Palfrey"
+maintainer:          "jack.palf@gmail.com"
+copyright:           "2018 Jack Palfrey"
+
+description:         Please see the README on Github at <https://github.com/palf/htask#readme>
+
+ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+
+dependencies:
+- base >= 4.7 && < 5
+- aeson
+- bytestring
+- conduit
+- conduit-combinators
+- containers
+- event
+- event-db
+- mtl
+- operational
+- persistent
+- persistent-postgresql
+- persistent-sqlite
+- persistent-template
+- random
+- resourcet
+- tagged
+- text
+- time
+- transformers
+- utf8-string
+- uuid
+
+executables:
+  event-migrate:
+    main:                Main.hs
+    source-dirs:         src
+    dependencies:
+    - optparse-applicative

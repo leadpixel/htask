@@ -35,22 +35,11 @@ instance H.HasTasks TaskApplication where
   updateExistingTask ref = TaskApp . H.updateExistingTask ref
   removeTaskRef = TaskApp . H.removeTaskRef
 
-
 instance CanTime TaskApplication where
   now = TaskApp $ S.lift $ R.lift now
 
-
 instance CanUuid TaskApplication where
   uuidGen = TaskApp $ S.lift $ R.lift uuidGen
-
-
--- runWithFile :: ConduitBackend a -> E.ExceptT String TaskConfig a
--- runWithFile k
---   = do
---     c <- ask
---     let c' = taskfile c
-
---     let k' = R.runReaderT c'
 
 instance HasEventSink TaskApplication where
   writeEvent ev
