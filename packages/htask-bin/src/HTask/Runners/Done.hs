@@ -20,7 +20,7 @@ runDone
 
   where
 
-    doneTask :: TaskApplication DoneOutput
+    doneTask :: TaskApplication IO DoneOutput
     doneTask = do
       xs <- H.listTasks
       let ts = filter isCurrent xs

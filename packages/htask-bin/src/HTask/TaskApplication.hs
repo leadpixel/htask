@@ -20,23 +20,23 @@ import qualified HTask                as H
 type TaskConfig m = R.ReaderT GlobalOptions m
 
 
-newtype TaskApplication a = TaskApp
-  { unwrapTaskApp :: S.StateT H.Tasks (TaskConfig IO) a
+newtype TaskApplication m a = TaskApp
+  { unwrapTaskApp :: S.StateT H.Tasks (TaskConfig m) a
   } deriving (Functor, Applicative, Monad)
 
-instance H.HasTasks TaskApplication where
+instance H.HasTasks (TaskApplication IO) where
   getTasks = TaskApp H.getTasks
   addNewTask = TaskApp . H.addNewTask
   updateExistingTask ref = TaskApp . H.updateExistingTask ref
   removeTaskRef = TaskApp . H.removeTaskRef
 
-instance CanTime TaskApplication where
+instance CanTime (TaskApplication IO) where
   now = TaskApp $ S.lift $ R.lift now
 
-instance CanUuid TaskApplication where
+instance CanUuid (TaskApplication IO) where
   uuidGen = TaskApp $ S.lift $ R.lift uuidGen
 
-instance HasEventSink TaskApplication where
+instance HasEventSink (TaskApplication IO) where
   writeEvent ev
     = TaskApp $ S.lift (runWithFile $ writeEvent ev)
 
@@ -52,7 +52,7 @@ prepTasks vs
       H.emptyTasks
 
 
-runTask :: TaskApplication a -> TaskConfig IO a
+runTask :: TaskApplication IO a -> TaskConfig IO a
 runTask op
   = runWithFile readEvents
   >>= prepTasks
