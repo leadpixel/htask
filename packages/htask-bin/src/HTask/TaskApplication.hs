@@ -20,7 +20,7 @@ import qualified HTask                as H
 type TaskConfig = R.ReaderT GlobalOptions IO
 
 
-runWithFile :: FileBackend a -> TaskConfig a
+runWithFile :: FileBackend IO a -> TaskConfig a
 runWithFile (F x) = R.withReaderT taskfile x
 
 

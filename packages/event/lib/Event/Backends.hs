@@ -7,23 +7,24 @@ module Event.Backends
   , FileBackend (..)
   ) where
 
-import Control.Exception
+import qualified Control.Monad.Reader         as R
 import qualified Control.Monad.Trans.Resource as Rt
 import qualified Data.Aeson                   as A
-import qualified Data.Conduit                 as C
-import qualified Control.Monad.Reader         as R
 import qualified Data.ByteString              as BS
 import qualified Data.ByteString.Lazy         as BL
+import qualified Data.Conduit                 as C
 import qualified Data.Conduit.Combinators     as Cx
-import qualified Data.Maybe as Mb
+import qualified Data.Maybe                   as Mb
+import qualified System.IO                    as IO
 
-import Event.Event
-import Data.Semigroup ((<>))
+import Control.Exception
+import Control.Monad.IO.Class
 import Data.Conduit (($$), ($=))
+import Data.Semigroup ((<>))
+import Event.Event
+import GHC.IO.Exception
 import System.Exit
 import System.IO.Error
-import qualified System.IO                   as IO
-import GHC.IO.Exception
 
 
 class HasEventSource m where
@@ -37,16 +38,16 @@ newtype FileError = FileError String
   deriving (Show)
 
 
-newtype FileBackend a = F (R.ReaderT FilePath IO a)
+newtype FileBackend m a = F (R.ReaderT FilePath m a)
 
-instance HasEventSource FileBackend where
+instance (MonadIO m) => HasEventSource (FileBackend m) where
   readEvents = conduitReadEvents
 
-instance HasEventSink FileBackend where
+instance (MonadIO m) => HasEventSink (FileBackend m) where
   writeEvent = conduitWriteEvent
 
 
-conduitReadEvents :: (A.FromJSON a) => FileBackend [Event a]
+conduitReadEvents :: (MonadIO m, A.FromJSON a) => FileBackend m [Event a]
 conduitReadEvents
   = F $ R.ask >>= \file
   -> R.liftIO $ handleReadFile file >>= orDie decodeEvents
@@ -66,7 +67,7 @@ conduitReadEvents
     decodeEvents = Mb.catMaybes . fmap A.decodeStrict
 
 
-conduitWriteEvent :: (A.ToJSON a) => Event a -> FileBackend ()
+conduitWriteEvent :: (MonadIO m, A.ToJSON a) => Event a -> FileBackend m ()
 conduitWriteEvent x
   = F $ R.ask >>= \file
   -> R.liftIO $ handleWriteFile file >>= orDie (const ())
