@@ -6,6 +6,7 @@ module HTask.Runners.Done
 
 import HTask.TaskApplication
 import HTask.Output
+import Event
 import qualified HTask as H
 import qualified Data.Text as Text
 import Data.Semigroup ((<>))
@@ -20,7 +21,7 @@ runDone
 
   where
 
-    doneTask :: TaskApplication IO DoneOutput
+    doneTask :: (CanUuid m, CanTime m,  Monad m, H.HasTasks m, HasEventSink m) => m DoneOutput
     doneTask = do
       xs <- H.listTasks
       let ts = filter isCurrent xs
