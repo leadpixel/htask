@@ -23,7 +23,7 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runSummary :: TaskConfig Document
+runSummary :: TaskConfig IO Document
 runSummary
   = renderSummary <$> runTask H.listTasks
 

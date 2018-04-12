@@ -12,7 +12,7 @@ import HTask.Output
 import Data.Semigroup ((<>))
 
 
-runRemove :: Text.Text -> TaskConfig Document
+runRemove :: Text.Text -> TaskConfig IO Document
 runRemove = withMatch
   (\tx -> runTask
     $   formatOutcome tx

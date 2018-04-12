@@ -12,7 +12,7 @@ import HTask.Output
 import Data.Semigroup ((<>))
 
 
-runStop :: Text.Text -> TaskConfig Document
+runStop :: Text.Text -> TaskConfig IO Document
 runStop = withMatch
   (\tx -> runTask
     $   formatOutcome tx

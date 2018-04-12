@@ -17,17 +17,12 @@ import qualified Control.Monad.State  as S
 import qualified HTask                as H
 
 
-type TaskConfig = R.ReaderT GlobalOptions IO
-
-
-runWithFile :: FileBackend IO a -> TaskConfig a
-runWithFile (F x) = R.withReaderT taskfile x
+type TaskConfig m = R.ReaderT GlobalOptions m
 
 
 newtype TaskApplication a = TaskApp
-  { unwrapTaskApp :: S.StateT H.Tasks TaskConfig a
+  { unwrapTaskApp :: S.StateT H.Tasks (TaskConfig IO) a
   } deriving (Functor, Applicative, Monad)
-
 
 instance H.HasTasks TaskApplication where
   getTasks = TaskApp H.getTasks
@@ -46,14 +41,18 @@ instance HasEventSink TaskApplication where
     = TaskApp $ S.lift (runWithFile $ writeEvent ev)
 
 
-prepTasks :: [H.TaskEvent] -> TaskConfig [H.Task]
+runWithFile :: FileBackend IO a -> TaskConfig IO a
+runWithFile (F x) = R.withReaderT taskfile x
+
+
+prepTasks :: [H.TaskEvent] -> TaskConfig IO [H.Task]
 prepTasks vs
   = S.execStateT
       (unwrapTaskApp $ H.replayEventLog vs)
       H.emptyTasks
 
 
-runTask :: TaskApplication a -> TaskConfig a
+runTask :: TaskApplication a -> TaskConfig IO a
 runTask op
   = runWithFile readEvents
   >>= prepTasks

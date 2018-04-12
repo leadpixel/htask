@@ -14,12 +14,12 @@ import Data.Semigroup ((<>))
 type AddOutput = Either String H.TaskRef
 
 
-runAdd :: Text.Text -> TaskConfig Document
+runAdd :: Text.Text -> TaskConfig IO Document
 runAdd t
   = presentAdd t <$> executeAdd t
 
 
-executeAdd :: Text.Text -> TaskConfig AddOutput
+executeAdd :: Text.Text -> TaskConfig IO AddOutput
 executeAdd
   = runTask . H.addTask
 

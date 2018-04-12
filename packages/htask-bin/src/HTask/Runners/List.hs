@@ -52,7 +52,7 @@ statusDisplayOrder  H.Abandoned   H.InProgress  =  GT
 statusDisplayOrder  H.Abandoned   H.Pending     =  GT
 
 
-runList :: ShowUUID -> ShowAll -> TaskConfig Document
+runList :: ShowUUID -> ShowAll -> TaskConfig IO Document
 runList showUUID showAll
   =   Document . fmap formatOutput . selectTasks
   <$> runTask H.listTasks

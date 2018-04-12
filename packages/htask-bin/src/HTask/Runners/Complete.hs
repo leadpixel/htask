@@ -15,13 +15,13 @@ import Data.Semigroup ((<>))
 type CompleteOutput = Either String H.TaskRef
 
 
-runComplete :: Text.Text -> TaskConfig Document
+runComplete :: Text.Text -> TaskConfig IO Document
 runComplete
   = withMatch $ \tx ->
       presentComplete tx <$> executeComplete tx
 
 
-executeComplete :: H.Task -> TaskConfig CompleteOutput
+executeComplete :: H.Task -> TaskConfig IO CompleteOutput
 executeComplete
   = runTask . H.completeTask . H.taskRef
 

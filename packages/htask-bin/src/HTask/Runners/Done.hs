@@ -14,7 +14,7 @@ import Data.Semigroup ((<>))
 type DoneOutput = [(H.Task, Either String H.TaskRef)]
 
 
-runDone :: TaskConfig Document
+runDone :: TaskConfig IO Document
 runDone
   = formatOutcome <$> runTask doneTask
 

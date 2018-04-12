@@ -15,7 +15,7 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runDrop :: TaskConfig Document
+runDrop :: TaskConfig IO Document
 runDrop
   = Document <$>
     ( runTask H.listTasks
@@ -23,7 +23,7 @@ runDrop
     )
 
 
-stopTask :: H.Task -> TaskConfig [Block]
+stopTask :: H.Task -> TaskConfig IO [Block]
 stopTask t = do
   _ <- runTask $ H.stopTask $ H.taskRef t
   pure [ line $ "stopping task: " <> H.description t ]

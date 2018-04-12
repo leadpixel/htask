@@ -25,7 +25,7 @@ runCommand opts
   >>= renderDocument (formatter $ globals opts)
 
 
-runAction :: Action -> TaskConfig Document
+runAction :: Action -> TaskConfig IO Document
 runAction Summary        = runSummary
 runAction (List d k)     = runList d k
 runAction (Add tex)      = runAdd tex

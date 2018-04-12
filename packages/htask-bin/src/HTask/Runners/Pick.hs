@@ -24,7 +24,7 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runPick :: TaskConfig Document
+runPick :: TaskConfig IO Document
 runPick = do
   ts <- runTask H.listTasks
   let ps = filter (hasStatus H.Pending) ts
@@ -35,13 +35,13 @@ runPick = do
     k
 
   where
-    startTask :: H.Task -> TaskConfig [Block]
+    startTask :: H.Task -> TaskConfig IO [Block]
     startTask t = do
       _ <- runTask $ H.startTask $ H.taskRef t
       pure [ line ("picking task: " <> H.description t)]
 
 
-    emptyMessage :: TaskConfig [Block]
+    emptyMessage :: TaskConfig IO [Block]
     emptyMessage
       = pure [ line "no task to pick" ]
 
