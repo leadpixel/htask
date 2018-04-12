@@ -10,6 +10,7 @@ module HTask.TaskApplication
   , runTask
   ) where
 
+import Control.Monad.IO.Class
 import Event
 import HTask.Config
 import qualified Control.Monad.Reader as R
@@ -30,10 +31,10 @@ instance H.HasTasks (TaskApplication IO) where
   updateExistingTask ref = TaskApp . H.updateExistingTask ref
   removeTaskRef = TaskApp . H.removeTaskRef
 
-instance CanTime (TaskApplication IO) where
+instance (Monad m, CanTime m) => CanTime (TaskApplication m) where
   now = TaskApp $ S.lift $ R.lift now
 
-instance CanUuid (TaskApplication IO) where
+instance (Monad m, CanUuid m) => CanUuid (TaskApplication m) where
   uuidGen = TaskApp $ S.lift $ R.lift uuidGen
 
 instance HasEventSink (TaskApplication IO) where
@@ -41,7 +42,7 @@ instance HasEventSink (TaskApplication IO) where
     = TaskApp $ S.lift (runWithFile $ writeEvent ev)
 
 
-runWithFile :: FileBackend IO a -> TaskConfig IO a
+runWithFile :: (MonadIO m) => FileBackend m a -> TaskConfig m a
 runWithFile (F x) = R.withReaderT taskfile x
 
 
