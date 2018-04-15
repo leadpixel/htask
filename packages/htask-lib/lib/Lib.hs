@@ -16,7 +16,6 @@ import GHC.Generics
 import Event
 import HTask.TaskContainer
 import HTask.Task
-import Control.Monad
 import qualified Data.Text as Text
 
 
@@ -45,38 +44,37 @@ instance FromJSON TaskEventDetail
 
 replayEventLog
   :: (Monad m, HasTasks m)
-  => [TaskEvent] -> m [Task]
-replayEventLog vs = do
-  ts <- getTasks
-  foldM (flip applyRawEvent) ts vs
+  => [TaskEvent] -> m ()
+replayEventLog
+  = mapM_ applyRawEvent
 
 
 applyRawEvent
   :: (Monad m, HasTasks m)
-  => TaskEvent -> a -> m [Task]
-applyRawEvent ev _ = do
+  => TaskEvent -> m ()
+applyRawEvent ev = do
   let td = eventType ev
   case intent td of
     (AddTask text) -> do
       let t = Task (detailRef td) text (timestamp ev) Pending
       _p <- addNewTask t
-      getTasks
+      pure ()
 
     (StartTask ref) -> do
       _p <- updateExistingTask ref $ setTaskStatus InProgress
-      getTasks
+      pure ()
 
     (StopTask ref) -> do
       _p <- updateExistingTask ref $ setTaskStatus Pending
-      getTasks
+      pure ()
 
     (CompleteTask ref) -> do
       _p <- updateExistingTask ref $ setTaskStatus Complete
-      getTasks
+      pure ()
 
     (RemoveTask ref) -> do
       _p <- updateExistingTask ref $ setTaskStatus Abandoned
-      getTasks
+      pure ()
 
 
 
