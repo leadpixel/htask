@@ -15,6 +15,7 @@ import Event
 import HTask.Config
 import qualified Control.Monad.Reader as R
 import qualified Control.Monad.State  as S
+import qualified Control.Monad.Trans  as T
 import qualified HTask                as H
 
 
@@ -24,6 +25,9 @@ type TaskConfig m = R.ReaderT GlobalOptions m
 newtype TaskApplication m a = TaskApp
   { unwrapTaskApp :: S.StateT H.Tasks (TaskConfig m) a
   } deriving (Functor, Applicative, Monad)
+
+instance T.MonadTrans TaskApplication where
+  lift = TaskApp . T.lift . T.lift
 
 instance (Monad m) => H.HasTasks (TaskApplication m) where
   getTasks = TaskApp H.getTasks
