@@ -25,7 +25,7 @@ newtype TaskApplication m a = TaskApp
   { unwrapTaskApp :: S.StateT H.Tasks (TaskConfig m) a
   } deriving (Functor, Applicative, Monad)
 
-instance H.HasTasks (TaskApplication IO) where
+instance (Monad m) => H.HasTasks (TaskApplication m) where
   getTasks = TaskApp H.getTasks
   addNewTask = TaskApp . H.addNewTask
   updateExistingTask ref = TaskApp . H.updateExistingTask ref
