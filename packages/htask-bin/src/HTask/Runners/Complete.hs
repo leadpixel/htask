@@ -1,9 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Complete
   ( runComplete
   ) where
 
+import Control.Monad.IO.Class
+import Event
 import qualified Data.Text as Text
 import qualified HTask as H
 import HTask.Runners.Common
@@ -15,13 +18,13 @@ import Data.Semigroup ((<>))
 type CompleteOutput = Either String H.TaskRef
 
 
-runComplete :: Text.Text -> TaskConfig IO Document
+runComplete :: (H.HasTasks (TaskApplication m), H.CanCreateTask m, MonadIO m) => Text.Text -> EventBackend m Document
 runComplete
   = withMatch $ \tx ->
       presentComplete tx <$> executeComplete tx
 
 
-executeComplete :: H.Task -> TaskConfig IO CompleteOutput
+executeComplete :: (H.HasTasks (TaskApplication m), H.CanCreateTask m, MonadIO m) => H.Task -> EventBackend m CompleteOutput
 executeComplete
   = runTask . H.completeTask . H.taskRef
 

@@ -1,9 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Start
   ( runStart
   ) where
 
+import Control.Monad.IO.Class
+import Event
 import qualified Data.Text as Text
 import qualified HTask as H
 import HTask.Runners.Common
@@ -12,7 +15,7 @@ import HTask.Output
 import Data.Semigroup ((<>))
 
 
-runStart :: Text.Text -> TaskConfig IO Document
+runStart :: (H.HasTasks (TaskApplication m), H.CanCreateTask m, MonadIO m) => Text.Text -> EventBackend m Document
 runStart = withMatch
   (\tx -> runTask
     $   formatOutcome tx

@@ -1,11 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.List
   ( runList
   ) where
 
+import Control.Monad.IO.Class
 import Data.List
 import Data.Function
 import Data.Semigroup ((<>))
@@ -52,7 +54,7 @@ statusDisplayOrder  H.Abandoned   H.InProgress  =  GT
 statusDisplayOrder  H.Abandoned   H.Pending     =  GT
 
 
-runList :: ShowUUID -> ShowAll -> TaskConfig IO Document
+runList :: (MonadIO m, H.HasTasks (TaskApplication m)) => ShowUUID -> ShowAll -> EventBackend m Document
 runList showUUID showAll
   =   Document . fmap formatOutput . selectTasks
   <$> runTask H.listTasks

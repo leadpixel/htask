@@ -1,9 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Common
   ( withMatch
   ) where
 
+import Control.Monad.IO.Class
+import Event
 import qualified Data.Text as Text
 import qualified HTask as H
 import HTask.TaskApplication
@@ -16,7 +19,6 @@ headSafe [x] = Just x
 headSafe _ = Nothing
 
 
-findMatch :: Text.Text -> TaskConfig IO (Maybe H.Task)
 findMatch ref
   =   headSafe . filterMatchesUUID ref
   <$> runTask H.listTasks
@@ -27,7 +29,6 @@ findMatch ref
      = filter (Text.isPrefixOf t . H.taskRefText . H.taskRef)
 
 
-withMatch :: (H.Task -> TaskConfig IO Document) -> Text.Text -> TaskConfig IO Document
 withMatch op t
   = findMatch t
   >>= maybe (pure $ formatErrorMatch t) op

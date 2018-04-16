@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 
 module Event.Backends
@@ -8,6 +10,7 @@ module Event.Backends
   ) where
 
 import qualified Control.Monad.Reader         as R
+import qualified Control.Monad.Trans          as T
 import qualified Control.Monad.Trans.Resource as Rt
 import qualified Data.Aeson                   as A
 import qualified Data.ByteString              as BS
@@ -38,7 +41,12 @@ newtype FileError = FileError String
   deriving (Show)
 
 
-newtype FileBackend m a = F (R.ReaderT FilePath m a)
+newtype FileBackend m a = F
+  { runFileBackend :: R.ReaderT FilePath m a
+  } deriving (Functor, Applicative, Monad)
+
+instance T.MonadTrans FileBackend where
+  lift = F . T.lift
 
 instance (MonadIO m) => HasEventSource (FileBackend m) where
   readEvents = conduitReadEvents

@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Summary
   ( runSummary
@@ -13,6 +14,7 @@ import HTask.TaskApplication
 import HTask.Output
 import qualified Data.Text              as Text
 import qualified HTask as H
+import Control.Monad.IO.Class
 
 
 taskPriority :: H.Task -> H.Task -> Ordering
@@ -23,7 +25,7 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runSummary :: TaskConfig IO Document
+runSummary :: (Functor m, MonadIO m, H.HasTasks (TaskApplication m)) => EventBackend m Document
 runSummary
   = renderSummary <$> runTask H.listTasks
 

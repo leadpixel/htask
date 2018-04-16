@@ -80,12 +80,12 @@ formatterParser = pure Terminal
 --   )
 
 
-globalsParser :: Parser GlobalOptions
-globalsParser = GlobalOptions <$> fileParser <*> formatterParser
-
-
 optionsParser :: Parser Options
-optionsParser = Options <$> globalsParser <*> (actionParser <|> defaultAction)
+optionsParser
+  = (\a b c -> Options c a b)
+  <$> fileParser
+  <*> formatterParser
+  <*> (actionParser <|> defaultAction)
 
 
 optionsInfo :: ParserInfo Options

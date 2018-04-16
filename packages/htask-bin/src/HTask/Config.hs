@@ -1,6 +1,5 @@
 module HTask.Config
   ( Options (..)
-  , GlobalOptions (..)
   , Formatter (..)
   ) where
 
@@ -14,13 +13,8 @@ data Formatter
   deriving (Show, Read)
 
 
-data GlobalOptions = GlobalOptions
-  { taskfile :: FilePath
-  , formatter :: Formatter
-  }
-
-
 data Options = Options
-  { globals :: GlobalOptions
-  , action :: Action
+  { action :: Action
+  , taskfile :: FilePath
+  , formatter :: Formatter
   }

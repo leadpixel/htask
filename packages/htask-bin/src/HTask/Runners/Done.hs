@@ -1,12 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Done
   ( runDone
   ) where
 
+import Control.Monad.IO.Class
+import Event
 import HTask.TaskApplication
 import HTask.Output
-import Event
 import qualified HTask as H
 import qualified Data.Text as Text
 import Data.Semigroup ((<>))
@@ -15,7 +17,7 @@ import Data.Semigroup ((<>))
 type DoneOutput = [(H.Task, Either String H.TaskRef)]
 
 
-runDone :: TaskConfig IO Document
+runDone :: (H.HasTasks (TaskApplication m), H.CanCreateTask m, MonadIO m) => EventBackend m Document
 runDone
   = formatOutcome <$> runTask doneTask
 

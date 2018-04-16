@@ -1,7 +1,10 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module HTask.Runners
   ( runCommand
   ) where
 
+import qualified HTask as H
 import HTask.Actions
 import HTask.Config
 import HTask.Output
@@ -17,15 +20,21 @@ import HTask.Runners.Done
 import HTask.Runners.Drop
 import HTask.TaskApplication
 import qualified Control.Monad.Reader as R
+import Control.Monad.IO.Class
+import Event
 
 
 runCommand :: Options -> IO ()
 runCommand opts
-  = R.runReaderT (runAction $ action opts) (globals opts)
-  >>= renderDocument (formatter $ globals opts)
+  = R.runReaderT (runFileBackend $ runAction $ action opts) (taskfile opts)
+  >>= renderDocument (formatter opts)
 
 
-runAction :: Action -> TaskConfig IO Document
+-- runWithFile :: (MonadIO m) => FileBackend m a -> TaskConfig m a
+-- runWithFile (F x) = R.withReaderT taskfile x
+
+
+runAction :: (MonadIO m, H.CanCreateTask m, H.HasTasks (TaskApplication m)) => Action -> EventBackend m Document
 runAction Summary        = runSummary
 runAction (List d k)     = runList d k
 runAction (Add tex)      = runAdd tex
