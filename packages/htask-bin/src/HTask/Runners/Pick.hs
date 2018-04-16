@@ -8,19 +8,11 @@ module HTask.Runners.Pick
 
 import Control.Monad.IO.Class
 import Event
-import System.Random
 import Control.Monad.Reader
 import HTask.TaskApplication
 import HTask.Output
 import Data.Semigroup ((<>))
 import qualified HTask as H
-
-
-class (Monad m) => CanRandom m where
-  getRandomR :: (Random a) => (a, a) -> m a
-
-instance CanRandom IO where
-  getRandomR = randomRIO
 
 
 hasStatus :: H.TaskStatus -> H.Task -> Bool
@@ -51,5 +43,5 @@ runPick = do
 randomSelectOne :: (CanRandom m) => [a] -> m (Maybe a)
 randomSelectOne [] = pure Nothing
 randomSelectOne xs = do
-  n <- getRandomR (0, length xs)
+  n <- getRandomRange (0, length xs)
   pure $ Just $ xs !! n

@@ -17,6 +17,7 @@ dependencies:
 - conduit
 - conduit-combinators
 - mtl
+- random
 - resourcet
 - time
 - transformers

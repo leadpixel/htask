@@ -202,3 +202,4 @@
 {"eventType":{"intent":{"tag":"AddTask","contents":"back task file as gist"},"detailRef":"96d102f1-9855-490e-9539-55c5e18525ad"},"timestamp":"2018-04-06T19:34:56.948049469Z"}
 {"eventType":{"intent":{"tag":"StartTask","contents":"2254ba3f-95c2-484e-bbdf-3d6370e5b8cd"},"detailRef":"2254ba3f-95c2-484e-bbdf-3d6370e5b8cd"},"timestamp":"2018-04-11T07:54:04.224141825Z"}
 {"eventType":{"intent":{"tag":"StartTask","contents":"6feced14-7d80-420c-b57a-49377a473942"},"detailRef":"6feced14-7d80-420c-b57a-49377a473942"},"timestamp":"2018-04-11T07:54:10.923717619Z"}
+{"eventType":{"intent":{"tag":"AddTask","contents":"split out capabiltiies"},"detailRef":"f6397293-2afe-4938-94d2-5885e35e37ca"},"timestamp":"2018-04-16T07:56:17.479531535Z"}

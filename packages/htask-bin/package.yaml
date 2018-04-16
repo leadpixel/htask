@@ -16,7 +16,6 @@ dependencies:
 - event
 - mtl
 - optparse-applicative
-- random
 - tagged
 - text
 - transformers
