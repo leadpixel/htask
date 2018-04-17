@@ -5,12 +5,12 @@ module HTask.Runners.Drop
   ( runDrop
   ) where
 
-import Control.Monad.IO.Class
-import Event
-import HTask.TaskApplication
-import HTask.Output
 import qualified HTask as H
+
 import Control.Monad
+import HTask.Output
+import HTask.TaskApplication
+
 import Data.Semigroup ((<>))
 
 
@@ -18,14 +18,15 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runDrop :: (H.HasTasks (TaskApplication m), H.CanCreateTask m, MonadIO m) => EventBackend m Document
+runDrop :: (HasEventBackend m, H.CanCreateTask m) => m Document
 runDrop
   = Document <$>
     ( runTask H.listTasks
-    >>= fmap join . mapM stopTask . filter (hasStatus H.InProgress)
+    >>= fmap join . mapM execStopTask . filter (hasStatus H.InProgress)
     )
 
+  where
 
-stopTask t = do
-  _ <- runTask $ H.stopTask $ H.taskRef t
-  pure [ line $ "stopping task: " <> H.description t ]
+    execStopTask t = do
+      _ <- runTask $ H.stopTask $ H.taskRef t
+      pure [ line $ "stopping task: " <> H.description t ]

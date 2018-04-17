@@ -6,7 +6,7 @@ module Event.Backends
   ( HasEventSource (..)
   , HasEventSink (..)
 
-  , FileBackend (..)
+  , FileBackend (runFileBackend)
   ) where
 
 import qualified Control.Monad.Reader         as R

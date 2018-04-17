@@ -9,7 +9,6 @@ module HTask.TaskContainer
 import Data.Maybe
 import Data.List
 import HTask.Task
-import Conduit
 import qualified Control.Monad.State as State
 
 
@@ -53,13 +52,6 @@ instance (Monad m) => HasTasks (State.StateT Tasks m) where
         State.put (removeTaskByRef ts ref)
         pure True)
       (findTask ts ref)
-
-
-instance (Monad m, MonadTrans t) => HasTasks (t (State.StateT Tasks m)) where
-  getTasks = lift getTasks
-  addNewTask = lift . addNewTask
-  updateExistingTask ref = lift . updateExistingTask ref
-  removeTaskRef = lift . removeTaskRef
 
 
 removeTaskByRef :: Tasks -> TaskRef -> Tasks

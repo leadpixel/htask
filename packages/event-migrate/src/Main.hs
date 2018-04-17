@@ -52,6 +52,6 @@ sortEvents = List.sortOn timestamp . M.catMaybes
 
 dbWriteEvents :: (A.ToJSON a) => [Event a] -> IO ()
 dbWriteEvents xs
-  = S.runSqlite "tasks.db" $ runSql $ do
+  = S.runSqlite "tasks.db" $ runSqlBackend $ do
       prepareDB
       mapM_ writeEvent xs

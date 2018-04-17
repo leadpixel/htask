@@ -13,7 +13,7 @@ run = do
   event01 <- V.createEvent ("fish" :: String)
 
   xs <- S.runSqlite "tasks.db"
-    $ runSql
+    $ runSqlBackend
     $ prepareDB >> writeEvent event01 >> readEvents
 
   print (xs :: [V.Event String])

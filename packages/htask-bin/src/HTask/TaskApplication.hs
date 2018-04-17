@@ -1,56 +1,69 @@
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE ConstraintKinds            #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE TypeSynonymInstances       #-}
 
 module HTask.TaskApplication
-  ( TaskApplication (..)
-  , EventBackend
+  ( TaskApplication
+  , HasEventBackend
   , runTask
   ) where
 
-import Control.Monad.IO.Class
-import Event
-import HTask.Config
 import qualified Control.Monad.Reader as R
 import qualified Control.Monad.State  as S
 import qualified Control.Monad.Trans  as T
 import qualified HTask                as H
+import Event
 
 
-type TaskLayer m a = S.StateT H.Tasks m a
+instance (Monad m, T.MonadTrans t, CanTime m) => CanTime (t m) where
+  now = T.lift now
 
-type EventBackend m = FileBackend m
+instance (Monad m, T.MonadTrans t, CanRandom m) => CanRandom (t m) where
+  getRandomRange = T.lift . getRandomRange
+
+instance (Monad m, T.MonadTrans t, CanUuid m) => CanUuid (t m) where
+  uuidGen = T.lift uuidGen
+
+
+type HasEventBackend m = (Monad m, HasEventSource m, HasEventSink m)
+
 
 newtype TaskApplication m a = TaskApp
-  { unwrapTaskApp :: TaskLayer (FileBackend m) a
+  { runTaskApp :: S.StateT H.Tasks m a
   } deriving (Functor, Applicative, Monad)
 
 instance T.MonadTrans TaskApplication where
-  lift = TaskApp . T.lift . T.lift
+  lift = TaskApp . T.lift
 
-instance H.HasTasks (TaskApplication IO) where
+instance (Monad m) => H.HasTasks (TaskApplication m) where
   getTasks = TaskApp H.getTasks
   addNewTask = TaskApp . H.addNewTask
   updateExistingTask ref = TaskApp . H.updateExistingTask ref
   removeTaskRef = TaskApp . H.removeTaskRef
 
-instance (Monad m, CanTime m) => CanTime (TaskApplication m) where
-  now = TaskApp $ S.lift $ R.lift now
+-- instance (Monad m, CanTime m) => CanTime (TaskApplication m) where
+--   now
+--     = TaskApp $ T.lift now
 
-instance (Monad m, CanUuid m) => CanUuid (TaskApplication m) where
-  uuidGen = TaskApp $ S.lift $ R.lift uuidGen
+-- instance (Monad m, CanUuid m) => CanUuid (TaskApplication m) where
+--   uuidGen = TaskApp $ T.lift uuidGen
 
-instance (MonadIO m) => HasEventSink (TaskApplication m) where
+-- instance (Monad m, HasEventSource m) => HasEventSource (TaskApplication m) where
+--   readEvents
+--     = TaskApp $ T.lift readEvents
+
+instance (Monad m, HasEventSink m) => HasEventSink (TaskApplication m) where
   writeEvent ev
-    = TaskApp $ S.lift (writeEvent ev)
+    = TaskApp $ T.lift (writeEvent ev)
 
 
 runTask
-  :: (H.HasTasks (TaskApplication m), MonadIO m)
-  => TaskApplication m a -> FileBackend m a
+  :: (Monad m, HasEventSource m, HasEventSink m)
+  => TaskApplication m a -> m a
 runTask op
   = readEvents
-  >>= \vs -> S.evalStateT (unwrapTaskApp $ H.replayEventLog vs >> op) H.emptyTasks
+  >>= \vs -> S.evalStateT (H.replayEventLog vs >> runTaskApp op) H.emptyTasks

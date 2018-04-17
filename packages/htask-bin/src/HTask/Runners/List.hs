@@ -7,17 +7,18 @@ module HTask.Runners.List
   ( runList
   ) where
 
-import Control.Monad.IO.Class
+import qualified Data.Text              as Text
+import qualified Data.UUID              as UUID
+import qualified HTask                  as H
+
 import Data.List
 import Data.Function
-import Data.Semigroup ((<>))
 import Data.Tagged
 import HTask.Actions
 import HTask.Output
 import HTask.TaskApplication
-import qualified Data.Text              as Text
-import qualified Data.UUID              as UUID
-import qualified HTask as H
+
+import Data.Semigroup ((<>))
 
 
 taskDisplayOrder :: H.Task -> H.Task -> Ordering
@@ -54,7 +55,7 @@ statusDisplayOrder  H.Abandoned   H.InProgress  =  GT
 statusDisplayOrder  H.Abandoned   H.Pending     =  GT
 
 
-runList :: (MonadIO m, H.HasTasks (TaskApplication m)) => ShowUUID -> ShowAll -> EventBackend m Document
+runList :: (HasEventBackend m) => ShowUUID -> ShowAll -> m Document
 runList showUUID showAll
   =   Document . fmap formatOutput . selectTasks
   <$> runTask H.listTasks

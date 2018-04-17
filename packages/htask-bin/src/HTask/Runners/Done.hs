@@ -17,7 +17,7 @@ import Data.Semigroup ((<>))
 type DoneOutput = [(H.Task, Either String H.TaskRef)]
 
 
-runDone :: (H.HasTasks (TaskApplication m), H.CanCreateTask m, MonadIO m) => EventBackend m Document
+runDone :: (HasEventBackend m, H.CanCreateTask m) => m Document
 runDone
   = formatOutcome <$> runTask doneTask
 

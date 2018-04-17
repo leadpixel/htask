@@ -1,20 +1,24 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Summary
   ( runSummary
   ) where
 
-import Data.List
-import Data.Function
-import Data.Semigroup ((<>))
-import Data.Tagged
-import qualified Data.UUID as UUID
-import HTask.TaskApplication
-import HTask.Output
-import qualified Data.Text              as Text
-import qualified HTask as H
+import qualified Data.Text    as Text
+import qualified Data.UUID    as UUID
+import qualified HTask        as H
+
 import Control.Monad.IO.Class
+import Data.Function
+import Data.List
+import Data.Tagged
+import Event
+import HTask.Output
+import HTask.TaskApplication
+
+import Data.Semigroup ((<>))
 
 
 taskPriority :: H.Task -> H.Task -> Ordering
@@ -25,7 +29,7 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runSummary :: (Functor m, MonadIO m, H.HasTasks (TaskApplication m)) => EventBackend m Document
+runSummary :: (HasEventBackend m) => m Document
 runSummary
   = renderSummary <$> runTask H.listTasks
 

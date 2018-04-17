@@ -10,10 +10,16 @@
 {-# LANGUAGE TypeFamilies               #-}
 
 module Event.Database
-  ( SQLEventBackend
+  ( SQLEventBackend (runSqlBackend)
   , prepareDB
-  , runSql
   ) where
+
+import qualified Control.Monad.Trans          as T
+import qualified Control.Monad.Reader         as R
+import qualified Data.Aeson                   as A
+import qualified Data.ByteString.Lazy         as BL
+import qualified Data.Text                    as Text
+import qualified Event                        as V
 
 import Control.Monad.IO.Class
 import Data.Maybe
@@ -21,12 +27,6 @@ import Data.Text.Encoding
 import Database.Persist
 import Database.Persist.Sql
 import Database.Persist.TH
-
-import qualified Control.Monad.Reader         as R
-import qualified Data.Aeson                   as A
-import qualified Data.ByteString.Lazy         as BL
-import qualified Data.Text                    as Text
-import qualified Event                        as V
 
 
 share [mkMigrate "migrateAll", mkPersist sqlSettings] [persistLowerCase|
@@ -36,8 +36,11 @@ EventRecord json
 
 
 newtype SQLEventBackend m a = S
-  { runSql :: R.ReaderT SqlBackend m a
+  { runSqlBackend :: R.ReaderT SqlBackend m a
   } deriving (Functor, Applicative, Monad)
+
+instance T.MonadTrans SQLEventBackend where
+  lift = S . T.lift
 
 instance (MonadIO m) => V.HasEventSource (SQLEventBackend m) where
   readEvents = sqliteReadAll

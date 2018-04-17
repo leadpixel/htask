@@ -18,13 +18,13 @@ import Data.Semigroup ((<>))
 type CompleteOutput = Either String H.TaskRef
 
 
-runComplete :: (H.HasTasks (TaskApplication m), H.CanCreateTask m, MonadIO m) => Text.Text -> EventBackend m Document
+runComplete :: (HasEventBackend m, H.CanCreateTask m) => Text.Text -> m Document
 runComplete
   = withMatch $ \tx ->
       presentComplete tx <$> executeComplete tx
 
 
-executeComplete :: (H.HasTasks (TaskApplication m), H.CanCreateTask m, MonadIO m) => H.Task -> EventBackend m CompleteOutput
+executeComplete :: (HasEventBackend m, H.CanCreateTask m) => H.Task -> m CompleteOutput
 executeComplete
   = runTask . H.completeTask . H.taskRef
 

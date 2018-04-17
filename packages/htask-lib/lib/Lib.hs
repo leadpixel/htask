@@ -43,8 +43,8 @@ instance FromJSON TaskEventDetail
 
 
 replayEventLog
-  :: (Monad m, HasTasks m)
-  => [TaskEvent] -> m ()
+  :: (Monad m, HasTasks m, Foldable f)
+  => f TaskEvent -> m ()
 replayEventLog
   = mapM_ applyRawEvent
 

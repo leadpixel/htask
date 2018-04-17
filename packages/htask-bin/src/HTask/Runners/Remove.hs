@@ -15,7 +15,7 @@ import HTask.Output
 import Data.Semigroup ((<>))
 
 
-runRemove :: (H.HasTasks (TaskApplication m), H.CanCreateTask m, MonadIO m) => Text.Text -> EventBackend m Document
+runRemove :: (HasEventBackend m, H.CanCreateTask m) => Text.Text -> m Document
 runRemove = withMatch
   (\tx -> runTask
     $   formatOutcome tx

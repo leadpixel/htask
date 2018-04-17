@@ -15,7 +15,7 @@ import HTask.Output
 import Data.Semigroup ((<>))
 
 
-runStart :: (H.HasTasks (TaskApplication m), H.CanCreateTask m, MonadIO m) => Text.Text -> EventBackend m Document
+runStart :: (HasEventBackend m, H.CanCreateTask m) => Text.Text -> m Document
 runStart = withMatch
   (\tx -> runTask
     $   formatOutcome tx
