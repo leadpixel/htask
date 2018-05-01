@@ -38,18 +38,8 @@ instance (Monad m) => H.HasTasks (TaskApplication m) where
 instance (Monad m, CanTime m) => CanTime (TaskApplication m) where
   now = T.lift now
 
--- instance (Monad m, T.MonadTrans t, CanRandom m) => CanRandom (t m) where
---   getRandomRange = T.lift . getRandomRange
-
 instance (Monad m, CanUuid m) => CanUuid (TaskApplication m) where
   uuidGen = T.lift uuidGen
-
--- instance (Monad m, CanUuid m) => CanUuid (TaskApplication m) where
---   uuidGen = TaskApp $ T.lift uuidGen
-
--- instance (Monad m, HasEventSource m) => HasEventSource (TaskApplication m) where
---   readEvents
---     = TaskApp $ T.lift readEvents
 
 instance (Monad m, HasEventSink m) => HasEventSink (TaskApplication m) where
   writeEvent ev
