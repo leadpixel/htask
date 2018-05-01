@@ -1,3 +1,5 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module HTask.Runners
   ( runCommand
   ) where
@@ -22,13 +24,30 @@ import HTask.Runners.Pick
 import HTask.Runners.Done
 import HTask.Runners.Drop
 import Event
-import Event.Database
+
+
+newtype TaskFileBackend a = TaskFileBackend
+  { runBackend :: FileBackend IO a }
+  deriving (Functor, Applicative, Monad, HasEventSource, HasEventSink)
+
+instance CanTime TaskFileBackend where
+  now = TaskFileBackend $ T.lift now
+
+instance CanUuid TaskFileBackend where
+  uuidGen = TaskFileBackend $ T.lift uuidGen
+
+instance CanRandom TaskFileBackend where
+  getRandomRange = TaskFileBackend . T.lift . getRandomRange
 
 
 runCommand :: Options -> IO ()
 runCommand opts
-  = R.runReaderT (runFileBackend $ runAction $ action opts) (taskfile opts)
+  = R.runReaderT (executeAction $ action opts) (taskfile opts)
   >>= renderDocument (formatter opts)
+
+  where
+    executeAction :: Action -> R.ReaderT FilePath IO Document
+    executeAction = runFileBackend . runBackend . runAction
 
 
 runAction

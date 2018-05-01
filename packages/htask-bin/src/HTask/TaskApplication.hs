@@ -19,16 +19,6 @@ import qualified HTask                as H
 import Event
 
 
-instance (Monad m, T.MonadTrans t, CanTime m) => CanTime (t m) where
-  now = T.lift now
-
-instance (Monad m, T.MonadTrans t, CanRandom m) => CanRandom (t m) where
-  getRandomRange = T.lift . getRandomRange
-
-instance (Monad m, T.MonadTrans t, CanUuid m) => CanUuid (t m) where
-  uuidGen = T.lift uuidGen
-
-
 type HasEventBackend m = (Monad m, HasEventSource m, HasEventSink m)
 
 
@@ -45,9 +35,14 @@ instance (Monad m) => H.HasTasks (TaskApplication m) where
   updateExistingTask ref = TaskApp . H.updateExistingTask ref
   removeTaskRef = TaskApp . H.removeTaskRef
 
--- instance (Monad m, CanTime m) => CanTime (TaskApplication m) where
---   now
---     = TaskApp $ T.lift now
+instance (Monad m, CanTime m) => CanTime (TaskApplication m) where
+  now = T.lift now
+
+-- instance (Monad m, T.MonadTrans t, CanRandom m) => CanRandom (t m) where
+--   getRandomRange = T.lift . getRandomRange
+
+instance (Monad m, CanUuid m) => CanUuid (TaskApplication m) where
+  uuidGen = T.lift uuidGen
 
 -- instance (Monad m, CanUuid m) => CanUuid (TaskApplication m) where
 --   uuidGen = TaskApp $ T.lift uuidGen

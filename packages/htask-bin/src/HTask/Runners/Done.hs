@@ -5,7 +5,6 @@ module HTask.Runners.Done
   ( runDone
   ) where
 
-import Control.Monad.IO.Class
 import Event
 import HTask.TaskApplication
 import HTask.Output

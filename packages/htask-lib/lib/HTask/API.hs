@@ -33,22 +33,45 @@ funk v = do
   pure (detailRef v)
 
 
+
 addTask
-  :: (HasTasks m, CanCreateTask m, HasEventSink m)
+  :: (HasTasks m, CanCreateTask m, CanCreateEvent m, HasEventSink m)
   => Text.Text -> m (Either String TaskRef)
-addTask t = do
-  r <- applyIntentToTasks (AddTask t)
-  case r of
-    Left e -> pure (Left e)
-    Right _v -> maybeStore r
+addTask tx = do
+
+  -- create
+  tk <- createTask tx
+  let detail = TaskEventDetail (taskRef tk) (AddTask tx)
+  e <- createEvent detail
+
+  -- apply
+  p <- addNewTask tk
+
+  -- persist
+  if p then writeEvent e else pure ()
+
+  pure $ if p
+            then Right (taskRef tk)
+            else Left "could not add"
 
 
 startTask
-  :: (HasTasks m, CanCreateTask m, HasEventSink m)
+  :: (HasTasks m, CanCreateEvent m, HasEventSink m)
   => TaskRef -> m (Either String TaskRef)
 startTask ref = do
-  r <- applyIntentToTasks (StartTask ref)
-  maybeStore r
+
+  -- create
+  let detail = TaskEventDetail ref (StartTask ref)
+  e <- createEvent detail
+
+  -- apply
+  p <- updateExistingTask ref $ setTaskStatus InProgress
+
+  if p then writeEvent e else pure ()
+
+  pure $ if p
+            then Right ref
+            else Left "could not find matching id"
 
 
 stopTask

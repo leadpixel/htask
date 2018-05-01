@@ -5,8 +5,6 @@ module HTask.Runners.Remove
   ( runRemove
   ) where
 
-import Control.Monad.IO.Class
-import Event
 import qualified Data.Text as Text
 import qualified HTask as H
 import HTask.Runners.Common

@@ -10,11 +10,9 @@ import qualified Data.Text    as Text
 import qualified Data.UUID    as UUID
 import qualified HTask        as H
 
-import Control.Monad.IO.Class
 import Data.Function
 import Data.List
 import Data.Tagged
-import Event
 import HTask.Output
 import HTask.TaskApplication
 
