@@ -56,7 +56,7 @@ addTask tx = do
 
 
 startTask
-  :: (HasTasks m, CanCreateEvent m, HasEventSink m)
+  :: (Monad m, HasTasks m, CanCreateEvent m, HasEventSink m)
   => TaskRef -> m (Either String TaskRef)
 startTask ref = do
 

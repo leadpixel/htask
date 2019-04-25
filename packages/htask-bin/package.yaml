@@ -14,7 +14,6 @@ dependencies:
 - base >= 4.7 && < 5
 - aeson
 - event
-- event-db
 - mtl
 - optparse-applicative
 - tagged

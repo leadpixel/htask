@@ -1,9 +1,12 @@
-resolver: lts-10.4
+resolver: lts-13.10
 
 packages:
-- ./packages/event
-- ./packages/event-db
-- ./packages/event-clean
-- ./packages/event-migrate
-- ./packages/htask-lib
-- ./packages/htask-bin
+  - ./packages/htask-lib
+  - ./packages/htask-bin
+
+extra-deps:
+  - git: /home/palf/projects/leadpixel/events
+    commit: e7038770646b025a141b8c25e67e2e325d7f8243
+    subdirs:
+    - packages/event
+    - packages/event-backends/file

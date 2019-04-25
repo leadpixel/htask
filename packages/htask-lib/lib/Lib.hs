@@ -53,7 +53,7 @@ applyRawEvent
   :: (Monad m, HasTasks m)
   => TaskEvent -> m ()
 applyRawEvent ev = do
-  let td = eventType ev
+  let td = payload ev
   case intent td of
     (AddTask text) -> do
       let t = Task (detailRef td) text (timestamp ev) Pending

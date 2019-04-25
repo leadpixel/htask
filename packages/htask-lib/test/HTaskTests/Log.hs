@@ -76,15 +76,15 @@ adding01Tasks :: TestTree
 adding01Tasks = testCase "adding one task" $ do
   ts <- extractLog [] $ H.addTask "some task"
   assertEqual "expecting one log entry" 1 (length ts)
-  assertEqual "expecting 'add-task' intent" (H.AddTask "some task") (H.intent $ eventType $ head ts)
+  assertEqual "expecting 'add-task' intent" (H.AddTask "some task") (H.intent $ payload $ head ts)
 
 
 adding02Tasks :: TestTree
 adding02Tasks = testCase "adding two tasks" $ do
   ts <- extractLog [] $ H.addTask "some task" >> H.addTask "some other task"
   assertEqual "expecting two log entries" 2 (length ts)
-  assertEqual "expecting 'add-task' intent" (H.AddTask "some task") (H.intent $ eventType $ head ts)
-  assertEqual "expecting 'add-task' intent" (H.AddTask "some other task") (H.intent $ eventType $ ts !! 1)
+  assertEqual "expecting 'add-task' intent" (H.AddTask "some task") (H.intent $ payload $ head ts)
+  assertEqual "expecting 'add-task' intent" (H.AddTask "some other task") (H.intent $ payload $ ts !! 1)
 
 
 startingTask :: TestTree
@@ -92,7 +92,7 @@ startingTask = testCase "starting a task" $ do
   let ref = Tagged UUID.nil
   ts <- extractLog [ randomTask ] $ H.startTask ref
   assertEqual "expecting one log entry" 1 (length ts)
-  assertEqual "expecting 'start-task' intent" (H.StartTask ref) (H.intent $ eventType $ head ts)
+  assertEqual "expecting 'start-task' intent" (H.StartTask ref) (H.intent $ payload $ head ts)
 
 
 startingNonTask :: TestTree
@@ -106,7 +106,7 @@ completingTask = testCase "completing a task" $ do
   let ref = Tagged UUID.nil
   ts <- extractLog [ randomTask ] $ H.completeTask ref
   assertEqual "expecting one log entry" 1 (length ts)
-  assertEqual "expecting 'complete-task' intent" (H.CompleteTask ref) (H.intent $ eventType $ head ts)
+  assertEqual "expecting 'complete-task' intent" (H.CompleteTask ref) (H.intent $ payload $ head ts)
 
 
 removingTask :: TestTree
@@ -114,4 +114,4 @@ removingTask = testCase "deleting a task" $ do
   let ref = Tagged UUID.nil
   ts <- extractLog [ randomTask ] $ H.removeTask ref
   assertEqual "expecting one log entry" 1 (length ts)
-  assertEqual "expecting 'remove-task' intent" (H.RemoveTask ref) (H.intent $ eventType $ head ts)
+  assertEqual "expecting 'remove-task' intent" (H.RemoveTask ref) (H.intent $ payload $ head ts)

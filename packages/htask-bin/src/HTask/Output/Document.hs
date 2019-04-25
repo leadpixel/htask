@@ -9,6 +9,9 @@ import qualified Data.Text as Text
 
 newtype Document = Document { undoc :: [Block] }
 
+instance Semigroup Document where
+  (<>) (Document a) (Document b) = Document (a <> b)
+
 instance Monoid Document where
   mempty = Document []
   mappend (Document a) (Document b) = Document (mappend a b)
