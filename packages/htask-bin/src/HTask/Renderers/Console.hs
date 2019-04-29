@@ -3,15 +3,15 @@ module HTask.Renderers.Console
   ) where
 
 
-import Data.Text (Text, pack)
-import HTask.Output.Document
-import HTask.Output.Formatters
+import           Data.Text               (Text, pack)
+import           HTask.Output.Document
+import           HTask.Output.Formatters
 
 
 renderToConsole :: RunResult -> [Text]
 renderToConsole r
   = case (success r) of
-      True -> formatSuccess (text r)
+      True  -> formatSuccess (text r)
       False -> formatError (text r)
 
 

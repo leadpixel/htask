@@ -1,8 +1,8 @@
 module HTask.CLI.Summary
   where
 
-import HTask.Actions
-import Options.Applicative
+import           HTask.Actions
+import           Options.Applicative
 
 
 summaryInfo :: ParserInfo Action

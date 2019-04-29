@@ -1,7 +1,7 @@
 module HTask.Actions
   where
 
-import Data.Text (Text)
+import           Data.Text (Text)
 
 
 type TaskReference = Text

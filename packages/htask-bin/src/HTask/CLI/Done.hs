@@ -1,8 +1,8 @@
 module HTask.CLI.Done
   where
 
-import HTask.Actions
-import Options.Applicative
+import           HTask.Actions
+import           Options.Applicative
 
 
 doneInfo :: ParserInfo Action

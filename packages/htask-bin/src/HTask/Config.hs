@@ -2,10 +2,10 @@ module HTask.Config
   ( Options (..)
   ) where
 
-import HTask.Actions
+import           HTask.Actions
 
 
 data Options = Options
-  { action :: Action
+  { action   :: Action
   , taskfile :: FilePath
   }

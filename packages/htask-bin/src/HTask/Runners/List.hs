@@ -1,25 +1,25 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.List
   ( runList
   ) where
 
-import qualified Data.UUID              as UUID
-import qualified HTask                  as H
-import qualified Event                  as V
+import qualified Data.UUID             as UUID
+import qualified Event                 as V
+import qualified HTask                 as H
 
-import Data.List
-import Data.Function
-import Data.Tagged
-import HTask.Actions
-import HTask.Output
-import HTask.TaskApplication
+import           Data.Function
+import           Data.List
+import           Data.Tagged
+import           HTask.Actions
+import           HTask.Output
+import           HTask.TaskApplication
 
-import Data.Text              (Text)
-import Data.Semigroup ((<>))
+import           Data.Semigroup        ((<>))
+import           Data.Text             (Text)
 
 
 taskDisplayOrder :: H.Task -> H.Task -> Ordering
@@ -35,25 +35,25 @@ taskDisplayOrder a b
 
 
 statusDisplayOrder :: H.TaskStatus -> H.TaskStatus -> Ordering
-statusDisplayOrder  H.InProgress  H.Abandoned   =  LT
-statusDisplayOrder  H.InProgress  H.Complete    =  LT
-statusDisplayOrder  H.InProgress  H.Pending     =  LT
-statusDisplayOrder  H.InProgress  H.InProgress  =  EQ
+statusDisplayOrder  H.InProgress  H.Abandoned  =  LT
+statusDisplayOrder  H.InProgress  H.Complete   =  LT
+statusDisplayOrder  H.InProgress  H.Pending    =  LT
+statusDisplayOrder  H.InProgress  H.InProgress =  EQ
 
-statusDisplayOrder  H.Pending     H.Abandoned   =  LT
-statusDisplayOrder  H.Pending     H.Complete    =  LT
-statusDisplayOrder  H.Pending     H.Pending     =  EQ
-statusDisplayOrder  H.Pending     H.InProgress  =  GT
+statusDisplayOrder  H.Pending     H.Abandoned  =  LT
+statusDisplayOrder  H.Pending     H.Complete   =  LT
+statusDisplayOrder  H.Pending     H.Pending    =  EQ
+statusDisplayOrder  H.Pending     H.InProgress =  GT
 
-statusDisplayOrder  H.Complete    H.Abandoned   =  LT
-statusDisplayOrder  H.Complete    H.Complete    =  EQ
-statusDisplayOrder  H.Complete    H.InProgress  =  GT
-statusDisplayOrder  H.Complete    H.Pending     =  GT
+statusDisplayOrder  H.Complete    H.Abandoned  =  LT
+statusDisplayOrder  H.Complete    H.Complete   =  EQ
+statusDisplayOrder  H.Complete    H.InProgress =  GT
+statusDisplayOrder  H.Complete    H.Pending    =  GT
 
-statusDisplayOrder  H.Abandoned   H.Abandoned   =  EQ
-statusDisplayOrder  H.Abandoned   H.Complete    =  GT
-statusDisplayOrder  H.Abandoned   H.InProgress  =  GT
-statusDisplayOrder  H.Abandoned   H.Pending     =  GT
+statusDisplayOrder  H.Abandoned   H.Abandoned  =  EQ
+statusDisplayOrder  H.Abandoned   H.Complete   =  GT
+statusDisplayOrder  H.Abandoned   H.InProgress =  GT
+statusDisplayOrder  H.Abandoned   H.Pending    =  GT
 
 
 runList :: (Monad m, V.HasEventSource m) => ShowUUID -> ShowAll -> m RunResult

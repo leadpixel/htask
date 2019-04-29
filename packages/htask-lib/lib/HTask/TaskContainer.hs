@@ -6,10 +6,10 @@ module HTask.TaskContainer
   , emptyTasks
   ) where
 
-import Data.Maybe
-import Data.List
-import HTask.Task
 import qualified Control.Monad.State as State
+import           Data.List
+import           Data.Maybe
+import           HTask.Task
 
 
 type Tasks = [Task]

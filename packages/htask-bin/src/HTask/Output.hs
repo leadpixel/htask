@@ -6,7 +6,7 @@ module HTask.Output
   , module HTask.Output.Renderers
   ) where
 
-import HTask.Output.Formatters
-import HTask.Output.Document
-import HTask.Output.Renderers
+import           HTask.Output.Document
+import           HTask.Output.Formatters
+import           HTask.Output.Renderers
 

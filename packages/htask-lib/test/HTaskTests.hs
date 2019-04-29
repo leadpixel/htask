@@ -2,9 +2,9 @@ module HTaskTests
   ( allTests
   ) where
 
-import Test.Tasty
-import HTaskTests.Tasks
-import HTaskTests.Log
+import           HTaskTests.Log
+import           HTaskTests.Tasks
+import           Test.Tasty
 
 
 allTests :: TestTree

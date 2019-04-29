@@ -7,13 +7,13 @@ module HTaskTests.Tasks
   ( test_tasks
   ) where
 
-import Data.Tagged
-import Event
-import Test.Tasty
-import Test.Tasty.HUnit
 import qualified Control.Monad.State as S
-import qualified Data.UUID as UUID
-import qualified HTask as H
+import           Data.Tagged
+import qualified Data.UUID           as UUID
+import           Event
+import qualified HTask               as H
+import           Test.Tasty
+import           Test.Tasty.HUnit
 
 
 newtype TaskTestMonad m a = TaskTest
@@ -81,7 +81,7 @@ startingTask = testCase "starting a task" $ do
   ts <- extractTasks $ do
     ref <- H.addTask "some task"
     case ref of
-      Left e -> pure (Left e)
+      Left e  -> pure (Left e)
       Right v -> H.startTask v
   assertEqual "expecting one task" 1 (length ts)
   assertEqual "expecting matching task" "some task" (H.description $ head ts)
@@ -100,7 +100,7 @@ completingTask = testCase "completing a task" $ do
   ts <- extractTasks $ do
     ref <- H.addTask "some task"
     case ref of
-      Left e -> pure (Left e)
+      Left e  -> pure (Left e)
       Right v -> H.completeTask v
   assertEqual "expecting one task" 1 (length ts)
   assertEqual "expecting matching task" "some task" (H.description $ head ts)
@@ -112,6 +112,6 @@ deletingTask = testCase "deleting a task" $ do
   ts <- extractTasks $ do
     ref <- H.addTask "some task"
     case ref of
-      Left e -> pure (Left e)
+      Left e  -> pure (Left e)
       Right v -> H.removeTask v
   assertEqual "expecting no tasks" 0 (length ts)

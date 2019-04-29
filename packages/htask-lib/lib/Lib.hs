@@ -1,5 +1,5 @@
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE ConstraintKinds   #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -11,17 +11,17 @@ module Lib
   , replayEventLog
   ) where
 
-import Data.Aeson
-import GHC.Generics
-import Event
-import HTask.TaskContainer
-import HTask.Task
-import Data.Text (Text)
+import           Data.Aeson
+import           Data.Text           (Text)
+import           Event
+import           GHC.Generics
+import           HTask.Task
+import           HTask.TaskContainer
 
 
 data TaskEventDetail = TaskEventDetail
   { detailRef :: TaskRef
-  , intent :: TaskIntent
+  , intent    :: TaskIntent
   } deriving (Show, Generic)
 
 

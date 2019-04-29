@@ -2,21 +2,21 @@ module HTask.CLI
   ( getOptions
   ) where
 
-import Options.Applicative as Opts
-import Data.Semigroup ((<>))
+import           Data.Semigroup      ((<>))
+import           Options.Applicative as Opts
 
-import HTask.Actions
-import HTask.Config
-import HTask.CLI.Add
-import HTask.CLI.Complete
-import HTask.CLI.Done
-import HTask.CLI.Drop
-import HTask.CLI.List
-import HTask.CLI.Pick
-import HTask.CLI.Remove
-import HTask.CLI.Start
-import HTask.CLI.Stop
-import HTask.CLI.Summary
+import           HTask.Actions
+import           HTask.CLI.Add
+import           HTask.CLI.Complete
+import           HTask.CLI.Done
+import           HTask.CLI.Drop
+import           HTask.CLI.List
+import           HTask.CLI.Pick
+import           HTask.CLI.Remove
+import           HTask.CLI.Start
+import           HTask.CLI.Stop
+import           HTask.CLI.Summary
+import           HTask.Config
 
 
 defaultAction :: Parser Action

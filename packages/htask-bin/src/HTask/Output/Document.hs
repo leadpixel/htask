@@ -6,13 +6,13 @@ module HTask.Output.Document
   , resultSuccess
   ) where
 
-import Data.Text (Text)
-import GHC.Generics
+import           Data.Text    (Text)
+import           GHC.Generics
 
 
 data RunResult = RunResult
   { success :: Bool
-  , text :: [Text]
+  , text    :: [Text]
   } deriving (Show, Generic)
 
 

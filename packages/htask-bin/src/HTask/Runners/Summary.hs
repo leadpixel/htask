@@ -1,23 +1,23 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Summary
   ( runSummary
   ) where
 
-import qualified Data.Text    as Text
-import qualified Data.UUID    as UUID
-import qualified HTask        as H
+import qualified Data.Text             as Text
+import qualified Data.UUID             as UUID
+import qualified HTask                 as H
 
-import Data.Function
-import Data.List
-import Data.Tagged
-import HTask.Output
-import HTask.TaskApplication
+import           Data.Function
+import           Data.List
+import           Data.Tagged
+import           HTask.Output
+import           HTask.TaskApplication
 
-import Data.Semigroup ((<>))
-import Data.Text (Text)
+import           Data.Semigroup        ((<>))
+import           Data.Text             (Text)
 
 
 taskPriority :: H.Task -> H.Task -> Ordering

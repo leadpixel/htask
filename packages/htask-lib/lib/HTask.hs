@@ -7,7 +7,7 @@ module HTask
   , module Task
   ) where
 
-import Lib
-import HTask.API as API
-import HTask.TaskContainer as TaskContainer
-import HTask.Task as Task
+import           HTask.API           as API
+import           HTask.Task          as Task
+import           HTask.TaskContainer as TaskContainer
+import           Lib

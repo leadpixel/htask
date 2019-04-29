@@ -1,8 +1,8 @@
 module HTask.CLI.Start
   where
 
-import HTask.Actions
-import Options.Applicative
+import           HTask.Actions
+import           Options.Applicative
 
 
 startInfo :: ParserInfo Action

@@ -2,8 +2,8 @@ module Main
   ( main
   ) where
 
-import Test.Tasty
-import HTaskTests
+import           HTaskTests
+import           Test.Tasty
 
 
 main :: IO ()

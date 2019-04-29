@@ -1,18 +1,18 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module HTask.Runners.Add
   ( runAdd
   ) where
 
-import qualified Data.Text as Text
-import qualified HTask as H
+import qualified Data.Text             as Text
+import qualified HTask                 as H
 
-import HTask.TaskApplication
-import Data.Text (Text)
-import HTask.Output
+import           Data.Text             (Text)
+import           HTask.Output
+import           HTask.TaskApplication
 
-import Data.Semigroup ((<>))
+import           Data.Semigroup        ((<>))
 
 
 type AddOutput = Either String H.TaskRef

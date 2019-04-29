@@ -1,8 +1,8 @@
 module HTask.CLI.Complete
   where
 
-import HTask.Actions
-import Options.Applicative
+import           HTask.Actions
+import           Options.Applicative
 
 
 completeInfo :: ParserInfo Action

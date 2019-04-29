@@ -1,18 +1,18 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module HTask.Runners.Pick
   ( runPick
   ) where
 
-import qualified HTask as H
+import qualified HTask                 as H
 
-import Event
-import HTask.TaskApplication
-import HTask.Output
+import           Event
+import           HTask.Output
+import           HTask.TaskApplication
 
-import Data.Semigroup ((<>))
+import           Data.Semigroup        ((<>))
 
 
 hasStatus :: H.TaskStatus -> H.Task -> Bool

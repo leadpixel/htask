@@ -1,9 +1,9 @@
 module HTask.CLI.List
   where
 
-import HTask.Actions
-import Options.Applicative
-import Data.Semigroup ((<>))
+import           Data.Semigroup      ((<>))
+import           HTask.Actions
+import           Options.Applicative
 
 
 listInfo :: ParserInfo Action

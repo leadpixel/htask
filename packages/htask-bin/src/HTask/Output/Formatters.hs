@@ -8,9 +8,9 @@ module HTask.Output.Formatters
   , indent
   ) where
 
-import qualified HTask as H
-import Data.Semigroup (Semigroup, (<>))
-import Data.String (IsString)
+import           Data.Semigroup (Semigroup, (<>))
+import           Data.String    (IsString)
+import qualified HTask          as H
 
 
 data TermColor

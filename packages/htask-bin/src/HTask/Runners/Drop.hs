@@ -1,17 +1,17 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Drop
   ( runDrop
   ) where
 
-import qualified HTask as H
+import qualified HTask                 as H
 
-import Control.Monad
-import HTask.Output
-import HTask.TaskApplication
+import           Control.Monad
+import           HTask.Output
+import           HTask.TaskApplication
 
-import Data.Semigroup ((<>))
+import           Data.Semigroup        ((<>))
 
 
 hasStatus :: H.TaskStatus -> H.Task -> Bool

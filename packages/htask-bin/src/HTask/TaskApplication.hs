@@ -1,7 +1,7 @@
-{-# LANGUAGE FlexibleInstances          #-}
-{-# LANGUAGE FlexibleContexts           #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE ConstraintKinds            #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE TypeSynonymInstances       #-}
@@ -12,11 +12,10 @@ module HTask.TaskApplication
   , runTask
   ) where
 
-import qualified Control.Monad.Reader as R
-import qualified Control.Monad.State  as S
-import qualified Control.Monad.Trans  as T
-import qualified HTask                as H
-import Event
+import qualified Control.Monad.State as S
+import qualified Control.Monad.Trans as T
+import           Event
+import qualified HTask               as H
 
 
 type HasEventBackend m = (Monad m, HasEventSource m, HasEventSink m)
@@ -24,10 +23,7 @@ type HasEventBackend m = (Monad m, HasEventSource m, HasEventSink m)
 
 newtype TaskApplication m a = TaskApp
   { runTaskApp :: S.StateT H.Tasks m a
-  } deriving (Functor, Applicative, Monad)
-
-instance T.MonadTrans TaskApplication where
-  lift = TaskApp . T.lift
+  } deriving (Functor, Applicative, Monad, T.MonadTrans)
 
 instance (Monad m) => H.HasTasks (TaskApplication m) where
   getTasks = TaskApp H.getTasks

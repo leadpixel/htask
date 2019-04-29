@@ -1,21 +1,21 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Common
   ( withMatch
   ) where
 
-import qualified Data.Text as Text
-import qualified HTask as H
-import HTask.TaskApplication
-import HTask.Output
-import Data.Semigroup ((<>))
-import Data.Text (Text)
+import           Data.Semigroup        ((<>))
+import           Data.Text             (Text)
+import qualified Data.Text             as Text
+import qualified HTask                 as H
+import           HTask.Output
+import           HTask.TaskApplication
 
 
 headSafe :: [a] -> Maybe a
 headSafe [x] = Just x
-headSafe _ = Nothing
+headSafe _   = Nothing
 
 
 findMatch :: (HasEventBackend m) => Text -> m (Maybe H.Task)

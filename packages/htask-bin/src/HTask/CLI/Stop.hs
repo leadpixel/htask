@@ -1,8 +1,8 @@
 module HTask.CLI.Stop
   where
 
-import HTask.Actions
-import Options.Applicative
+import           HTask.Actions
+import           Options.Applicative
 
 
 stopInfo :: ParserInfo Action

@@ -1,8 +1,8 @@
 module HTask.CLI.Pick
   where
 
-import HTask.Actions
-import Options.Applicative
+import           HTask.Actions
+import           Options.Applicative
 
 
 pickInfo :: ParserInfo Action

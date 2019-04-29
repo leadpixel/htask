@@ -1,17 +1,17 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Complete
   ( runComplete
   ) where
 
-import qualified Data.Text as Text
-import qualified HTask as H
-import HTask.Runners.Common
-import HTask.TaskApplication
-import HTask.Output
-import Data.Semigroup ((<>))
-import Data.Text (Text)
+import           Data.Semigroup        ((<>))
+import           Data.Text             (Text)
+import qualified Data.Text             as Text
+import qualified HTask                 as H
+import           HTask.Output
+import           HTask.Runners.Common
+import           HTask.TaskApplication
 
 
 type CompleteOutput = Either String H.TaskRef

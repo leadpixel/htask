@@ -1,8 +1,8 @@
 module HTask.CLI.Add
   where
 
-import HTask.Actions
-import Options.Applicative
+import           HTask.Actions
+import           Options.Applicative
 
 
 addInfo :: ParserInfo Action

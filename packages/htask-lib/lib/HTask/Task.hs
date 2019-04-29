@@ -10,10 +10,10 @@ module HTask.Task
   , taskRefText
   ) where
 
-import qualified Event as V
-import qualified Data.UUID as UUID
-import Data.Tagged
-import Data.Text (Text)
+import           Data.Tagged
+import           Data.Text   (Text)
+import qualified Data.UUID   as UUID
+import qualified Event       as V
 
 
 type TaskIdent = ()
@@ -29,10 +29,10 @@ data TaskStatus
 
 
 data Task = Task
-  { taskRef :: TaskRef
+  { taskRef     :: TaskRef
   , description :: Text
-  , createdAt :: V.Timestamp
-  , status :: TaskStatus
+  , createdAt   :: V.Timestamp
+  , status      :: TaskStatus
   } deriving (Show, Eq)
 
 

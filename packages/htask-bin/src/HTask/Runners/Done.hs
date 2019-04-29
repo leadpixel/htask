@@ -1,16 +1,16 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Runners.Done
   ( runDone
   ) where
 
-import Event
-import HTask.TaskApplication
-import HTask.Output
-import qualified HTask as H
-import qualified Data.Text as Text
-import Data.Semigroup ((<>))
+import           Data.Semigroup        ((<>))
+import qualified Data.Text             as Text
+import           Event
+import qualified HTask                 as H
+import           HTask.Output
+import           HTask.TaskApplication
 
 
 type DoneOutput = [(H.Task, Either String H.TaskRef)]
@@ -36,7 +36,7 @@ runDone
     formatOutcome xs
       = undefined (formatDone <$> xs)
 
-    formatDone (_t, Left err) = resultError (Text.pack err)
+    formatDone (_t, Left err)  = resultError (Text.pack err)
     formatDone (t, Right _ref) = formatSuccessComplete t
 
     formatSuccessComplete tx

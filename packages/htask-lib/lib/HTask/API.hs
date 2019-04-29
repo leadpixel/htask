@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds          #-}
+{-# LANGUAGE ConstraintKinds #-}
 
 module HTask.API
   ( addTask
@@ -9,11 +9,11 @@ module HTask.API
   , listTasks
   ) where
 
-import Lib
-import Data.Text (Text)
-import Event
-import HTask.TaskContainer
-import HTask.Task
+import           Data.Text           (Text)
+import           Event
+import           HTask.Task
+import           HTask.TaskContainer
+import           Lib
 
 
 maybeStore
@@ -21,7 +21,7 @@ maybeStore
   => Either String TaskEventDetail -> m (Either String TaskRef)
 maybeStore r
   = case r of
-      Left e -> pure (Left e)
+      Left e  -> pure (Left e)
       Right v -> Right <$> funk v
 
 

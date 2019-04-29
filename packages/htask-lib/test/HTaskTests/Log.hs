@@ -7,17 +7,17 @@ module HTaskTests.Log
   ( test_log
   ) where
 
-import Data.Maybe
-import Data.Tagged
-import Event
-import Test.Tasty
-import Test.Tasty.HUnit
 import qualified Control.Monad.Reader as R
 import qualified Control.Monad.Writer as W
-import qualified Data.Aeson as A
+import qualified Data.Aeson           as A
 import qualified Data.ByteString.Lazy as BS
-import qualified Data.UUID as UUID
-import qualified HTask as H
+import           Data.Maybe
+import           Data.Tagged
+import qualified Data.UUID            as UUID
+import           Event
+import qualified HTask                as H
+import           Test.Tasty
+import           Test.Tasty.HUnit
 
 
 newtype LogTestMonad m a = LogTest
