@@ -7,9 +7,9 @@ module HTask.Runners.List
   ( runList
   ) where
 
-import qualified Data.Text              as Text
 import qualified Data.UUID              as UUID
 import qualified HTask                  as H
+import qualified Event                  as V
 
 import Data.List
 import Data.Function
@@ -18,6 +18,7 @@ import HTask.Actions
 import HTask.Output
 import HTask.TaskApplication
 
+import Data.Text              (Text)
 import Data.Semigroup ((<>))
 
 
@@ -55,14 +56,14 @@ statusDisplayOrder  H.Abandoned   H.InProgress  =  GT
 statusDisplayOrder  H.Abandoned   H.Pending     =  GT
 
 
-runList :: (HasEventBackend m) => ShowUUID -> ShowAll -> m Document
+runList :: (Monad m, V.HasEventSource m) => ShowUUID -> ShowAll -> m RunResult
 runList showUUID showAll
-  =   Document . fmap formatOutput . selectTasks
+  = resultSuccess . fmap formatOutput . selectTasks
   <$> runTask H.listTasks
 
   where
     formatOutput
-      = line . nicePrint showUUID
+      = nicePrint showUUID
 
     selectTasks
       = sortBy taskDisplayOrder
@@ -80,7 +81,7 @@ runList showUUID showAll
     justActive H.Abandoned  = False
 
 
-nicePrint :: ShowUUID -> H.Task -> Text.Text
+nicePrint :: ShowUUID -> H.Task -> Text
 nicePrint d t
   =  ( if d then printUUID else "" )
   <> statusSymbol (H.status t)

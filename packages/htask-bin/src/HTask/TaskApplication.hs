@@ -47,7 +47,7 @@ instance (Monad m, HasEventSink m) => HasEventSink (TaskApplication m) where
 
 
 runTask
-  :: (Monad m, HasEventSource m, HasEventSink m)
+  :: (Monad m, HasEventSource m)
   => TaskApplication m a -> m a
 runTask op
   = readEvents

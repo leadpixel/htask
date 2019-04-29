@@ -11,9 +11,10 @@ import HTask.Runners.Common
 import HTask.TaskApplication
 import HTask.Output
 import Data.Semigroup ((<>))
+import Data.Text (Text)
 
 
-runRemove :: (HasEventBackend m, H.CanCreateTask m) => Text.Text -> m Document
+runRemove :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runRemove = withMatch
   (\tx -> runTask
     $   formatOutcome tx
@@ -23,8 +24,8 @@ runRemove = withMatch
   where
     formatOutcome tx
       = either
-          (formatError . Text.pack)
+          (resultError . Text.pack)
           (const $ formatSuccessRemove tx)
 
     formatSuccessRemove tx
-      = formatSuccess ("removing task: " <> H.description tx)
+      = resultSuccess [ ("removing task: " <> H.description tx)]

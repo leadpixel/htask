@@ -10,10 +10,10 @@ module HTask.Task
   , taskRefText
   ) where
 
-import Event
-import qualified Data.Text as Text
+import qualified Event as V
 import qualified Data.UUID as UUID
 import Data.Tagged
+import Data.Text (Text)
 
 
 type TaskIdent = ()
@@ -30,25 +30,25 @@ data TaskStatus
 
 data Task = Task
   { taskRef :: TaskRef
-  , description :: Text.Text
-  , createdAt :: Timestamp
+  , description :: Text
+  , createdAt :: V.Timestamp
   , status :: TaskStatus
   } deriving (Show, Eq)
 
 
-type CanCreateTask m = (Monad m, CanTime m, CanUuid m)
+type CanCreateTask m = (Monad m, V.CanTime m, V.CanUuid m)
 
 
-createTask :: (CanCreateTask m) => Text.Text -> m Task
+createTask :: (CanCreateTask m) => Text -> m Task
 createTask tex
   = (\u m -> Task u tex m Pending)
-  <$> (Tagged <$> uuidGen)
-  <*> now
+  <$> (Tagged <$> V.uuidGen)
+  <*> V.now
 
 
 setTaskStatus :: TaskStatus -> Task -> Task
 setTaskStatus s t = t { status = s }
 
 
-taskRefText :: TaskRef -> Text.Text
+taskRefText :: TaskRef -> Text
 taskRefText = UUID.toText . untag

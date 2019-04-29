@@ -14,6 +14,8 @@ dependencies:
 - base >= 4.7 && < 5
 - aeson
 - event
+- event-backend-file
+- unliftio-core
 - mtl
 - optparse-applicative
 - tagged

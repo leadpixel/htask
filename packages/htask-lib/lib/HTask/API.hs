@@ -10,7 +10,7 @@ module HTask.API
   ) where
 
 import Lib
-import qualified Data.Text as Text
+import Data.Text (Text)
 import Event
 import HTask.TaskContainer
 import HTask.Task
@@ -36,7 +36,7 @@ funk v = do
 
 addTask
   :: (HasTasks m, CanCreateTask m, CanCreateEvent m, HasEventSink m)
-  => Text.Text -> m (Either String TaskRef)
+  => Text -> m (Either String TaskRef)
 addTask tx = do
 
   -- create

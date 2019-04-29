@@ -11,12 +11,13 @@ import HTask.Runners.Common
 import HTask.TaskApplication
 import HTask.Output
 import Data.Semigroup ((<>))
+import Data.Text (Text)
 
 
 type CompleteOutput = Either String H.TaskRef
 
 
-runComplete :: (HasEventBackend m, H.CanCreateTask m) => Text.Text -> m Document
+runComplete :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runComplete
   = withMatch $ \tx ->
       presentComplete tx <$> executeComplete tx
@@ -27,12 +28,12 @@ executeComplete
   = runTask . H.completeTask . H.taskRef
 
 
-presentComplete :: H.Task -> CompleteOutput -> Document
+presentComplete :: H.Task -> CompleteOutput -> RunResult
 presentComplete tx
   = either
-      (formatError . Text.pack)
+      (resultError . Text.pack)
       (const $ formatSuccessComplete tx)
 
   where
     formatSuccessComplete tx'
-      = formatSuccess ("completing task: " <> H.description tx')
+      = resultSuccess [ ("completing task: " <> H.description tx')]

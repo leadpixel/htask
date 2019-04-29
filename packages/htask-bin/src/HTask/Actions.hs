@@ -1,10 +1,10 @@
 module HTask.Actions
   where
 
-import qualified Data.Text as Text
+import Data.Text (Text)
 
 
-type TaskReference = Text.Text
+type TaskReference = Text
 
 type ShowUUID = Bool
 type ShowAll = Bool
@@ -14,7 +14,7 @@ data Action
   = Summary
   | List ShowUUID ShowAll
 
-  | Add Text.Text
+  | Add Text
   | Start TaskReference
   | Stop TaskReference
   | Complete TaskReference

@@ -16,7 +16,7 @@ import Data.Semigroup ((<>))
 type DoneOutput = [(H.Task, Either String H.TaskRef)]
 
 
-runDone :: (HasEventBackend m, H.CanCreateTask m) => m Document
+runDone :: (HasEventBackend m, H.CanCreateTask m) => m RunResult
 runDone
   = formatOutcome <$> runTask doneTask
 
@@ -28,18 +28,16 @@ runDone
       let ts = filter isCurrent xs
       mapM execDone ts
 
-    execDone t = do
-      x <- H.completeTask (H.taskRef t)
-      pure (t, x)
+    execDone t = (\x -> (t, x)) <$> H.completeTask (H.taskRef t)
 
     isCurrent t = H.status t == H.InProgress
 
-    formatOutcome :: DoneOutput -> Document
+    formatOutcome :: DoneOutput -> RunResult
     formatOutcome xs
-      = mconcat (formatDone <$> xs)
+      = undefined (formatDone <$> xs)
 
-    formatDone (_t, Left err) = formatError (Text.pack err)
+    formatDone (_t, Left err) = resultError (Text.pack err)
     formatDone (t, Right _ref) = formatSuccessComplete t
 
     formatSuccessComplete tx
-      = formatSuccess ("completing task: " <> H.description tx)
+      = resultSuccess ["completing task: " <> H.description tx]

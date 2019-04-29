@@ -11,9 +11,10 @@ import HTask.Runners.Common
 import HTask.TaskApplication
 import HTask.Output
 import Data.Semigroup ((<>))
+import Data.Text (Text)
 
 
-runStop :: (HasEventBackend m, H.CanCreateTask m) => Text.Text -> m Document
+runStop :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runStop = withMatch
   (\tx -> runTask
     $   formatOutcome tx
@@ -23,8 +24,8 @@ runStop = withMatch
   where
     formatOutcome tx
       = either
-          (formatError . Text.pack)
+          (resultError . Text.pack)
           (const $ formatSuccessStop tx)
 
     formatSuccessStop tx
-      = formatSuccess ("stopping task: " <> H.description tx)
+      = resultSuccess [("stopping task: " <> H.description tx)]

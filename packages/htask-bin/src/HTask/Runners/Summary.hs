@@ -17,6 +17,7 @@ import HTask.Output
 import HTask.TaskApplication
 
 import Data.Semigroup ((<>))
+import Data.Text (Text)
 
 
 taskPriority :: H.Task -> H.Task -> Ordering
@@ -27,29 +28,29 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runSummary :: (HasEventBackend m) => m Document
+runSummary :: (HasEventBackend m) => m RunResult
 runSummary
   = renderSummary <$> runTask H.listTasks
 
 
-renderSummary :: [H.Task] -> Document
-renderSummary ts = Document
+renderSummary :: [H.Task] -> RunResult
+renderSummary ts = resultSuccess
   $ displayCurrent ts
-  <> (line "" : displayTopPending ts)
+  <> ("" : displayTopPending ts)
 
 
-displayCurrent :: [H.Task] -> [Block]
+displayCurrent :: [H.Task] -> [Text]
 displayCurrent ts = do
   let ps = filter (hasStatus H.InProgress) ts
   if Data.List.null ps
      then
-       [ line "No current task" ]
+       [ "No current task" ]
      else
-       line "Current task:"
+       "Current task:"
        : concatMap printTaskForSummary ps
 
 
-displayTopPending :: [H.Task] -> [Block]
+displayTopPending :: [H.Task] -> [Text]
 displayTopPending ts
   = pendingMessage (length xs) (length ps)
   : concatMap printTaskForSummary xs
@@ -59,24 +60,24 @@ displayTopPending ts
 
     xs = take 5 ps
 
-    pendingMessage x p = line
+    pendingMessage x p =
       ( "Top " <> tInt x <> " pending (" <> tInt (p - x) <> " hidden):" )
 
     tInt = Text.pack . show
 
 
-printTaskForSummary :: H.Task -> [Block]
+printTaskForSummary :: H.Task -> [Text]
 printTaskForSummary t =
-  [ line (indent printDescription)
-  , line (indent $ indent printRef)
+  [ (indent printDescription)
+  , (indent $ indent printRef)
   ]
 
   where
-    printDescription :: Text.Text
+    printDescription :: Text
     printDescription
       =  statusSymbol (H.status t)
       <> " "
       <> withStatusColor (H.status t) (H.description t)
 
-    printRef :: Text.Text
+    printRef :: Text
     printRef = (UUID.toText . untag . H.taskRef) t

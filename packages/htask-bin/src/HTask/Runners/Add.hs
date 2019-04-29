@@ -9,6 +9,7 @@ import qualified Data.Text as Text
 import qualified HTask as H
 
 import HTask.TaskApplication
+import Data.Text (Text)
 import HTask.Output
 
 import Data.Semigroup ((<>))
@@ -17,20 +18,20 @@ import Data.Semigroup ((<>))
 type AddOutput = Either String H.TaskRef
 
 
-runAdd :: (HasEventBackend m, H.CanCreateTask m) => Text.Text -> m Document
+runAdd :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runAdd t
   = presentAdd t <$> runTask (H.addTask t)
 
 
-presentAdd :: Text.Text -> AddOutput -> Document
+presentAdd :: Text -> AddOutput -> RunResult
 presentAdd t
   = either
-      (formatError . Text.pack)
-      (formatSuccessAdd t)
+      (resultError . Text.pack)
+      resultSuccessAdd
 
   where
-    formatSuccessAdd t' ref
-      = formatSuccess
-          (  "added task: " <> t' <> "\n"
-          <> "ref: " <> H.taskRefText ref
-          )
+    resultSuccessAdd ref
+      = resultSuccess
+          [ "added task: " <> t
+          , "ref: " <> H.taskRefText ref
+          ]

@@ -11,9 +11,10 @@ import HTask.Runners.Common
 import HTask.TaskApplication
 import HTask.Output
 import Data.Semigroup ((<>))
+import Data.Text (Text)
 
 
-runStart :: (HasEventBackend m, H.CanCreateTask m) => Text.Text -> m Document
+runStart :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runStart = withMatch
   (\tx -> runTask
     $   formatOutcome tx
@@ -23,8 +24,8 @@ runStart = withMatch
   where
     formatOutcome tx
       = either
-          (formatError . Text.pack)
+          (resultError . Text.pack)
           (const $ formatSuccessStart tx)
 
     formatSuccessStart tx
-      = formatSuccess ("starting task: " <> H.description tx)
+      = resultSuccess [("starting task: " <> H.description tx)]

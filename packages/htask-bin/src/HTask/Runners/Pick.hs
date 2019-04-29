@@ -19,29 +19,23 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runPick :: (CanRandom m, HasEventBackend m, H.CanCreateTask m) => m Document
+runPick :: (CanRandom m, HasEventBackend m, H.CanCreateTask m) => m RunResult
 runPick = do
   ts <- runTask H.listTasks
   let ps = filter (hasStatus H.Pending) ts
   k <- randomSelectOne ps
-  Document <$> maybe
-    emptyMessage
-    startTask
+  maybe
+    (pure $ resultError "no task to pick")
+    (\x -> resultSuccess <$> startTask x)
     k
 
   where
     startTask t = do
       _ <- runTask $ H.startTask $ H.taskRef t
-      pure [ line ("picking task: " <> H.description t)]
-
-
-    emptyMessage :: (Applicative m) => m [Block]
-    emptyMessage
-      = pure [ line "no task to pick" ]
+      pure [("picking task: " <> H.description t)]
 
 
 randomSelectOne :: (Monad m, CanRandom m) => [a] -> m (Maybe a)
 randomSelectOne [] = pure Nothing
-randomSelectOne xs = do
-  n <- getRandomRange (0, length xs)
-  pure $ Just $ xs !! n
+randomSelectOne xs =
+  (\n -> Just $ xs !! n) <$> getRandomRange (0, length xs)

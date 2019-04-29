@@ -1,26 +1,30 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module HTask.Output.Document
-  ( Document (..)
-  , Block (..)
-  , line
+  ( RunResult (..)
+  , resultError
+  , resultSuccess
   ) where
 
-import qualified Data.Text as Text
+import Data.Text (Text)
+import GHC.Generics
 
 
-newtype Document = Document { undoc :: [Block] }
-
-instance Semigroup Document where
-  (<>) (Document a) (Document b) = Document (a <> b)
-
-instance Monoid Document where
-  mempty = Document []
-  mappend (Document a) (Document b) = Document (mappend a b)
+data RunResult = RunResult
+  { success :: Bool
+  , text :: [Text]
+  } deriving (Show, Generic)
 
 
-newtype Block
-  = Line Text.Text
+resultError :: Text -> RunResult
+resultError x = RunResult
+  { success = False
+  , text = [x]
+  }
 
 
-line :: Text.Text -> Block
-line = Line
-
+resultSuccess :: [Text] -> RunResult
+resultSuccess x = RunResult
+  { success = True
+  , text = x
+  }

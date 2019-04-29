@@ -16,7 +16,7 @@ import GHC.Generics
 import Event
 import HTask.TaskContainer
 import HTask.Task
-import qualified Data.Text as Text
+import Data.Text (Text)
 
 
 data TaskEventDetail = TaskEventDetail
@@ -29,7 +29,7 @@ type TaskEvent = Event TaskEventDetail
 
 
 data TaskIntent
-  = AddTask Text.Text
+  = AddTask Text
   | StartTask TaskRef
   | StopTask TaskRef
   | CompleteTask TaskRef

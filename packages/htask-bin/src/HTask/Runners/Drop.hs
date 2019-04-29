@@ -18,9 +18,9 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runDrop :: (HasEventBackend m, H.CanCreateTask m) => m Document
+runDrop :: (HasEventBackend m, H.CanCreateTask m) => m RunResult
 runDrop
-  = Document <$>
+  = resultSuccess <$>
     ( runTask H.listTasks
     >>= fmap join . mapM execStopTask . filter (hasStatus H.InProgress)
     )
@@ -29,4 +29,4 @@ runDrop
 
     execStopTask t = do
       _ <- runTask $ H.stopTask $ H.taskRef t
-      pure [ line $ "stopping task: " <> H.description t ]
+      pure [ "stopping task: " <> H.description t ]
