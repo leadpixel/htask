@@ -10,9 +10,7 @@ import           HTask.Output.Formatters
 
 renderToConsole :: RunResult -> [Text]
 renderToConsole r
-  = case (success r) of
-      True  -> formatSuccess (text r)
-      False -> formatError (text r)
+  = if success r then formatSuccess (text r) else formatError (text r)
 
 
 formatError :: [Text] -> [Text]
@@ -23,4 +21,3 @@ formatError t =
 formatSuccess :: [Text] -> [Text]
 formatSuccess t =
   [ pack $ withColor Green "Success!" ] <> t
-

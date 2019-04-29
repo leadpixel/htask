@@ -28,4 +28,4 @@ runStop = withMatch
           (const $ formatSuccessStop tx)
 
     formatSuccessStop tx
-      = resultSuccess [("stopping task: " <> H.description tx)]
+      = resultSuccess ["stopping task: " <> H.description tx]

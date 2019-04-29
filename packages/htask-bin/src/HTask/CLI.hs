@@ -65,7 +65,7 @@ fileParser = option str
 
 optionsParser :: Parser Options
 optionsParser
-  = (\a c -> Options c a)
+  = flip Options
   <$> fileParser
   <*> (actionParser <|> defaultAction)
 

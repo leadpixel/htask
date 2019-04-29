@@ -26,13 +26,13 @@ runPick = do
   k <- randomSelectOne ps
   maybe
     (pure $ resultError "no task to pick")
-    (\x -> resultSuccess <$> startTask x)
+    (fmap resultSuccess . startTask)
     k
 
   where
     startTask t = do
       _ <- runTask $ H.startTask $ H.taskRef t
-      pure [("picking task: " <> H.description t)]
+      pure ["picking task: " <> H.description t]
 
 
 randomSelectOne :: (Monad m, CanRandom m) => [a] -> m (Maybe a)

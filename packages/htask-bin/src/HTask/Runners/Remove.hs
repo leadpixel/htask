@@ -28,4 +28,4 @@ runRemove = withMatch
           (const $ formatSuccessRemove tx)
 
     formatSuccessRemove tx
-      = resultSuccess [ ("removing task: " <> H.description tx)]
+      = resultSuccess [ "removing task: " <> H.description tx]

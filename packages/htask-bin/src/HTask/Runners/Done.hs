@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections     #-}
 
 module HTask.Runners.Done
   ( runDone
@@ -28,7 +29,7 @@ runDone
       let ts = filter isCurrent xs
       mapM execDone ts
 
-    execDone t = (\x -> (t, x)) <$> H.completeTask (H.taskRef t)
+    execDone t = (t,) <$> H.completeTask (H.taskRef t)
 
     isCurrent t = H.status t == H.InProgress
 

@@ -1,5 +1,5 @@
-{-# LANGUAGE ConstraintKinds            #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE ConstraintKinds #-}
+
 
 module HTask.Runners
   ( runAction

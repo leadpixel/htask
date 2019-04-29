@@ -42,7 +42,7 @@ instance (Monad m) => H.HasTasks (LogTestMonad m) where
 
 extractLog :: (Monad m) => [H.Task] -> LogTestMonad m a -> m [H.TaskEvent]
 extractLog xs op
-  = catMaybes . fmap A.decode <$> W.execWriterT ( R.runReaderT (runLog op) xs )
+  = mapMaybe A.decode <$> W.execWriterT ( R.runReaderT (runLog op) xs )
 
 
 randomTask :: H.Task

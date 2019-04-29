@@ -113,4 +113,3 @@ applyIntentToTasks itx =
       pure $ if p
         then Right (TaskEventDetail ref itx)
         else Left "unknown fuckup"
-

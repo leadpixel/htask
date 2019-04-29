@@ -28,4 +28,4 @@ runStart = withMatch
           (const $ formatSuccessStart tx)
 
     formatSuccessStart tx
-      = resultSuccess [("starting task: " <> H.description tx)]
+      = resultSuccess ["starting task: " <> H.description tx]

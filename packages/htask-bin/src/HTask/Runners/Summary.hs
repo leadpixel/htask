@@ -61,15 +61,15 @@ displayTopPending ts
     xs = take 5 ps
 
     pendingMessage x p =
-      ( "Top " <> tInt x <> " pending (" <> tInt (p - x) <> " hidden):" )
+      "Top " <> tInt x <> " pending (" <> tInt (p - x) <> " hidden):"
 
     tInt = Text.pack . show
 
 
 printTaskForSummary :: H.Task -> [Text]
 printTaskForSummary t =
-  [ (indent printDescription)
-  , (indent $ indent printRef)
+  [ indent printDescription
+  , indent $ indent printRef
   ]
 
   where

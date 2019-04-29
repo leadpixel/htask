@@ -36,4 +36,4 @@ presentComplete tx
 
   where
     formatSuccessComplete tx'
-      = resultSuccess [ ("completing task: " <> H.description tx')]
+      = resultSuccess [ "completing task: " <> H.description tx']

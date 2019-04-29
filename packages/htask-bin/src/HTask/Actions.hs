@@ -25,4 +25,3 @@ data Action
   | Done
 
   deriving (Show, Read)
-
