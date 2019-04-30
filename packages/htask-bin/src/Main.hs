@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Main
   ( main
