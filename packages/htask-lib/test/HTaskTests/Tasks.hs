@@ -8,39 +8,43 @@ module HTaskTests.Tasks
   ) where
 
 import qualified Control.Monad.State as S
-import           Data.Tagged
 import qualified Data.UUID           as UUID
-import           Event
-import qualified HTask               as H
+import qualified Event as V
+import qualified HTask.Task as H
+import qualified HTask.TaskContainer as HC
+import qualified HTask.API as API
+
+import           Data.Tagged (Tagged(..))
+
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
 
 newtype TaskTestMonad m a = TaskTest
-  { runTask :: (S.StateT H.Tasks m) a
+  { runTask :: (S.StateT HC.Tasks m) a
   } deriving (Functor, Applicative, Monad)
 
-instance (Monad m, CanTime m) => CanTime (TaskTestMonad m) where
-  now = TaskTest $ S.lift now
+instance (Monad m, V.CanTime m) => V.CanTime (TaskTestMonad m) where
+  now = TaskTest $ S.lift V.now
 
-instance (Monad m, CanUuid m) => CanUuid (TaskTestMonad m) where
-  uuidGen = TaskTest $ S.lift uuidGen
+instance (Monad m, V.CanUuid m) => V.CanUuid (TaskTestMonad m) where
+  uuidGen = TaskTest $ S.lift V.uuidGen
 
-instance (Monad m) => H.HasTasks (TaskTestMonad m) where
-  getTasks = TaskTest H.getTasks
-  addNewTask t = TaskTest $ H.addNewTask t
-  updateExistingTask t f = TaskTest $ H.updateExistingTask t f
-  removeTaskRef t = TaskTest $ H.removeTaskRef t
+instance (Monad m) => HC.HasTasks (TaskTestMonad m) where
+  getTasks = TaskTest HC.getTasks
+  addNewTask t = TaskTest $ HC.addNewTask t
+  updateExistingTask t f = TaskTest $ HC.updateExistingTask t f
+  removeTaskRef t = TaskTest $ HC.removeTaskRef t
 
-instance (Monad m) => HasEventSink (TaskTestMonad m) where
+instance (Monad m) => V.HasEventSink (TaskTestMonad m) where
   writeEvent _k = pure ()
 
 
-extractTasks :: TaskTestMonad IO a -> IO H.Tasks
+extractTasks :: TaskTestMonad IO a -> IO HC.Tasks
 extractTasks op
   = S.evalStateT
-      (runTask op >> H.listTasks)
-      H.emptyTasks
+      (runTask op >> API.listTasks)
+      HC.emptyTasks
 
 
 test_tasks :: TestTree
@@ -64,25 +68,25 @@ listingEmptyTasks = testCase "listing empty tasks" $ do
 adding01Tasks :: TestTree
 adding01Tasks = testCase "adding one task" $ do
   ts <- extractTasks $
-    H.addTask "some task"
+    API.addTask "some task"
   assertEqual "expecting one task" 1 (length ts)
 
 
 adding02Tasks :: TestTree
 adding02Tasks = testCase "adding two tasks" $ do
   ts <- extractTasks $ do
-    _ <- H.addTask "some task"
-    H.addTask "some other task"
+    _ <- API.addTask "some task"
+    API.addTask "some other task"
   assertEqual "expecting two tasks" 2 (length ts)
 
 
 startingTask :: TestTree
 startingTask = testCase "starting a task" $ do
   ts <- extractTasks $ do
-    ref <- H.addTask "some task"
+    ref <- API.addTask "some task"
     case ref of
       Left e  -> pure (Left e)
-      Right v -> H.startTask v
+      Right v -> API.startTask v
   assertEqual "expecting one task" 1 (length ts)
   assertEqual "expecting matching task" "some task" (H.description $ head ts)
   assertEqual "expecting started task" H.InProgress (H.status $ head ts)
@@ -91,17 +95,17 @@ startingTask = testCase "starting a task" $ do
 startingNonTask :: TestTree
 startingNonTask = testCase "starting non-existent task does not error" $ do
   ts <- extractTasks $
-    H.startTask (Tagged UUID.nil)
+    API.startTask (Tagged UUID.nil)
   assertEqual "expecting no tasks" 0 (length ts)
 
 
 completingTask :: TestTree
 completingTask = testCase "completing a task" $ do
   ts <- extractTasks $ do
-    ref <- H.addTask "some task"
+    ref <- API.addTask "some task"
     case ref of
       Left e  -> pure (Left e)
-      Right v -> H.completeTask v
+      Right v -> API.completeTask v
   assertEqual "expecting one task" 1 (length ts)
   assertEqual "expecting matching task" "some task" (H.description $ head ts)
   assertEqual "expecting started task" H.Complete (H.status $ head ts)
@@ -110,8 +114,8 @@ completingTask = testCase "completing a task" $ do
 deletingTask :: TestTree
 deletingTask = testCase "deleting a task" $ do
   ts <- extractTasks $ do
-    ref <- H.addTask "some task"
+    ref <- API.addTask "some task"
     case ref of
       Left e  -> pure (Left e)
-      Right v -> H.removeTask v
+      Right v -> API.removeTask v
   assertEqual "expecting no tasks" 0 (length ts)

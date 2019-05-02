@@ -9,16 +9,17 @@ module HTask.API
   , listTasks
   ) where
 
+import qualified Event as V
+import qualified HTask.Task as H
+import qualified HTask.TaskContainer as HC
+import qualified Lib
+
 import           Data.Text           (Text)
-import           Event
-import           HTask.Task
-import           HTask.TaskContainer
-import           Lib
 
 
 maybeStore
-  :: (CanCreateTask m, HasEventSink m)
-  => Either String TaskEventDetail -> m (Either String TaskRef)
+  :: (H.CanCreateTask m, V.HasEventSink m)
+  => Either String Lib.TaskEventDetail -> m (Either String H.TaskRef)
 maybeStore r
   = case r of
       Left e  -> pure (Left e)
@@ -26,48 +27,48 @@ maybeStore r
 
 
 funk
-  :: (CanCreateTask m, HasEventSink m)
-  => TaskEventDetail -> m TaskRef
+  :: (H.CanCreateTask m, V.HasEventSink m)
+  => Lib.TaskEventDetail -> m H.TaskRef
 funk v = do
-  createEvent v >>= writeEvent
-  pure (detailRef v)
+  V.createEvent v >>= V.writeEvent
+  pure (Lib.detailRef v)
 
 
 
 addTask
-  :: (HasTasks m, CanCreateTask m, CanCreateEvent m, HasEventSink m)
-  => Text -> m (Either String TaskRef)
+  :: (HC.HasTasks m, H.CanCreateTask m, V.CanCreateEvent m, V.HasEventSink m)
+  => Text -> m (Either String H.TaskRef)
 addTask tx = do
 
   -- create
-  tk <- createTask tx
-  let detail = TaskEventDetail (taskRef tk) (AddTask tx)
-  e <- createEvent detail
+  tk <- H.createTask tx
+  let detail = Lib.TaskEventDetail (H.taskRef tk) (Lib.AddTask tx)
+  e <- V.createEvent detail
 
   -- apply
-  p <- addNewTask tk
+  p <- HC.addNewTask tk
 
   -- persist
-  if p then writeEvent e else pure ()
+  if p then V.writeEvent e else pure ()
 
   pure $ if p
-            then Right (taskRef tk)
+            then Right (H.taskRef tk)
             else Left "could not add"
 
 
 startTask
-  :: (Monad m, HasTasks m, CanCreateEvent m, HasEventSink m)
-  => TaskRef -> m (Either String TaskRef)
+  :: (Monad m, HC.HasTasks m, V.CanCreateEvent m, V.HasEventSink m)
+  => H.TaskRef -> m (Either String H.TaskRef)
 startTask ref = do
 
   -- create
-  let detail = TaskEventDetail ref (StartTask ref)
-  e <- createEvent detail
+  let detail = Lib.TaskEventDetail ref (Lib.StartTask ref)
+  e <- V.createEvent detail
 
   -- apply
-  p <- updateExistingTask ref $ setTaskStatus InProgress
+  p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
 
-  if p then writeEvent e else pure ()
+  if p then V.writeEvent e else pure ()
 
   pure $ if p
             then Right ref
@@ -75,28 +76,28 @@ startTask ref = do
 
 
 stopTask
-  :: (HasTasks m, CanCreateTask m, HasEventSink m)
-  => TaskRef -> m (Either String TaskRef)
+  :: (HC.HasTasks m, H.CanCreateTask m, V.HasEventSink m)
+  => H.TaskRef -> m (Either String H.TaskRef)
 stopTask ref = do
-  r <- applyIntentToTasks (StopTask ref)
+  r <- Lib.applyIntentToTasks (Lib.StopTask ref)
   maybeStore r
 
 
 completeTask
-  :: (HasTasks m, CanCreateTask m, HasEventSink m)
-  => TaskRef -> m (Either String TaskRef)
+  :: (HC.HasTasks m, H.CanCreateTask m, V.HasEventSink m)
+  => H.TaskRef -> m (Either String H.TaskRef)
 completeTask ref = do
-  r <- applyIntentToTasks (CompleteTask ref)
+  r <- Lib.applyIntentToTasks (Lib.CompleteTask ref)
   maybeStore r
 
 
 removeTask
-  :: (HasTasks m, CanCreateTask m, HasEventSink m)
-  => TaskRef -> m (Either String TaskRef)
+  :: (HC.HasTasks m, H.CanCreateTask m, V.HasEventSink m)
+  => H.TaskRef -> m (Either String H.TaskRef)
 removeTask ref = do
-  r <- applyIntentToTasks (RemoveTask ref)
+  r <- Lib.applyIntentToTasks (Lib.RemoveTask ref)
   maybeStore r
 
 
-listTasks :: (HasTasks m) => m Tasks
-listTasks = getTasks
+listTasks :: (HC.HasTasks m) => m HC.Tasks
+listTasks = HC.getTasks

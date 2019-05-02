@@ -6,13 +6,14 @@ module HTask.Runners.Add
   ) where
 
 import qualified Data.Text             as Text
-import qualified HTask                 as H
+import qualified HTask.API             as API
+import qualified HTask.Task            as H
 
-import           Data.Text             (Text)
-import           HTask.Output
+import           HTask.Output.Document
 import           HTask.TaskApplication
 
 import           Data.Semigroup        ((<>))
+import           Data.Text             (Text)
 
 
 type AddOutput = Either String H.TaskRef
@@ -20,7 +21,7 @@ type AddOutput = Either String H.TaskRef
 
 runAdd :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runAdd t
-  = presentAdd t <$> runTask (H.addTask t)
+  = presentAdd t <$> runTask (API.addTask t)
 
 
 presentAdd :: Text -> AddOutput -> RunResult

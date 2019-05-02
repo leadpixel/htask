@@ -11,105 +11,107 @@ module Lib
   , replayEventLog
   ) where
 
-import           Data.Aeson
+import qualified Event as V
+import qualified HTask.Task as H
+import qualified HTask.TaskContainer as HC
+
 import           Data.Text           (Text)
-import           Event
 import           GHC.Generics
-import           HTask.Task
-import           HTask.TaskContainer
 
-
-data TaskEventDetail = TaskEventDetail
-  { detailRef :: TaskRef
-  , intent    :: TaskIntent
-  } deriving (Show, Generic)
-
-
-type TaskEvent = Event TaskEventDetail
+import           Data.Aeson
 
 
 data TaskIntent
   = AddTask Text
-  | StartTask TaskRef
-  | StopTask TaskRef
-  | CompleteTask TaskRef
-  | RemoveTask TaskRef
+  | StartTask H.TaskRef
+  | StopTask H.TaskRef
+  | CompleteTask H.TaskRef
+  | RemoveTask H.TaskRef
   deriving (Show, Eq, Generic)
 
 instance ToJSON TaskIntent
-instance ToJSON TaskEventDetail
 instance FromJSON TaskIntent
+
+
+data TaskEventDetail = TaskEventDetail
+  { detailRef :: H.TaskRef
+  , intent    :: TaskIntent
+  } deriving (Show, Generic)
+
+instance ToJSON TaskEventDetail
 instance FromJSON TaskEventDetail
 
 
+type TaskEvent = V.Event TaskEventDetail
+
+
 replayEventLog
-  :: (Monad m, HasTasks m, Foldable f)
+  :: (Monad m, HC.HasTasks m, Foldable f)
   => f TaskEvent -> m ()
-replayEventLog
-  = mapM_ applyRawEvent
+replayEventLog = mapM_ applyRawEvent
 
 
 applyRawEvent
-  :: (Monad m, HasTasks m)
+  :: (Monad m, HC.HasTasks m)
   => TaskEvent -> m ()
 applyRawEvent ev = do
-  let td = payload ev
+  let td = V.payload ev
   case intent td of
     (AddTask text) -> do
-      let t = Task (detailRef td) text (timestamp ev) Pending
-      _p <- addNewTask t
+      let t = H.Task (detailRef td) text (V.timestamp ev) H.Pending
+      _p <- HC.addNewTask t
       pure ()
 
     (StartTask ref) -> do
-      _p <- updateExistingTask ref $ setTaskStatus InProgress
+      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
       pure ()
 
     (StopTask ref) -> do
-      _p <- updateExistingTask ref $ setTaskStatus Pending
+      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Pending
       pure ()
 
     (CompleteTask ref) -> do
-      _p <- updateExistingTask ref $ setTaskStatus Complete
+      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Complete
       pure ()
 
     (RemoveTask ref) -> do
-      _p <- updateExistingTask ref $ setTaskStatus Abandoned
+      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Abandoned
       pure ()
 
 
 
 applyIntentToTasks
-  :: (Monad m, CanCreateTask m, HasTasks m)
+  :: (Monad m, H.CanCreateTask m, HC.HasTasks m)
   => TaskIntent -> m (Either String TaskEventDetail)
 applyIntentToTasks itx =
   case itx of
     (AddTask text) -> do
-      t <- createTask text
-      p <- addNewTask t
+      t <- H.createTask text
+      p <- HC.addNewTask t
       pure $ if p
-        then Right (TaskEventDetail (taskRef t) itx)
+        then Right (TaskEventDetail (H.taskRef t) itx)
         else Left "could not add; non-unique id"
 
     (StartTask ref) -> do
-      p <- updateExistingTask ref $ setTaskStatus InProgress
+      p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
       pure $ if p
         then Right (TaskEventDetail ref itx)
         else Left "could not find matching id"
 
     (StopTask ref) -> do
-      p <- updateExistingTask ref $ setTaskStatus Pending
+      p <- HC.updateExistingTask ref $ H.setTaskStatus H.Pending
       pure $ if p
         then Right (TaskEventDetail ref itx)
         else Left "could not find matching id"
 
     (CompleteTask ref) -> do
-      p <- updateExistingTask ref $ setTaskStatus Complete
+      p <- HC.updateExistingTask ref $ H.setTaskStatus H.Complete
       pure $ if p
         then Right (TaskEventDetail ref itx)
         else Left "could not find matching id"
 
     (RemoveTask ref) -> do
-      p <- removeTaskRef ref
+      p <- HC.removeTaskRef ref
       pure $ if p
         then Right (TaskEventDetail ref itx)
         else Left "unknown fuckup"

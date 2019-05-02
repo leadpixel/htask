@@ -5,20 +5,23 @@ module HTask.Runners.Start
   ( runStart
   ) where
 
-import           Data.Semigroup        ((<>))
-import           Data.Text             (Text)
 import qualified Data.Text             as Text
-import qualified HTask                 as H
-import           HTask.Output
+import qualified HTask.API             as API
+import qualified HTask.Task            as H
+
+import           HTask.Output.Document
 import           HTask.Runners.Common
 import           HTask.TaskApplication
+
+import           Data.Semigroup        ((<>))
+import           Data.Text             (Text)
 
 
 runStart :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runStart = withMatch
   (\tx -> runTask
     $   formatOutcome tx
-    <$> H.startTask (H.taskRef tx)
+    <$> API.startTask (H.taskRef tx)
   )
 
   where

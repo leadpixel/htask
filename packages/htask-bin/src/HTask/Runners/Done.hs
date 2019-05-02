@@ -6,12 +6,16 @@ module HTask.Runners.Done
   ( runDone
   ) where
 
-import           Data.Semigroup        ((<>))
 import qualified Data.Text             as Text
-import           Event
-import qualified HTask                 as H
-import           HTask.Output
+import qualified Event                 as V
+import qualified HTask.API             as API
+import qualified HTask.Task            as H
+import qualified HTask.TaskContainer   as HC
+
+import           HTask.Output.Document
 import           HTask.TaskApplication
+
+import           Data.Semigroup        ((<>))
 
 
 type DoneOutput = [(H.Task, Either String H.TaskRef)]
@@ -23,13 +27,13 @@ runDone
 
   where
 
-    doneTask :: (CanUuid m, CanTime m,  Monad m, H.HasTasks m, HasEventSink m) => m DoneOutput
+    doneTask :: (V.CanUuid m, V.CanTime m, Monad m, HC.HasTasks m, V.HasEventSink m) => m DoneOutput
     doneTask = do
-      xs <- H.listTasks
+      xs <- API.listTasks
       let ts = filter isCurrent xs
       mapM execDone ts
 
-    execDone t = (t,) <$> H.completeTask (H.taskRef t)
+    execDone t = (t,) <$> API.completeTask (H.taskRef t)
 
     isCurrent t = H.status t == H.InProgress
 

@@ -6,10 +6,10 @@ module HTask.Runners
   ) where
 
 import qualified Event                  as V
-import qualified HTask                  as H
+import qualified HTask.Task             as H
 
 import           HTask.Actions
-import           HTask.Output
+import           HTask.Output.Document
 import           HTask.TaskApplication
 
 import           HTask.Runners.Add

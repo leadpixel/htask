@@ -5,12 +5,15 @@ module HTask.Runners.Common
   ( withMatch
   ) where
 
+import qualified Data.Text             as Text
+import qualified HTask.API             as API
+import qualified HTask.Task            as H
+
+import           HTask.Output.Document
+import           HTask.TaskApplication
+
 import           Data.Semigroup        ((<>))
 import           Data.Text             (Text)
-import qualified Data.Text             as Text
-import qualified HTask                 as H
-import           HTask.Output
-import           HTask.TaskApplication
 
 
 headSafe :: [a] -> Maybe a
@@ -21,7 +24,7 @@ headSafe _   = Nothing
 findMatch :: (HasEventBackend m) => Text -> m (Maybe H.Task)
 findMatch ref
   =   headSafe . filterMatchesUUID ref
-  <$> runTask H.listTasks
+  <$> runTask API.listTasks
 
  where
    filterMatchesUUID :: Text -> [H.Task] -> [H.Task]

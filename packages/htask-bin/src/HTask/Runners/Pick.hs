@@ -6,10 +6,12 @@ module HTask.Runners.Pick
   ( runPick
   ) where
 
-import qualified HTask                 as H
 
-import           Event
-import           HTask.Output
+import qualified Event                 as V
+import qualified HTask.API             as API
+import qualified HTask.Task            as H
+
+import           HTask.Output.Document
 import           HTask.TaskApplication
 
 import           Data.Semigroup        ((<>))
@@ -19,9 +21,9 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runPick :: (CanRandom m, HasEventBackend m, H.CanCreateTask m) => m RunResult
+runPick :: (V.CanRandom m, HasEventBackend m, H.CanCreateTask m) => m RunResult
 runPick = do
-  ts <- runTask H.listTasks
+  ts <- runTask API.listTasks
   let ps = filter (hasStatus H.Pending) ts
   k <- randomSelectOne ps
   maybe
@@ -31,11 +33,11 @@ runPick = do
 
   where
     startTask t = do
-      _ <- runTask $ H.startTask $ H.taskRef t
+      _ <- runTask $ API.startTask $ H.taskRef t
       pure ["picking task: " <> H.description t]
 
 
-randomSelectOne :: (Monad m, CanRandom m) => [a] -> m (Maybe a)
+randomSelectOne :: (Monad m, V.CanRandom m) => [a] -> m (Maybe a)
 randomSelectOne [] = pure Nothing
 randomSelectOne xs =
-  (\n -> Just $ xs !! n) <$> getRandomRange (0, length xs)
+  (\n -> Just $ xs !! n) <$> V.getRandomRange (0, length xs)

@@ -5,13 +5,16 @@ module HTask.Runners.Complete
   ( runComplete
   ) where
 
-import           Data.Semigroup        ((<>))
-import           Data.Text             (Text)
 import qualified Data.Text             as Text
-import qualified HTask                 as H
-import           HTask.Output
+import qualified HTask.API             as API
+import qualified HTask.Task            as H
+
+import           HTask.Output.Document
 import           HTask.Runners.Common
 import           HTask.TaskApplication
+
+import           Data.Semigroup        ((<>))
+import           Data.Text             (Text)
 
 
 type CompleteOutput = Either String H.TaskRef
@@ -25,7 +28,7 @@ runComplete
 
 executeComplete :: (HasEventBackend m, H.CanCreateTask m) => H.Task -> m CompleteOutput
 executeComplete
-  = runTask . H.completeTask . H.taskRef
+  = runTask . API.completeTask . H.taskRef
 
 
 presentComplete :: H.Task -> CompleteOutput -> RunResult

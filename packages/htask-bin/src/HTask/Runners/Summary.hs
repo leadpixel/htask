@@ -8,12 +8,14 @@ module HTask.Runners.Summary
 
 import qualified Data.Text             as Text
 import qualified Data.UUID             as UUID
-import qualified HTask                 as H
+import qualified HTask.API             as API
+import qualified HTask.Task            as H
 
 import           Data.Function
 import           Data.List
 import           Data.Tagged
-import           HTask.Output
+import           HTask.Output.Document
+import           HTask.Output.Formatters
 import           HTask.TaskApplication
 
 import           Data.Semigroup        ((<>))
@@ -30,7 +32,7 @@ hasStatus s t = s == H.status t
 
 runSummary :: (HasEventBackend m) => m RunResult
 runSummary
-  = renderSummary <$> runTask H.listTasks
+  = renderSummary <$> runTask API.listTasks
 
 
 renderSummary :: [H.Task] -> RunResult

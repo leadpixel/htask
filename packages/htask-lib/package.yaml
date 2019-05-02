@@ -21,7 +21,11 @@ dependencies:
 
 library:
   source-dirs: lib
-  exposed-modules: HTask
+  exposed-modules:
+    - HTask.API
+    - HTask.Task
+    - HTask.TaskContainer
+    - Lib
   dependencies:
   - conduit-combinators
   - text

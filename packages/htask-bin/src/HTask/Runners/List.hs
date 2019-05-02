@@ -9,13 +9,15 @@ module HTask.Runners.List
 
 import qualified Data.UUID             as UUID
 import qualified Event                 as V
-import qualified HTask                 as H
+import qualified HTask.API             as API
+import qualified HTask.Task            as H
 
 import           Data.Function
 import           Data.List
 import           Data.Tagged
 import           HTask.Actions
-import           HTask.Output
+import           HTask.Output.Document
+import           HTask.Output.Formatters
 import           HTask.TaskApplication
 
 import           Data.Semigroup        ((<>))
@@ -59,7 +61,7 @@ statusDisplayOrder  H.Abandoned   H.Pending    =  GT
 runList :: (Monad m, V.HasEventSource m) => ShowUUID -> ShowAll -> m RunResult
 runList showUUID showAll
   = resultSuccess . fmap formatOutput . selectTasks
-  <$> runTask H.listTasks
+  <$> runTask API.listTasks
 
   where
     formatOutput
