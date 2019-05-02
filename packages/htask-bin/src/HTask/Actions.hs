@@ -4,8 +4,6 @@ module HTask.Actions
 import           Data.Text (Text)
 
 
-type TaskReference = Text
-
 type ShowUUID = Bool
 type ShowAll = Bool
 
@@ -15,10 +13,10 @@ data Action
   | List ShowUUID ShowAll
 
   | Add Text
-  | Start TaskReference
-  | Stop TaskReference
-  | Complete TaskReference
-  | Remove TaskReference
+  | Start Text
+  | Stop Text
+  | Complete Text
+  | Remove Text
 
   | Pick
   | Drop

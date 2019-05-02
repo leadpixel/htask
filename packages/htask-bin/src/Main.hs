@@ -9,7 +9,6 @@ module Main
 import qualified Control.Monad.Trans    as T
 import qualified Event                  as V
 import qualified HTask.CLI              as CLI
-import qualified HTask.Config           as Config
 import qualified HTask.Runners          as Runner
 
 import           Event.Backend.File
@@ -29,5 +28,5 @@ instance (Monad m, V.CanRandom m, T.MonadTrans t) => V.CanRandom (t m) where
 main :: IO ()
 main = do
   options <- CLI.getOptions
-  let op = Runner.runAction (Config.action options)
-  runFileBackend (Config.taskfile options) op >>= renderResult
+  let op = Runner.runAction (CLI.action options)
+  runFileBackend (CLI.taskfile options) op >>= renderResult

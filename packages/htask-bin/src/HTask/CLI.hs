@@ -1,11 +1,15 @@
 module HTask.CLI
-  ( getOptions
+  ( Options (..)
+  , getOptions
   ) where
 
-import           Data.Semigroup      ((<>))
-import           Options.Applicative as Opts
+import qualified Options.Applicative as Opts
 
-import           HTask.Actions
+import           Data.Semigroup      ((<>))
+import           HTask.Actions       (Action)
+import           HTask.Config        (Options (..))
+import           Options.Applicative ((<|>))
+
 import           HTask.CLI.Add
 import           HTask.CLI.Complete
 import           HTask.CLI.Done
@@ -16,66 +20,64 @@ import           HTask.CLI.Remove
 import           HTask.CLI.Start
 import           HTask.CLI.Stop
 import           HTask.CLI.Summary
-import           HTask.Config
 
 
-defaultAction :: Parser Action
-defaultAction = pure Summary
-
-
-actionParser :: Parser Action
+actionParser :: Opts.Parser Action
 actionParser = infoCommands <|> taskCommands <|> shortcutCommands
   where
     infoCommands
-      = hsubparser
-      $ commandGroup "Info"
-        <> command "summary"  summaryInfo
-        <> command "list"     listInfo
+      = Opts.hsubparser
+      $ Opts.commandGroup "Info"
+        <> Opts.command "summary"  summaryInfo
+        <> Opts.command "list"     listInfo
 
     taskCommands
-      = hsubparser
-      $ commandGroup "Tasks"
-        <> command "add"      addInfo
-        <> command "start"    startInfo
-        <> command "stop"     stopInfo
-        <> command "complete" completeInfo
-        <> command "remove"   removeInfo
-        <> hidden
+      = Opts.hsubparser
+      $ Opts.commandGroup "Tasks"
+        <> Opts.command "add"      addInfo
+        <> Opts.command "start"    startInfo
+        <> Opts.command "stop"     stopInfo
+        <> Opts.command "complete" completeInfo
+        <> Opts.command "remove"   removeInfo
+        <> Opts.hidden
 
     shortcutCommands
-      = hsubparser
-      $ commandGroup "Shortcuts"
-        <> command "ls"       listInfo
-        <> command "pick"     pickInfo
-        <> command "drop"     dropInfo
-        <> command "done"     doneInfo
-        <> hidden
+      = Opts.hsubparser
+      $ Opts.commandGroup "Shortcuts"
+        <> Opts.command "ls"       listInfo
+        <> Opts.command "pick"     pickInfo
+        <> Opts.command "drop"     dropInfo
+        <> Opts.command "done"     doneInfo
+        <> Opts.hidden
 
 
-fileParser :: Parser FilePath
-fileParser = option str
-  (  long "file"
-  <> short 'f'
-  <> showDefault
-  <> help "path to tasks file"
-  <> value ".tasks"
+fileParser :: Opts.Parser FilePath
+fileParser = Opts.option Opts.str
+  ( Opts.long "file"
+  <> Opts.short 'f'
+  <> Opts.showDefault
+  <> Opts.help "path to tasks file"
+  <> Opts.value ".tasks"
   )
 
 
-
-optionsParser :: Parser Options
+optionsParser :: Opts.Parser Options
 optionsParser
   = flip Options
   <$> fileParser
   <*> (actionParser <|> defaultAction)
 
+  where
+    defaultAction :: Opts.Parser Action
+    defaultAction = summaryParser
 
-optionsInfo :: ParserInfo Options
+
+optionsInfo :: Opts.ParserInfo Options
 optionsInfo
-  = info (helper <*> optionsParser)
-  $ header "HTask"
-  <> progDesc "track tasks in a local event log"
+  = Opts.info (Opts.helper <*> optionsParser)
+  $ Opts.header "HTask"
+  <> Opts.progDesc "track tasks in a local event log"
 
 
 getOptions :: IO Options
-getOptions = execParser optionsInfo
+getOptions = Opts.execParser optionsInfo

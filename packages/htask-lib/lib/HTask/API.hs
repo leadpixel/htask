@@ -9,8 +9,8 @@ module HTask.API
   , listTasks
   ) where
 
-import qualified Event as V
-import qualified HTask.Task as H
+import qualified Event               as V
+import qualified HTask.Task          as H
 import qualified HTask.TaskContainer as HC
 import qualified Lib
 

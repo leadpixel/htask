@@ -13,7 +13,7 @@ module HTask.Task
 import qualified Data.UUID   as UUID
 import qualified Event       as V
 
-import           Data.Tagged (Tagged(..), untag)
+import           Data.Tagged (Tagged (..), untag)
 import           Data.Text   (Text)
 
 

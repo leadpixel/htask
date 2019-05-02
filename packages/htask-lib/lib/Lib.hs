@@ -11,8 +11,8 @@ module Lib
   , replayEventLog
   ) where
 
-import qualified Event as V
-import qualified HTask.Task as H
+import qualified Event               as V
+import qualified HTask.Task          as H
 import qualified HTask.TaskContainer as HC
 
 import           Data.Text           (Text)

@@ -12,10 +12,10 @@ import qualified Control.Monad.Writer as W
 import qualified Data.Aeson           as A
 import qualified Data.ByteString.Lazy as BS
 import qualified Data.UUID            as UUID
-import qualified Event as V
-import qualified HTask.Task as H
-import qualified HTask.TaskContainer as HC
-import qualified HTask.API as API
+import qualified Event                as V
+import qualified HTask.API            as API
+import qualified HTask.Task           as H
+import qualified HTask.TaskContainer  as HC
 import qualified Lib
 
 import           Data.Maybe
