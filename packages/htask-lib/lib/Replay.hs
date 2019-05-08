@@ -8,38 +8,38 @@ module Replay
 import qualified Events              as V
 import qualified HTask.Task          as H
 import qualified HTask.TaskContainer as HC
-import qualified Lib
+import qualified HTask.TaskEvent as TV
 
 
 replayEventLog
   :: (Monad m, HC.HasTasks m, Foldable f)
-  => f Lib.TaskEvent -> m ()
+  => f TV.TaskEvent -> m ()
 replayEventLog = mapM_ applyRawEvent
 
 
 applyRawEvent
   :: (Monad m, HC.HasTasks m)
-  => Lib.TaskEvent -> m ()
+  => TV.TaskEvent -> m ()
 applyRawEvent ev = do
   let td = V.payload ev
-  case Lib.intent td of
-    (Lib.AddTask text) -> do
-      let t = H.Task (Lib.detailRef td) text (V.timestamp ev) H.Pending
+  case TV.intent td of
+    (TV.AddTask text) -> do
+      let t = H.Task (TV.detailRef td) text (V.timestamp ev) H.Pending
       _p <- HC.addNewTask t
       pure ()
 
-    (Lib.StartTask ref) -> do
+    (TV.StartTask ref) -> do
       _p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
       pure ()
 
-    (Lib.StopTask ref) -> do
+    (TV.StopTask ref) -> do
       _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Pending
       pure ()
 
-    (Lib.CompleteTask ref) -> do
+    (TV.CompleteTask ref) -> do
       _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Complete
       pure ()
 
-    (Lib.RemoveTask ref) -> do
+    (TV.RemoveTask ref) -> do
       _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Abandoned
       pure ()

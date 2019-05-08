@@ -10,9 +10,9 @@ import qualified Control.Monad.Trans    as T
 import qualified Effects                as F
 import qualified HTask.CLI              as CLI
 import qualified HTask.Runners          as Runner
+import qualified HTask.Render as Render
 
 import           Event.Backend.File
-import           HTask.Output.Renderers
 
 
 instance (Monad m, F.CanTime m, T.MonadTrans t) => F.CanTime (t m) where
@@ -29,4 +29,4 @@ main :: IO ()
 main = do
   options <- CLI.getOptions
   let op = Runner.runAction (CLI.action options)
-  runFileBackend (CLI.taskfile options) op >>= renderResult
+  runFileBackend (CLI.taskfile options) op >>= Render.renderResult

@@ -1,4 +1,4 @@
-name:                htask-bin
+name:                htask-cli
 version:             0.1.0.0
 github:              "palf/htask"
 license:             BSD3
@@ -8,7 +8,7 @@ copyright:           "2018 Jack Palfrey"
 
 description:         Please see the README on Github at <https://github.com/palf/htask#readme>
 
-ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+ghc-options: -Wall
 
 dependencies:
 - base >= 4.7 && < 5
@@ -18,15 +18,17 @@ dependencies:
 - event-backend-file
 - unliftio-core
 - mtl
+- optparse-applicative
 - tagged
 - text
 - transformers
 - uuid
 
-executables:
-  htask:
-    main:                Main.hs
-    source-dirs:         src
-    dependencies:
-    - htask-cli
-    - htask-lib
+library:
+  source-dirs: src
+  exposed-modules:
+    - HTask.CLI
+    - HTask.Runners
+    - HTask.Render
+  dependencies:
+  - htask-lib

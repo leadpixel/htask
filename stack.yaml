@@ -3,6 +3,7 @@ resolver: lts-13.10
 packages:
   - ./packages/htask-lib
   - ./packages/htask-bin
+  - ./packages/htask-cli
 
 extra-deps:
   - git: /home/palf/projects/leadpixel/events

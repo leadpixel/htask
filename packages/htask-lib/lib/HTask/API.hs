@@ -12,15 +12,14 @@ module HTask.API
 import qualified Events              as V
 import qualified HTask.Task          as H
 import qualified HTask.TaskContainer as HC
-import qualified Lib                 (TaskEventDetail (..), TaskIntent (..),
-                                      applyIntentToTasks)
+import qualified HTask.TaskEvent as TV
 
 import           Data.Text           (Text)
 
 
 maybeStore
   :: (H.CanCreateTask m, V.HasEventSink m)
-  => Either String Lib.TaskEventDetail -> m (Either String H.TaskRef)
+  => Either String TV.TaskEventDetail -> m (Either String H.TaskRef)
 maybeStore r
   = case r of
       Left e  -> pure (Left e)
@@ -29,10 +28,10 @@ maybeStore r
 
 funk
   :: (H.CanCreateTask m, V.HasEventSink m)
-  => Lib.TaskEventDetail -> m H.TaskRef
+  => TV.TaskEventDetail -> m H.TaskRef
 funk v = do
   V.createEvent v >>= V.writeEvent
-  pure (Lib.detailRef v)
+  pure (TV.detailRef v)
 
 
 
@@ -43,7 +42,7 @@ addTask tx = do
 
   -- create
   tk <- H.createTask tx
-  let detail = Lib.TaskEventDetail (H.taskRef tk) (Lib.AddTask tx)
+  let detail = TV.TaskEventDetail (H.taskRef tk) (TV.AddTask tx)
   e <- V.createEvent detail
 
   -- apply
@@ -63,7 +62,7 @@ startTask
 startTask ref = do
 
   -- create
-  let detail = Lib.TaskEventDetail ref (Lib.StartTask ref)
+  let detail = TV.TaskEventDetail ref (TV.StartTask ref)
   e <- V.createEvent detail
 
   -- apply
@@ -80,7 +79,7 @@ stopTask
   :: (HC.HasTasks m, H.CanCreateTask m, V.HasEventSink m)
   => H.TaskRef -> m (Either String H.TaskRef)
 stopTask ref = do
-  r <- Lib.applyIntentToTasks (Lib.StopTask ref)
+  r <- TV.applyIntentToTasks (TV.StopTask ref)
   maybeStore r
 
 
@@ -88,7 +87,7 @@ completeTask
   :: (HC.HasTasks m, H.CanCreateTask m, V.HasEventSink m)
   => H.TaskRef -> m (Either String H.TaskRef)
 completeTask ref = do
-  r <- Lib.applyIntentToTasks (Lib.CompleteTask ref)
+  r <- TV.applyIntentToTasks (TV.CompleteTask ref)
   maybeStore r
 
 
@@ -96,7 +95,7 @@ removeTask
   :: (HC.HasTasks m, H.CanCreateTask m, V.HasEventSink m)
   => H.TaskRef -> m (Either String H.TaskRef)
 removeTask ref = do
-  r <- Lib.applyIntentToTasks (Lib.RemoveTask ref)
+  r <- TV.applyIntentToTasks (TV.RemoveTask ref)
   maybeStore r
 
 

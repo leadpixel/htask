@@ -3,7 +3,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Lib
+module HTask.TaskEvent
   ( TaskEvent
   , TaskEventDetail (..)
   , TaskIntent (..)

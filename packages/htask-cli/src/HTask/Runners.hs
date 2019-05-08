@@ -5,7 +5,7 @@ module HTask.Runners
   ( runAction
   ) where
 
-import qualified Effects                as F
+import qualified Effects                 as F
 import qualified HTask.Task             as H
 
 import           HTask.Actions

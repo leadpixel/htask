@@ -26,7 +26,7 @@ library:
     - HTask.API
     - HTask.Task
     - HTask.TaskContainer
-    - Lib
+    - HTask.TaskEvent
     - Replay
   dependencies:
   - conduit-combinators

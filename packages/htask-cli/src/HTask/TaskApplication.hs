@@ -9,6 +9,7 @@
 module HTask.TaskApplication
   ( TaskApplication
   , HasEventBackend
+  , CanRunTask
   , runTask
   ) where
 
@@ -21,6 +22,7 @@ import qualified Replay              (replayEventLog)
 
 
 type HasEventBackend m = (Monad m, V.HasEventSource m, V.HasEventSink m)
+type CanRunTask m = (Monad m, HasEventBackend m)
 
 
 newtype TaskApplication m a = TaskApp
@@ -38,6 +40,9 @@ instance (Monad m, F.CanTime m) => F.CanTime (TaskApplication m) where
 
 instance (Monad m, F.CanUuid m) => F.CanUuid (TaskApplication m) where
   uuidGen = T.lift F.uuidGen
+
+instance (Monad m, F.CanRandom m) => F.CanRandom (TaskApplication m) where
+  getRandomRange = T.lift . F.getRandomRange
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskApplication m) where
   writeEvent = TaskApp . T.lift . V.writeEvent
