@@ -8,10 +8,9 @@ module Lib
   , TaskEventDetail (..)
   , TaskIntent (..)
   , applyIntentToTasks
-  , replayEventLog
   ) where
 
-import qualified Event               as V
+import qualified Events              as V
 import qualified HTask.Task          as H
 import qualified HTask.TaskContainer as HC
 
@@ -43,41 +42,6 @@ instance FromJSON TaskEventDetail
 
 
 type TaskEvent = V.Event TaskEventDetail
-
-
-replayEventLog
-  :: (Monad m, HC.HasTasks m, Foldable f)
-  => f TaskEvent -> m ()
-replayEventLog = mapM_ applyRawEvent
-
-
-applyRawEvent
-  :: (Monad m, HC.HasTasks m)
-  => TaskEvent -> m ()
-applyRawEvent ev = do
-  let td = V.payload ev
-  case intent td of
-    (AddTask text) -> do
-      let t = H.Task (detailRef td) text (V.timestamp ev) H.Pending
-      _p <- HC.addNewTask t
-      pure ()
-
-    (StartTask ref) -> do
-      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
-      pure ()
-
-    (StopTask ref) -> do
-      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Pending
-      pure ()
-
-    (CompleteTask ref) -> do
-      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Complete
-      pure ()
-
-    (RemoveTask ref) -> do
-      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Abandoned
-      pure ()
-
 
 
 applyIntentToTasks

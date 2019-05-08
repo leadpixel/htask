@@ -14,9 +14,10 @@ module HTask.TaskApplication
 
 import qualified Control.Monad.State as S
 import qualified Control.Monad.Trans as T
-import qualified Event               as V
+import qualified Effects             as F
+import qualified Events              as V
 import qualified HTask.TaskContainer as HC
-import qualified Lib
+import qualified Replay              (replayEventLog)
 
 
 type HasEventBackend m = (Monad m, V.HasEventSource m, V.HasEventSink m)
@@ -32,11 +33,11 @@ instance (Monad m) => HC.HasTasks (TaskApplication m) where
   updateExistingTask ref = TaskApp . HC.updateExistingTask ref
   removeTaskRef = TaskApp . HC.removeTaskRef
 
-instance (Monad m, V.CanTime m) => V.CanTime (TaskApplication m) where
-  now = T.lift V.now
+instance (Monad m, F.CanTime m) => F.CanTime (TaskApplication m) where
+  now = T.lift F.now
 
-instance (Monad m, V.CanUuid m) => V.CanUuid (TaskApplication m) where
-  uuidGen = T.lift V.uuidGen
+instance (Monad m, F.CanUuid m) => F.CanUuid (TaskApplication m) where
+  uuidGen = T.lift F.uuidGen
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskApplication m) where
   writeEvent = TaskApp . T.lift . V.writeEvent
@@ -47,4 +48,4 @@ runTask
   => TaskApplication m a -> m a
 runTask op
   = V.readEvents
-  >>= \vs -> S.evalStateT (Lib.replayEventLog vs >> runTaskApp op) HC.emptyTasks
+  >>= \vs -> S.evalStateT (Replay.replayEventLog vs >> runTaskApp op) HC.emptyTasks

@@ -16,7 +16,8 @@ dependencies:
 - mtl
 - tagged
 - transformers
-- event
+- effects
+- events
 - uuid
 
 library:
@@ -26,6 +27,7 @@ library:
     - HTask.Task
     - HTask.TaskContainer
     - Lib
+    - Replay
   dependencies:
   - conduit-combinators
   - text

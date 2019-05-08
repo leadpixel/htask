@@ -8,7 +8,7 @@ module HTask.Runners.List
   ) where
 
 import qualified Data.UUID               as UUID
-import qualified Event                   as V
+import qualified Events                  as V
 import qualified HTask.API               as API
 import qualified HTask.Task              as H
 

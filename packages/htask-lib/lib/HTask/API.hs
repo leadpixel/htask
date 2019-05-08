@@ -9,10 +9,11 @@ module HTask.API
   , listTasks
   ) where
 
-import qualified Event               as V
+import qualified Events              as V
 import qualified HTask.Task          as H
 import qualified HTask.TaskContainer as HC
-import qualified Lib
+import qualified Lib                 (TaskEventDetail (..), TaskIntent (..),
+                                      applyIntentToTasks)
 
 import           Data.Text           (Text)
 

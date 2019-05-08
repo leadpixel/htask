@@ -13,7 +13,8 @@ ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
 dependencies:
 - base >= 4.7 && < 5
 - aeson
-- event
+- effects
+- events
 - event-backend-file
 - unliftio-core
 - mtl

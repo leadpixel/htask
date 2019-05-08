@@ -9,7 +9,7 @@ module HTaskTests.Tasks
 
 import qualified Control.Monad.State as S
 import qualified Data.UUID           as UUID
-import qualified Event               as V
+import qualified Events              as V
 import qualified HTask.API           as API
 import qualified HTask.Task          as H
 import qualified HTask.TaskContainer as HC

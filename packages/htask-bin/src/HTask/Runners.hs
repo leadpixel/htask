@@ -5,7 +5,7 @@ module HTask.Runners
   ( runAction
   ) where
 
-import qualified Event                  as V
+import qualified Effects                as F
 import qualified HTask.Task             as H
 
 import           HTask.Actions
@@ -25,7 +25,7 @@ import           HTask.Runners.Summary
 
 
 runAction
-  :: (HasEventBackend m, H.CanCreateTask m, V.CanRandom m)
+  :: (HasEventBackend m, H.CanCreateTask m, F.CanRandom m)
   => Action -> m RunResult
 runAction Summary        = runSummary
 runAction (List d k)     = runList d k

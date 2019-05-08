@@ -7,7 +7,8 @@ module HTask.Runners.Done
   ) where
 
 import qualified Data.Text             as Text
-import qualified Event                 as V
+import qualified Effects               as F
+import qualified Events                as V
 import qualified HTask.API             as API
 import qualified HTask.Task            as H
 import qualified HTask.TaskContainer   as HC
@@ -27,7 +28,7 @@ runDone
 
   where
 
-    doneTask :: (V.CanUuid m, V.CanTime m, Monad m, HC.HasTasks m, V.HasEventSink m) => m DoneOutput
+    doneTask :: (F.CanUuid m, F.CanTime m, Monad m, HC.HasTasks m, V.HasEventSink m) => m DoneOutput
     doneTask = do
       xs <- API.listTasks
       let ts = filter isCurrent xs
