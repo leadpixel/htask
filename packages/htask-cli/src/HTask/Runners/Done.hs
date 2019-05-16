@@ -1,25 +1,28 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TupleSections     #-}
 
 module HTask.Runners.Done
   ( runDone
   ) where
 
-import qualified Data.Text             as Text
-import qualified Effects               as F
-import qualified Events                as V
+import qualified Data.UUID             as UUID
 import qualified HTask.API             as API
 import qualified HTask.Task            as H
-import qualified HTask.TaskContainer   as HC
 
 import           HTask.Output.Document
 import           HTask.TaskApplication
 
 import           Data.Semigroup        ((<>))
+import           Data.Tagged           (untag)
+import           Data.Text             (Text)
 
 
-type DoneOutput = [(H.Task, Either String H.TaskRef)]
+inProgress :: H.Task -> Bool
+inProgress t = H.status t == H.InProgress
+
+
+taskRefText :: H.Task -> Text
+taskRefText = UUID.toText . untag . H.taskRef
 
 
 runDone :: (HasEventBackend m, H.CanCreateTask m) => m RunResult
@@ -27,23 +30,19 @@ runDone
   = formatOutcome <$> runTask doneTask
 
   where
+    doneTask
+      = (filter inProgress <$> API.listTasks) >>= mapM (API.completeTask . taskRefText)
 
-    doneTask :: (F.CanUuid m, F.CanTime m, Monad m, HC.HasTasks m, V.HasEventSink m) => m DoneOutput
-    doneTask = do
-      xs <- API.listTasks
-      let ts = filter isCurrent xs
-      mapM execDone ts
+    formatOutcome
+      = resultSuccess . fmap formatRow
 
-    execDone t = (t,) <$> API.completeTask (H.taskRef t)
+    formatRow x
+      = case x of
+          API.ModifySuccess tsk ->
+            "completing task: " <> H.description tsk
 
-    isCurrent t = H.status t == H.InProgress
+          API.FailedToFind ->
+            "unable to find matching task"
 
-    formatOutcome :: DoneOutput -> RunResult
-    formatOutcome xs
-      = undefined (formatDone <$> xs)
-
-    formatDone (_t, Left err)  = resultError (Text.pack err)
-    formatDone (t, Right _ref) = formatSuccessComplete t
-
-    formatSuccessComplete tx
-      = resultSuccess ["completing task: " <> H.description tx]
+          API.FailedToModify ->
+            "unable to modify matching task"

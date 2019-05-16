@@ -7,8 +7,9 @@ packages:
 
 extra-deps:
   - git: /home/palf/projects/leadpixel/events
-    commit: 0c26aae064f416527605de178948610759e34e3a
+    commit: 3837071abcc9ede1a75f5934cf0acff697fb7bec
     subdirs:
     - packages/effects
     - packages/events
+    - packages/event-backends/memory
     - packages/event-backends/file

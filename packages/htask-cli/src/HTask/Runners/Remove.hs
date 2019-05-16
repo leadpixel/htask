@@ -5,12 +5,10 @@ module HTask.Runners.Remove
   ( runRemove
   ) where
 
-import qualified Data.Text             as Text
 import qualified HTask.API             as API
 import qualified HTask.Task            as H
 
 import           HTask.Output.Document
-import           HTask.Runners.Common
 import           HTask.TaskApplication
 
 import           Data.Semigroup        ((<>))
@@ -18,17 +16,17 @@ import           Data.Text             (Text)
 
 
 runRemove :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
-runRemove = withMatch
-  (\tx -> runTask
-    $   formatOutcome tx
-    <$> API.removeTask (H.taskRef tx)
-  )
+runRemove t
+  = formatOutcome <$> runTask (API.removeTask t)
 
   where
-    formatOutcome tx
-      = either
-          (resultError . Text.pack)
-          (const $ formatSuccessRemove tx)
+    formatOutcome x
+      = case x of
+          API.ModifySuccess tsk ->
+            resultSuccess ["removing task: " <> H.description tsk]
 
-    formatSuccessRemove tx
-      = resultSuccess [ "removing task: " <> H.description tx]
+          API.FailedToFind ->
+            resultError "unable to find matching task"
+
+          API.FailedToModify ->
+            resultError "unable to modify matching task"

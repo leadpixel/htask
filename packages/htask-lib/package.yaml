@@ -45,3 +45,9 @@ tests:
     - bytestring
     - tasty
     - tasty-hunit
+    - tasty-quickcheck
+    - QuickCheck
+    - quickcheck-instances
+    - event-backend-memory
+    - time
+    - containers

@@ -6,11 +6,11 @@ module Main
   ( main
   ) where
 
-import qualified Control.Monad.Trans    as T
-import qualified Effects                as F
-import qualified HTask.CLI              as CLI
-import qualified HTask.Runners          as Runner
-import qualified HTask.Render as Render
+import qualified Control.Monad.Trans as T
+import qualified Effects             as F
+import qualified HTask.CLI           as CLI
+import qualified HTask.Render        as Render
+import qualified HTask.Runners       as Runner
 
 import           Event.Backend.File
 

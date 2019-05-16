@@ -1,7 +1,11 @@
 {-# LANGUAGE ConstraintKinds #-}
 
 module HTask.API
-  ( addTask
+  ( AddResult (..)
+  , ModifyResult (..)
+  , CanAddTask
+  , CanModifyTask
+  , addTask
   , startTask
   , stopTask
   , completeTask
@@ -9,95 +13,137 @@ module HTask.API
   , listTasks
   ) where
 
+import qualified Data.Text           as Text
 import qualified Events              as V
 import qualified HTask.Task          as H
 import qualified HTask.TaskContainer as HC
-import qualified HTask.TaskEvent as TV
+import qualified HTask.TaskEvent     as TV
 
+import           Data.Functor        (($>))
 import           Data.Text           (Text)
 
 
-maybeStore
-  :: (H.CanCreateTask m, V.HasEventSink m)
-  => Either String TV.TaskEventDetail -> m (Either String H.TaskRef)
-maybeStore r
-  = case r of
-      Left e  -> pure (Left e)
-      Right v -> Right <$> funk v
+data AddResult
+  = AddSuccess H.TaskRef
+  | FailedToAdd
+  deriving (Show, Eq)
 
 
-funk
-  :: (H.CanCreateTask m, V.HasEventSink m)
-  => TV.TaskEventDetail -> m H.TaskRef
-funk v = do
-  V.createEvent v >>= V.writeEvent
-  pure (TV.detailRef v)
+data ModifyResult
+  = ModifySuccess H.Task
+  | FailedToModify
+  | FailedToFind
+  deriving (Show, Eq)
 
+
+type CanAddTask m = (Monad m, V.HasEventSink m, V.CanCreateEvent m, HC.HasTasks m, H.CanCreateTask m)
+type CanModifyTask m = (Monad m, V.HasEventSink m, V.CanCreateEvent m, HC.HasTasks m)
 
 
 addTask
-  :: (HC.HasTasks m, H.CanCreateTask m, V.CanCreateEvent m, V.HasEventSink m)
-  => Text -> m (Either String H.TaskRef)
+  :: (CanAddTask m)
+  => Text -> m AddResult
 addTask tx = do
-
-  -- create
   tk <- H.createTask tx
-  let detail = TV.TaskEventDetail (H.taskRef tk) (TV.AddTask tx)
-  e <- V.createEvent detail
-
-  -- apply
   p <- HC.addNewTask tk
 
-  -- persist
-  if p then V.writeEvent e else pure ()
+  if p
+    then
+      (V.createEvent (TV.TaskEventDetail (H.taskRef tk) (TV.AddTask tx)) >>= V.writeEvent) $> AddSuccess (H.taskRef tk)
 
-  pure $ if p
-            then Right (H.taskRef tk)
-            else Left "could not add"
+    else
+      pure FailedToAdd
+
+
+
+headSafe :: [a] -> Maybe a
+headSafe []    = Nothing
+headSafe (x:_) = Just x
+
+
+findMatch :: (Monad m, HC.HasTasks m) => Text -> m (Maybe H.Task)
+findMatch ref
+  = headSafe . filterMatchesUUID ref <$> listTasks
+
+ where
+   filterMatchesUUID :: Text -> [H.Task] -> [H.Task]
+   filterMatchesUUID t
+     = filter (Text.isPrefixOf t . H.taskRefText . H.taskRef)
+
+
+withMatch :: (Monad m, HC.HasTasks m) => Text -> (H.Task -> m ModifyResult) -> m ModifyResult
+withMatch tx op
+  = findMatch tx >>= maybe (pure FailedToFind) op
 
 
 startTask
-  :: (Monad m, HC.HasTasks m, V.CanCreateEvent m, V.HasEventSink m)
-  => H.TaskRef -> m (Either String H.TaskRef)
-startTask ref = do
+  :: (CanModifyTask m)
+  => Text -> m ModifyResult
+startTask tx =
+  withMatch tx $ \tsk -> do
+    let ref = H.taskRef tsk
+    p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
 
-  -- create
-  let detail = TV.TaskEventDetail ref (TV.StartTask ref)
-  e <- V.createEvent detail
+    if p
+      then do
+        V.createEvent (TV.TaskEventDetail ref (TV.StartTask ref)) >>= V.writeEvent
+        pure $ ModifySuccess tsk
 
-  -- apply
-  p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
-
-  if p then V.writeEvent e else pure ()
-
-  pure $ if p
-            then Right ref
-            else Left "could not find matching id"
+      else
+        pure FailedToModify
 
 
 stopTask
-  :: (HC.HasTasks m, H.CanCreateTask m, V.HasEventSink m)
-  => H.TaskRef -> m (Either String H.TaskRef)
-stopTask ref = do
-  r <- TV.applyIntentToTasks (TV.StopTask ref)
-  maybeStore r
+  :: (CanModifyTask m)
+  => Text -> m ModifyResult
+stopTask tx =
+  withMatch tx $ \tsk -> do
+    let ref = H.taskRef tsk
+    p <- HC.updateExistingTask ref $ H.setTaskStatus H.Pending
+
+    if p
+      then do
+        V.createEvent (TV.TaskEventDetail ref (TV.StopTask ref)) >>= V.writeEvent
+        pure $ ModifySuccess tsk
+
+      else
+        pure FailedToModify
 
 
 completeTask
-  :: (HC.HasTasks m, H.CanCreateTask m, V.HasEventSink m)
-  => H.TaskRef -> m (Either String H.TaskRef)
-completeTask ref = do
-  r <- TV.applyIntentToTasks (TV.CompleteTask ref)
-  maybeStore r
+  :: (CanModifyTask m)
+  => Text -> m ModifyResult
+completeTask tx =
+  withMatch tx $ \tsk -> do
+    let ref = H.taskRef tsk
+    p <- HC.updateExistingTask ref $ H.setTaskStatus H.Complete
+
+    if p
+      then do
+        V.createEvent (TV.TaskEventDetail ref (TV.CompleteTask ref)) >>= V.writeEvent
+        pure $ ModifySuccess tsk
+
+      else
+        pure FailedToModify
 
 
 removeTask
-  :: (HC.HasTasks m, H.CanCreateTask m, V.HasEventSink m)
-  => H.TaskRef -> m (Either String H.TaskRef)
-removeTask ref = do
-  r <- TV.applyIntentToTasks (TV.RemoveTask ref)
-  maybeStore r
+  :: (CanModifyTask m)
+  => Text -> m ModifyResult
+removeTask tx = do
+  withMatch tx $ \tsk -> do
+    let ref = H.taskRef tsk
+    p <- HC.removeTaskRef ref
+
+    if p
+      then do
+        V.createEvent (TV.TaskEventDetail ref (TV.RemoveTask ref)) >>= V.writeEvent
+        pure $ ModifySuccess tsk
+
+      else
+        pure FailedToModify
 
 
 listTasks :: (HC.HasTasks m) => m HC.Tasks
 listTasks = HC.getTasks
+

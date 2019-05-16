@@ -5,7 +5,6 @@ module HTask.Runners.Add
   ( runAdd
   ) where
 
-import qualified Data.Text             as Text
 import qualified HTask.API             as API
 import qualified HTask.Task            as H
 
@@ -16,23 +15,22 @@ import           Data.Semigroup        ((<>))
 import           Data.Text             (Text)
 
 
-type AddOutput = Either String H.TaskRef
-
-
 runAdd :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runAdd t
-  = presentAdd t <$> runTask (API.addTask t)
-
-
-presentAdd :: Text -> AddOutput -> RunResult
-presentAdd t
-  = either
-      (resultError . Text.pack)
-      resultSuccessAdd
+  = formatOutcome <$> runTask (API.addTask t)
 
   where
-    resultSuccessAdd ref
-      = resultSuccess
-          [ "added task: " <> t
-          , "ref: " <> H.taskRefText ref
-          ]
+    formatOutcome x
+      = case x of
+          API.AddSuccess ref ->
+            resultSuccessAdd ref
+
+          API.FailedToAdd ->
+            resultError "failed to add"
+
+      where
+        resultSuccessAdd ref
+          = resultSuccess
+              [ "added task: " <> t
+              , "ref: " <> H.taskRefText ref
+              ]

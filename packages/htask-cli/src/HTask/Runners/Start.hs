@@ -1,16 +1,13 @@
-{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module HTask.Runners.Start
   ( runStart
   ) where
 
-import qualified Data.Text             as Text
 import qualified HTask.API             as API
 import qualified HTask.Task            as H
 
 import           HTask.Output.Document
-import           HTask.Runners.Common
 import           HTask.TaskApplication
 
 import           Data.Semigroup        ((<>))
@@ -18,17 +15,17 @@ import           Data.Text             (Text)
 
 
 runStart :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
-runStart = withMatch
-  (\tx -> runTask
-    $   formatOutcome tx
-    <$> API.startTask (H.taskRef tx)
-  )
+runStart t
+  = formatOutcome <$> runTask (API.startTask t)
 
   where
-    formatOutcome tx
-      = either
-          (resultError . Text.pack)
-          (const $ formatSuccessStart tx)
+    formatOutcome x
+      = case x of
+          API.ModifySuccess tsk ->
+            resultSuccess ["starting task: " <> H.description tsk]
 
-    formatSuccessStart tx
-      = resultSuccess ["starting task: " <> H.description tx]
+          API.FailedToFind ->
+            resultError "unable to find matching task"
+
+          API.FailedToModify ->
+            resultError "unable to modify matching task"

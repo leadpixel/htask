@@ -26,7 +26,7 @@ type CanRunTask m = (Monad m, HasEventBackend m)
 
 
 newtype TaskApplication m a = TaskApp
-  { runTaskApp :: S.StateT HC.Tasks m a
+  { unTaskApp :: S.StateT HC.Tasks m a
   } deriving (Functor, Applicative, Monad, T.MonadTrans)
 
 instance (Monad m) => HC.HasTasks (TaskApplication m) where
@@ -45,7 +45,7 @@ instance (Monad m, F.CanRandom m) => F.CanRandom (TaskApplication m) where
   getRandomRange = T.lift . F.getRandomRange
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskApplication m) where
-  writeEvent = TaskApp . T.lift . V.writeEvent
+  writeEvent = T.lift . V.writeEvent
 
 
 runTask
@@ -53,4 +53,4 @@ runTask
   => TaskApplication m a -> m a
 runTask op
   = V.readEvents
-  >>= \vs -> S.evalStateT (Replay.replayEventLog vs >> runTaskApp op) HC.emptyTasks
+  >>= \vs -> S.evalStateT (Replay.replayEventLog vs >> unTaskApp op) HC.emptyTasks

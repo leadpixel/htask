@@ -7,9 +7,10 @@ module HTask.TaskContainer
   ) where
 
 import qualified Control.Monad.State as State
-import           Data.List
-import           Data.Maybe
 import           HTask.Task
+
+import           Data.List           (find)
+import           Data.Maybe          (isNothing)
 
 
 type Tasks = [Task]
@@ -39,8 +40,7 @@ instance (Monad m) => HasTasks (State.StateT Tasks m) where
     maybe
       (pure False)
       (\t -> do
-        let k = op t
-        State.put (k : removeTaskByRef ts ref)
+        State.put (op t : removeTaskByRef ref ts)
         pure True)
       (findTask ts ref)
 
@@ -49,13 +49,13 @@ instance (Monad m) => HasTasks (State.StateT Tasks m) where
     maybe
       (pure False)
       (\_t -> do
-        State.put (removeTaskByRef ts ref)
+        State.put (removeTaskByRef ref ts)
         pure True)
       (findTask ts ref)
 
 
-removeTaskByRef :: Tasks -> TaskRef -> Tasks
-removeTaskByRef ts ref = filter (\k -> taskRef k /= ref) ts
+removeTaskByRef :: TaskRef -> Tasks -> Tasks
+removeTaskByRef ref = filter (\k -> taskRef k /= ref)
 
 
 emptyTasks :: Tasks

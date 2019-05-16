@@ -3,11 +3,8 @@ module HTask.Render
   ) where
 
 import qualified Data.Text               as Text
-import           HTask.Output.Document (RunResult(..))
-import           HTask.Output.Formatters
-  ( TermColor (..)
-  , withColor
-  )
+import           HTask.Output.Document   (RunResult (..))
+import           HTask.Output.Formatters (TermColor (..), withColor)
 
 import           Data.Text               (Text)
 
