@@ -84,12 +84,12 @@ startTask tx =
     let ref = H.taskRef tsk
     p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
 
-    if p
-      then do
+    case p of
+      Just t -> do
         V.createEvent (TV.TaskEventDetail ref (TV.StartTask ref)) >>= V.writeEvent
-        pure $ ModifySuccess tsk
+        pure $ ModifySuccess t
 
-      else
+      Nothing ->
         pure FailedToModify
 
 
@@ -101,12 +101,12 @@ stopTask tx =
     let ref = H.taskRef tsk
     p <- HC.updateExistingTask ref $ H.setTaskStatus H.Pending
 
-    if p
-      then do
+    case p of
+      Just t -> do
         V.createEvent (TV.TaskEventDetail ref (TV.StopTask ref)) >>= V.writeEvent
-        pure $ ModifySuccess tsk
+        pure $ ModifySuccess t
 
-      else
+      Nothing ->
         pure FailedToModify
 
 
@@ -118,19 +118,19 @@ completeTask tx =
     let ref = H.taskRef tsk
     p <- HC.updateExistingTask ref $ H.setTaskStatus H.Complete
 
-    if p
-      then do
+    case p of
+      Just t -> do
         V.createEvent (TV.TaskEventDetail ref (TV.CompleteTask ref)) >>= V.writeEvent
-        pure $ ModifySuccess tsk
+        pure $ ModifySuccess t
 
-      else
+      Nothing ->
         pure FailedToModify
 
 
 removeTask
   :: (CanModifyTask m)
   => Text -> m ModifyResult
-removeTask tx = do
+removeTask tx =
   withMatch tx $ \tsk -> do
     let ref = H.taskRef tsk
     p <- HC.removeTaskRef ref

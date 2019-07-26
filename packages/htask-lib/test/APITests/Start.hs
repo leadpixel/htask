@@ -43,14 +43,14 @@ canStartEvent :: TestTree
 canStartEvent = testCase "reports success when starting a task" $ do
   uuid <- F.uuidGen
   x <- runApi (uuid, fakeTime) (op uuid)
-  assertEqual "" (f uuid) (x)
+  assertEqual "" (f uuid) x
     where
       f uuid = API.ModifySuccess
         ( H.Task
           { H.taskRef = Tagged uuid
           , H.description = "some task"
           , H.createdAt = fakeTime
-          , H.status = H.Pending
+          , H.status = H.InProgress
           }
         )
 

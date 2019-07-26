@@ -42,14 +42,14 @@ returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
   uuid <- F.uuidGen
   x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.completeTask (UUID.toText uuid))
-  assertEqual "" (f uuid) (x)
+  assertEqual "" (f uuid) x
     where
       f uuid = API.ModifySuccess
         ( H.Task
           { H.taskRef = Tagged uuid
           , H.description = "some task"
           , H.createdAt = fakeTime
-          , H.status = H.Pending
+          , H.status = H.Complete
           }
         )
 
@@ -57,5 +57,5 @@ returnsCreatedUuid = testCase "returns the created uuid on success" $ do
 failsWhenUnableToFindMatch :: TestTree
 failsWhenUnableToFindMatch = testCase "fails when unable to find a matching task" $ do
   uuid <- F.uuidGen
-  x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.completeTask ("unknown"))
-  assertEqual "expecting failed to find" (API.FailedToFind) x
+  x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.completeTask "unknown")
+  assertEqual "expecting failed to find" API.FailedToFind x

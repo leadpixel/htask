@@ -19,7 +19,7 @@ type Tasks = [Task]
 class HasTasks m where
   getTasks :: m Tasks
   addNewTask :: Task -> m Bool
-  updateExistingTask :: TaskRef -> (Task -> Task) -> m Bool
+  updateExistingTask :: TaskRef -> (Task -> Task) -> m (Maybe Task)
   removeTaskRef :: TaskRef -> m Bool
 
 
@@ -38,10 +38,11 @@ instance (Monad m) => HasTasks (State.StateT Tasks m) where
   updateExistingTask ref op = do
     ts <- getTasks
     maybe
-      (pure False)
+      (pure Nothing)
       (\t -> do
-        State.put (op t : removeTaskByRef ref ts)
-        pure True)
+        let t' = op t
+        State.put (t' : removeTaskByRef ref ts)
+        pure $ Just t')
       (findTask ts ref)
 
   removeTaskRef ref = do

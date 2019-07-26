@@ -43,7 +43,7 @@ canStopEvent :: TestTree
 canStopEvent = testCase "reports success when stopping a task" $ do
   uuid <- F.uuidGen
   x <- runApi (uuid, fakeTime) (op uuid)
-  assertEqual "" (f uuid) (x)
+  assertEqual "" (f uuid) x
     where
       f uuid = API.ModifySuccess
         ( H.Task

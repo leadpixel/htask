@@ -43,7 +43,7 @@ canRemoveEvent :: TestTree
 canRemoveEvent = testCase "reports success when removing a task" $ do
   uuid <- F.uuidGen
   x <- runApi (uuid, fakeTime) (op uuid)
-  assertEqual "" (f uuid) (x)
+  assertEqual "" (f uuid) x
     where
       f uuid = API.ModifySuccess
         ( H.Task
