@@ -203,3 +203,22 @@
 {"payload":{"intent":{"tag":"StartTask","contents":"2254ba3f-95c2-484e-bbdf-3d6370e5b8cd"},"detailRef":"2254ba3f-95c2-484e-bbdf-3d6370e5b8cd"},"timestamp":"2018-04-11T07:54:04.224141825Z"}
 {"payload":{"intent":{"tag":"StartTask","contents":"6feced14-7d80-420c-b57a-49377a473942"},"detailRef":"6feced14-7d80-420c-b57a-49377a473942"},"timestamp":"2018-04-11T07:54:10.923717619Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"split out capabiltiies"},"detailRef":"f6397293-2afe-4938-94d2-5885e35e37ca"},"timestamp":"2018-04-16T07:56:17.479531535Z"}
+{"payload":{"intent":{"tag":"AddTask","contents":"remove colors when piping"},"detailRef":"6cc92e6b-3d34-4d16-824a-feaa22ebfd81"},"timestamp":"2019-08-21T07:48:13.08876158Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"53c85ff4-2838-46d3-a64c-268864be71c6"},"detailRef":"53c85ff4-2838-46d3-a64c-268864be71c6"},"timestamp":"2019-08-21T07:48:54.228251438Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"660c5f08-fc51-4cd0-a145-6dc5ee7533a0"},"detailRef":"660c5f08-fc51-4cd0-a145-6dc5ee7533a0"},"timestamp":"2019-08-21T07:49:03.072527435Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"e46c8eef-eb57-47c2-b99c-2e8b6ab8de49"},"detailRef":"e46c8eef-eb57-47c2-b99c-2e8b6ab8de49"},"timestamp":"2019-08-21T07:49:13.294334354Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"92c3381c-e9a2-43f5-9a63-8e178aab636b"},"detailRef":"92c3381c-e9a2-43f5-9a63-8e178aab636b"},"timestamp":"2019-08-21T07:49:19.124288492Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"081b3f28-740b-4b8d-88eb-5d94a2e85949"},"detailRef":"081b3f28-740b-4b8d-88eb-5d94a2e85949"},"timestamp":"2019-08-21T07:49:43.754015769Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"d5d56ec7-353c-427d-bbba-9aeb80288cf6"},"detailRef":"d5d56ec7-353c-427d-bbba-9aeb80288cf6"},"timestamp":"2019-08-21T07:49:45.375712601Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"f1a7a9ca-4078-4b22-84f4-f8c214a1190b"},"detailRef":"f1a7a9ca-4078-4b22-84f4-f8c214a1190b"},"timestamp":"2019-08-21T07:49:55.219196016Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"808fb9e7-cee8-487d-9fa7-92252176bf19"},"detailRef":"808fb9e7-cee8-487d-9fa7-92252176bf19"},"timestamp":"2019-08-21T07:50:16.106277392Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"f835e6f8-6903-4a19-9e03-b32c3ad22a66"},"detailRef":"f835e6f8-6903-4a19-9e03-b32c3ad22a66"},"timestamp":"2019-08-21T07:50:34.931405858Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"f835e6f8-6903-4a19-9e03-b32c3ad22a66"},"detailRef":"f835e6f8-6903-4a19-9e03-b32c3ad22a66"},"timestamp":"2019-08-21T07:51:08.843411677Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"f835e6f8-6903-4a19-9e03-b32c3ad22a66"},"detailRef":"f835e6f8-6903-4a19-9e03-b32c3ad22a66"},"timestamp":"2019-08-21T07:51:13.08377696Z"}
+{"payload":{"intent":{"tag":"CompleteTask","contents":"e06fe93f-f077-46d1-85d9-8a78d4188026"},"detailRef":"e06fe93f-f077-46d1-85d9-8a78d4188026"},"timestamp":"2019-08-21T07:51:25.804549507Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"c645fda6-13f8-4ed6-a2df-045c811d6e5d"},"detailRef":"c645fda6-13f8-4ed6-a2df-045c811d6e5d"},"timestamp":"2019-08-21T07:52:51.902482653Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"082feeed-1752-440d-b621-9b3490224444"},"detailRef":"082feeed-1752-440d-b621-9b3490224444"},"timestamp":"2019-08-21T07:53:22.312752894Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"f6b06664-91fa-431c-80ca-3e8f96711a8b"},"detailRef":"f6b06664-91fa-431c-80ca-3e8f96711a8b"},"timestamp":"2019-08-21T07:53:33.34686249Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"96d102f1-9855-490e-9539-55c5e18525ad"},"detailRef":"96d102f1-9855-490e-9539-55c5e18525ad"},"timestamp":"2019-08-21T07:53:44.664145525Z"}
+{"payload":{"intent":{"tag":"CompleteTask","contents":"f6397293-2afe-4938-94d2-5885e35e37ca"},"detailRef":"f6397293-2afe-4938-94d2-5885e35e37ca"},"timestamp":"2019-08-21T07:53:52.004762477Z"}
+{"payload":{"intent":{"tag":"RemoveTask","contents":"f7a894bc-d724-418d-a319-d755fffcc778"},"detailRef":"f7a894bc-d724-418d-a319-d755fffcc778"},"timestamp":"2019-08-21T07:54:04.077998167Z"}
