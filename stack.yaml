@@ -6,10 +6,10 @@ packages:
   - ./packages/htask-cli
 
 extra-deps:
-  - git: /home/palf/projects/leadpixel/events
+  - git: /home/jack/projects/leadpixel/events
     commit: 3837071abcc9ede1a75f5934cf0acff697fb7bec
     subdirs:
-    - packages/effects
-    - packages/events
-    - packages/event-backends/memory
-    - packages/event-backends/file
+      - packages/effects
+      - packages/events
+      - packages/event-backends/memory
+      - packages/event-backends/file
