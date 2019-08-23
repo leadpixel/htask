@@ -1,8 +1,10 @@
 #!/usr/bin/env zsh
 
+echo $PWD
 
-DOT="./deps.dot"
-JSON="./deps.json"
+mkdir "docs"
+DOT="$PWD/docs/deps.dot"
+JSON="$PWD/docs/deps.json"
 
 echo "{" > $JSON
 
@@ -27,5 +29,3 @@ sed -i '/Data/d' $DOT
 
 # sed -i 's/^import \(\S*\)\s*/  "PREV" -> "\1";/' $DOT
 # sed -i 's/^module \(\S*\)\s*/  "\1" [style="solid"];/' $DOT
-
-
