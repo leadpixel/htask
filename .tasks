@@ -222,3 +222,5 @@
 {"payload":{"intent":{"tag":"RemoveTask","contents":"96d102f1-9855-490e-9539-55c5e18525ad"},"detailRef":"96d102f1-9855-490e-9539-55c5e18525ad"},"timestamp":"2019-08-21T07:53:44.664145525Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"f6397293-2afe-4938-94d2-5885e35e37ca"},"detailRef":"f6397293-2afe-4938-94d2-5885e35e37ca"},"timestamp":"2019-08-21T07:53:52.004762477Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"f7a894bc-d724-418d-a319-d755fffcc778"},"detailRef":"f7a894bc-d724-418d-a319-d755fffcc778"},"timestamp":"2019-08-21T07:54:04.077998167Z"}
+{"payload":{"intent":{"tag":"AddTask","contents":"prompt to create file/backend"},"detailRef":"3a545400-42da-4615-857e-e90655e7e0b8"},"timestamp":"2019-08-25T19:00:16.208610059Z"}
+{"payload":{"intent":{"tag":"AddTask","contents":"move config to task-config.yaml"},"detailRef":"6dfed51d-7ea6-4098-ae77-300043101caf"},"timestamp":"2019-08-25T21:29:48.756670189Z"}
