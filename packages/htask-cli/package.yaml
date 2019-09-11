@@ -11,24 +11,20 @@ description:         Please see the README on Github at <https://github.com/palf
 ghc-options: -Wall
 
 dependencies:
-- base >= 4.7 && < 5
-- aeson
-- effects
-- events
-- event-backend-file
-- unliftio-core
-- mtl
-- optparse-applicative
-- tagged
-- text
-- transformers
-- uuid
-
-library:
-  source-dirs: src
-  exposed-modules:
-    - HTask.CLI
-    - HTask.Runners
-    - HTask.Render
-  dependencies:
+  - base >= 4.7 && < 5
+  - effects
+  - event-backend-file
+  - events
   - htask-lib
+  - mtl
+  - optparse-applicative
+  - tagged
+  - text
+  - uuid
+
+
+executables:
+  htask:
+    main:                Main.hs
+    source-dirs:         src
+    ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
