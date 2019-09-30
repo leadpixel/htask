@@ -5,14 +5,14 @@ module HTask.CLI.Runners.Complete
   ( runComplete
   ) where
 
-import qualified HTask.Core.API             as API
-import qualified HTask.Core.Task            as H
+import qualified HTask.Core.API            as API
+import qualified HTask.Core.Task           as H
 
 import           HTask.CLI.Output.Document
 import           HTask.CLI.TaskApplication
 
-import           Data.Semigroup        ((<>))
-import           Data.Text             (Text)
+import           Data.Semigroup            ((<>))
+import           Data.Text                 (Text)
 
 
 runComplete :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult

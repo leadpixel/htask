@@ -8,9 +8,9 @@ module Main
 
 import qualified Control.Monad.Trans as T
 import qualified Effects             as F
-import qualified HTask.CLI.Options           as Opt
-import qualified HTask.CLI.Render        as Render
-import qualified HTask.CLI.Runners       as Runner
+import qualified HTask.CLI.Options   as Opt
+import qualified HTask.CLI.Render    as Render
+import qualified HTask.CLI.Runners   as Runner
 
 import           Event.Backend.File
 

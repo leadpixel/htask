@@ -5,14 +5,14 @@ module HTask.CLI.Runners.Remove
   ( runRemove
   ) where
 
-import qualified HTask.Core.API             as API
-import qualified HTask.Core.Task            as H
+import qualified HTask.Core.API            as API
+import qualified HTask.Core.Task           as H
 
 import           HTask.CLI.Output.Document
 import           HTask.CLI.TaskApplication
 
-import           Data.Semigroup        ((<>))
-import           Data.Text             (Text)
+import           Data.Semigroup            ((<>))
+import           Data.Text                 (Text)
 
 
 runRemove :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult

@@ -6,10 +6,10 @@ module HTask.CLI.Runners.Summary
   ( runSummary
   ) where
 
-import qualified Data.Text               as Text
-import qualified Data.UUID               as UUID
-import qualified HTask.Core.API               as API
-import qualified HTask.Core.Task              as H
+import qualified Data.Text                   as Text
+import qualified Data.UUID                   as UUID
+import qualified HTask.Core.API              as API
+import qualified HTask.Core.Task             as H
 
 import           Data.Function
 import           Data.List
@@ -18,8 +18,8 @@ import           HTask.CLI.Output.Document
 import           HTask.CLI.Output.Formatters
 import           HTask.CLI.TaskApplication
 
-import           Data.Semigroup          ((<>))
-import           Data.Text               (Text)
+import           Data.Semigroup              ((<>))
+import           Data.Text                   (Text)
 
 
 taskPriority :: H.Task -> H.Task -> Ordering

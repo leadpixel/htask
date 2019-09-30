@@ -7,10 +7,10 @@ module HTask.CLI.Runners.List
   ( runList
   ) where
 
-import qualified Data.UUID               as UUID
-import qualified Events                  as V
-import qualified HTask.Core.API               as API
-import qualified HTask.Core.Task              as H
+import qualified Data.UUID                   as UUID
+import qualified Events                      as V
+import qualified HTask.Core.API              as API
+import qualified HTask.Core.Task             as H
 
 import           Data.Function
 import           Data.List
@@ -19,8 +19,8 @@ import           HTask.CLI.Output.Document
 import           HTask.CLI.Output.Formatters
 import           HTask.CLI.TaskApplication
 
-import           Data.Semigroup          ((<>))
-import           Data.Text               (Text)
+import           Data.Semigroup              ((<>))
+import           Data.Text                   (Text)
 
 
 taskDisplayOrder :: H.Task -> H.Task -> Ordering

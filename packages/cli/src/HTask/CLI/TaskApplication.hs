@@ -13,12 +13,12 @@ module HTask.CLI.TaskApplication
   , runTask
   ) where
 
-import qualified Control.Monad.State as S
-import qualified Control.Monad.Trans as T
-import qualified Effects             as F
-import qualified Events              as V
+import qualified Control.Monad.State      as S
+import qualified Control.Monad.Trans      as T
+import qualified Effects                  as F
+import qualified Events                   as V
+import           HTask.Core.Replay        (replayEventLog)
 import qualified HTask.Core.TaskContainer as HC
-import HTask.Core.Replay              (replayEventLog)
 
 
 type HasEventBackend m = (Monad m, V.HasEventSource m, V.HasEventSink m)

@@ -2,11 +2,11 @@ module HTask.CLI.Render
   ( renderResult
   ) where
 
-import qualified Data.Text               as Text
+import qualified Data.Text                   as Text
 import           HTask.CLI.Output.Document   (RunResult (..))
 import           HTask.CLI.Output.Formatters (TermColor (..), withColor)
 
-import           Data.Text               (Text)
+import           Data.Text                   (Text)
 
 
 renderResult :: RunResult -> IO ()

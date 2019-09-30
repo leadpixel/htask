@@ -6,16 +6,16 @@ module HTask.CLI.Runners.Drop
   ) where
 
 
-import qualified Data.UUID             as UUID
-import qualified HTask.Core.API             as API
-import qualified HTask.Core.Task            as H
+import qualified Data.UUID                 as UUID
+import qualified HTask.Core.API            as API
+import qualified HTask.Core.Task           as H
 
 import           HTask.CLI.Output.Document
 import           HTask.CLI.TaskApplication
 
-import           Data.Semigroup        ((<>))
-import           Data.Tagged           (untag)
-import           Data.Text             (Text)
+import           Data.Semigroup            ((<>))
+import           Data.Tagged               (untag)
+import           Data.Text                 (Text)
 
 
 inProgress :: H.Task -> Bool

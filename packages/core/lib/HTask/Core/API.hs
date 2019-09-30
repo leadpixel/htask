@@ -13,14 +13,14 @@ module HTask.Core.API
   , listTasks
   ) where
 
-import qualified Data.Text           as Text
-import qualified Events              as V
+import qualified Data.Text                as Text
+import qualified Events                   as V
 import qualified HTask.Core.Task          as H
 import qualified HTask.Core.TaskContainer as HC
 import qualified HTask.Core.TaskEvent     as TV
 
-import           Data.Functor        (($>))
-import           Data.Text           (Text)
+import           Data.Functor             (($>))
+import           Data.Text                (Text)
 
 
 data AddResult

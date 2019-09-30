@@ -6,7 +6,7 @@ module HTask.Core.Replay
   , applyRawEvent
   ) where
 
-import qualified Events              as V
+import qualified Events                   as V
 import qualified HTask.Core.Task          as H
 import qualified HTask.Core.TaskContainer as HC
 import qualified HTask.Core.TaskEvent     as TV

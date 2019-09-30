@@ -4,10 +4,10 @@ module APITests.Complete
   ( testComplete
   ) where
 
+import qualified Data.UUID                 as UUID
 import qualified Effects                   as F
-import qualified HTask.Task                as H
 import qualified HTask.API                 as API
-import qualified Data.UUID as UUID
+import qualified HTask.Task                as H
 
 import           APITestMonad              (runApi)
 import           Data.Tagged               (Tagged (..))

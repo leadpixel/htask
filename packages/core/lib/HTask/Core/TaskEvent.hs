@@ -8,10 +8,10 @@ module HTask.Core.TaskEvent
   , TaskIntent (..)
   ) where
 
-import qualified Events       as V
-import qualified HTask.Core.Task   as H
+import qualified Events          as V
+import qualified HTask.Core.Task as H
 
-import           Data.Text    (Text)
+import           Data.Text       (Text)
 
 import           Data.Aeson
 import           GHC.Generics

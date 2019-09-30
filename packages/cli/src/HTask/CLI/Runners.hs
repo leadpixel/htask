@@ -5,8 +5,8 @@ module HTask.CLI.Runners
   ( runAction
   ) where
 
-import qualified Effects                as F
-import qualified HTask.Core.Task             as H
+import qualified Effects                    as F
+import qualified HTask.Core.Task            as H
 
 import           HTask.CLI.Actions
 import           HTask.CLI.Output.Document

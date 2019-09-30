@@ -8,10 +8,10 @@ module HTask.CLI.Output.Formatters
   , indent
   ) where
 
-import qualified HTask.Core.Task     as H
+import qualified HTask.Core.Task as H
 
-import           Data.Semigroup (Semigroup, (<>))
-import           Data.String    (IsString)
+import           Data.Semigroup  (Semigroup, (<>))
+import           Data.String     (IsString)
 
 
 data TermColor

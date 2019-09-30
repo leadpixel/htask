@@ -4,12 +4,12 @@ module APITests.Stop
   ( testStop
   ) where
 
+import qualified Data.UUID                 as UUID
 import qualified Effects                   as F
 import qualified Events                    as V
 import qualified HTask.API                 as API
 import qualified HTask.Task                as H
 import qualified HTask.TaskEvent           as TV
-import qualified Data.UUID as UUID
 
 import           Data.Tagged               (Tagged (..))
 import           Data.Time                 (Day (ModifiedJulianDay),

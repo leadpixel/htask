@@ -3,12 +3,12 @@ module HTask.CLI.Options
   , getOptions
   ) where
 
-import qualified Options.Applicative as Opts
+import qualified Options.Applicative        as Opts
 
-import           Data.Semigroup      ((<>))
-import           HTask.CLI.Actions       (Action)
-import           HTask.CLI.Config        (Options (..))
-import           Options.Applicative ((<|>))
+import           Data.Semigroup             ((<>))
+import           HTask.CLI.Actions          (Action)
+import           HTask.CLI.Config           (Options (..))
+import           Options.Applicative        ((<|>))
 
 import           HTask.CLI.Actions.Add
 import           HTask.CLI.Actions.Complete
