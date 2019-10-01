@@ -43,23 +43,24 @@ canStartEvent :: TestTree
 canStartEvent = testCase "reports success when starting a task" $ do
   uuid <- F.uuidGen
   x <- runApi (uuid, fakeTime) (op uuid)
-  assertEqual "" (f uuid) x
-    where
-      f uuid = API.ModifySuccess
-        ( H.Task
-          { H.taskRef = Tagged uuid
-          , H.description = "some task"
-          , H.createdAt = fakeTime
-          , H.status = H.InProgress
-          }
-        )
+  assertEqual "can start" (f uuid) x
+
+  where
+    f uuid = API.ModifySuccess
+      ( H.Task
+        { H.taskRef = Tagged uuid
+        , H.description = "some task"
+        , H.createdAt = fakeTime
+        , H.status = H.InProgress
+        }
+      )
 
 
 canStartEvent' :: TestTree
 canStartEvent' = testCase "marks the task as in-progress" $ do
   uuid <- F.uuidGen
   x <- runTasks (uuid, fakeTime) (op uuid)
-  assertEqual ""
+  assertEqual "can start"
     [ H.Task
       { H.taskRef = Tagged uuid
       , H.description = "some task"
@@ -86,7 +87,7 @@ canStartEvent'' = testCase "cannot start a started task" $ do
 -- canStartEvent''' = testCase "cannot start a startped task" $ do
 --   uuid <- F.uuidGen
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.startTask (UUID.toText uuid))
---   assertEqual ""
+--   assertEqual "can start"
 --     [ H.Task
 --       { H.taskRef = Tagged uuid
 --       , H.description = "some task"

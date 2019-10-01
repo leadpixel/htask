@@ -43,23 +43,24 @@ canRemoveEvent :: TestTree
 canRemoveEvent = testCase "reports success when removing a task" $ do
   uuid <- F.uuidGen
   x <- runApi (uuid, fakeTime) (op uuid)
-  assertEqual "" (f uuid) x
-    where
-      f uuid = API.ModifySuccess
-        ( H.Task
-          { H.taskRef = Tagged uuid
-          , H.description = "some task"
-          , H.createdAt = fakeTime
-          , H.status = H.Pending
-          }
-        )
+  assertEqual "can remove" (f uuid) x
+
+  where
+    f uuid = API.ModifySuccess
+      ( H.Task
+        { H.taskRef = Tagged uuid
+        , H.description = "some task"
+        , H.createdAt = fakeTime
+        , H.status = H.Pending
+        }
+      )
 
 
 canRemoveEvent' :: TestTree
 canRemoveEvent' = testCase "removes the task" $ do
   uuid <- F.uuidGen
   x <- runTasks (uuid, fakeTime) (op uuid)
-  assertEqual "" [] x
+  assertEqual "can remove" [] x
 
 
 canRemoveEvent'' :: TestTree
@@ -77,7 +78,7 @@ canRemoveEvent'' = testCase "cannot remove a removeped task" $ do
 -- canRemoveEvent''' = testCase "cannot remove a removeped task" $ do
 --   uuid <- F.uuidGen
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.removeTask (Tagged uuid))
---   assertEqual ""
+--   assertEqual "can remove"
 --     [ H.Task
 --       { H.taskRef = Tagged uuid
 --       , H.description = "some task"
