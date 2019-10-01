@@ -4,11 +4,18 @@ type: docker
 name: default
 
 steps:
-- name: hello
-  image: haskell:latest
+- name: submodules
+  image: alpine/git
   commands:
-  - stack setup
-  - stack build
-  trigger:
-    branch:
-    - master
+  - git submodule update --recursive --remote
+
+- name: hello
+  image: haskell
+  commands:
+  - ls
+
+- name: notify
+  image: plugins/slack
+  settings:
+    webhook:
+      from_secret: deploy_webhook
