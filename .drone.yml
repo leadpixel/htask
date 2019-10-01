@@ -5,14 +5,13 @@ name: default
 
 steps:
 - name: submodules
-  image: alpine/git
-  commands:
-  - git submodule update --recursive --remote
+  image: plugins/git
+  recursive: true
 
-- name: hello
-  image: haskell
+- name: build
+  image: fpco/stack-build:lts-13.10
   commands:
-  - ls
+  - stack build
 
 - name: notify
   image: plugins/slack

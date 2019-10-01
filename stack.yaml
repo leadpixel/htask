@@ -4,11 +4,8 @@ packages:
   - ./packages/core
   - ./packages/cli
 
-extra-deps:
-  - git: /home/jack/projects/leadpixel/events
-    commit: 3837071abcc9ede1a75f5934cf0acff697fb7bec
-    subdirs:
-      - packages/effects
-      - packages/events
-      - packages/event-backends/memory
-      - packages/event-backends/file
+  - ./modules/events/packages/effects
+  - ./modules/events/packages/events
+  - ./modules/events/packages/event-backends/memory
+  - ./modules/events/packages/event-backends/file
+  - ./modules/events/packages/event-backends/sqlite
