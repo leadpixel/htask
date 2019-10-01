@@ -4,10 +4,11 @@ type: docker
 name: default
 
 steps:
-  - name: hello
-    image: hello-world
-    commands:
-      - ls
-    trigger:
-      branch:
-        - master
+- name: hello
+  image: haskell:latest
+  commands:
+  - stack setup
+  - stack build
+  trigger:
+    branch:
+    - master
