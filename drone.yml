@@ -8,3 +8,6 @@ steps:
     image: fpco/stack-build
     commands:
       - stack build
+    trigger:
+      branch:
+        - master
