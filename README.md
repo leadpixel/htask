@@ -1,5 +1,7 @@
 # HTask
 
+[![Build Status](http://drone:8080/api/badges/leadpixel/htask/status.svg)](http://drone:8080/leadpixel/htask)
+
 A command-line utility for task management.
 
 ## Motivation
