@@ -11,7 +11,7 @@ steps:
 - name: build
   image: fpco/stack-build:lts-13.10
   commands:
-  - stack build
+  - stack build htask-cli
 
 - name: notify
   image: plugins/slack
