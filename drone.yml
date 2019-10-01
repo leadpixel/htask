@@ -1,0 +1,10 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: stack-build
+    image: fpco/stack-build
+    commands:
+      - stack build
