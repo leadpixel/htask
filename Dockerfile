@@ -6,4 +6,4 @@ COPY stack.yaml .
 COPY packages packages
 COPY modules modules
 
-RUN stack build && stack clean
+RUN stack build && stack test && stack clean

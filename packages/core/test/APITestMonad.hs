@@ -21,8 +21,8 @@ import qualified Data.UUID            as UUID
 import qualified Effects              as F
 import qualified Event.Backend.Memory as Mem
 import qualified Events               as V
-import qualified HTask.TaskContainer  as HC
-import qualified HTask.TaskEvent      as TV
+import qualified HTask.Core.TaskContainer  as HC
+import qualified HTask.Core.TaskEvent      as TV
 
 import           Data.Sequence        (Seq (..))
 import           Data.Time            (UTCTime)
