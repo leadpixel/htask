@@ -9,7 +9,7 @@ steps:
   recursive: true
 
 - name: build
-  image: localhost:5000/haskell-build
+  image: localhost:5000/leadpixel/htask-build
   commands:
   - stack build --pedantic htask-cli
 
