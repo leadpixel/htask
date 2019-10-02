@@ -9,9 +9,9 @@ steps:
   recursive: true
 
 - name: build
-  image: localhost:5000/hello
+  image: localhost:5000/haskell-build
   commands:
-  - ls
+  - stack build --pedantic htask-cli
 
 - name: notify
   image: plugins/slack
