@@ -1,4 +1,5 @@
-{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE ConstraintKinds     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module HTask.Core.API
   ( AddResult (..)
@@ -6,6 +7,7 @@ module HTask.Core.API
   , CanAddTask
   , CanModifyTask
   , addTask
+  , findTask
   , startTask
   , stopTask
   , completeTask
@@ -20,6 +22,7 @@ import qualified HTask.Core.TaskContainer as HC
 import qualified HTask.Core.TaskEvent     as TV
 
 import           Data.Functor             (($>))
+import           Data.List
 import           Data.Text                (Text)
 
 
@@ -55,25 +58,20 @@ addTask tx = do
       pure FailedToAdd
 
 
+findTask :: (Monad m, HC.HasTasks m) => Text -> m (Maybe H.Task)
+findTask tx
+  = find (uuidStartsWith tx)
+  <$> listTasks
 
-headSafe :: [a] -> Maybe a
-headSafe []    = Nothing
-headSafe (x:_) = Just x
-
-
-findMatch :: (Monad m, HC.HasTasks m) => Text -> m (Maybe H.Task)
-findMatch ref
-  = headSafe . filterMatchesUUID ref <$> listTasks
-
- where
-   filterMatchesUUID :: Text -> [H.Task] -> [H.Task]
-   filterMatchesUUID t
-     = filter (Text.isPrefixOf t . H.taskRefText . H.taskRef)
+  where
+    uuidStartsWith :: Text -> H.Task -> Bool
+    uuidStartsWith t
+      = Text.isPrefixOf t . H.taskRefText . H.taskRef
 
 
 withMatch :: (Monad m, HC.HasTasks m) => Text -> (H.Task -> m ModifyResult) -> m ModifyResult
 withMatch tx op
-  = findMatch tx >>= maybe (pure FailedToFind) op
+  = findTask tx >>= maybe (pure FailedToFind) op
 
 
 startTask
