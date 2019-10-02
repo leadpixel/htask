@@ -11,6 +11,7 @@ steps:
 - name: build
   image: localhost:5000/leadpixel/htask-build
   commands:
+  - stack test --pedantic
   - stack build --pedantic htask-cli
 
 - name: notify
