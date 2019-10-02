@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE DeriveGeneric   #-}
 
 module HTask.Core.Task
   ( Task (..)
@@ -10,11 +11,12 @@ module HTask.Core.Task
   , taskRefText
   ) where
 
-import qualified Data.UUID   as UUID
-import qualified Effects     as F
+import qualified Data.UUID    as UUID
+import qualified Effects      as F
 
-import           Data.Tagged (Tagged (..), untag)
-import           Data.Text   (Text)
+import           Data.Tagged  (Tagged (..), untag)
+import           Data.Text    (Text)
+import           GHC.Generics
 
 
 type TaskIdent = ()
@@ -26,7 +28,7 @@ data TaskStatus
   | InProgress
   | Complete
   | Abandoned
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
 
 
 data Task = Task
@@ -34,7 +36,7 @@ data Task = Task
   , description :: Text
   , createdAt   :: F.Timestamp
   , status      :: TaskStatus
-  } deriving (Show, Eq)
+  } deriving (Show, Eq, Generic)
 
 
 type CanCreateTask m = (Monad m, F.CanTime m, F.CanUuid m)
