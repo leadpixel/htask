@@ -9,9 +9,9 @@ steps:
   recursive: true
 
 - name: build
-  image: fpco/stack-build:lts-13.10
+  image: localhost:5000/hello
   commands:
-  - stack build htask-cli
+  - ls
 
 - name: notify
   image: plugins/slack
