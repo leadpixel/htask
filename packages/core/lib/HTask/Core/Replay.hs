@@ -3,7 +3,6 @@
 
 module HTask.Core.Replay
   ( replayEventLog
-  , applyRawEvent
   ) where
 
 import qualified Events                   as V
@@ -14,8 +13,9 @@ import qualified HTask.Core.TaskEvent     as TV
 
 replayEventLog
   :: (Monad m, HC.HasTasks m, Foldable f)
-  => f TV.TaskEvent -> m ()
-replayEventLog = mapM_ applyRawEvent
+  => f TV.TaskEvent -> m HC.Tasks
+replayEventLog k
+  = mapM_ applyRawEvent k >> HC.getTasks
 
 
 applyRawEvent
