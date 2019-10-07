@@ -11,21 +11,21 @@ module APITestMonad
   , runWriteFailure
   ) where
 
-import qualified Control.Monad.Reader as R
-import qualified Control.Monad.State  as S
-import qualified Control.Monad.Trans  as T
-import qualified Data.Aeson           as A
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.Foldable        as Foldable
-import qualified Data.UUID            as UUID
-import qualified Effects              as F
-import qualified Event.Backend.Memory as Mem
-import qualified Events               as V
-import qualified HTask.Core.TaskContainer  as HC
-import qualified HTask.Core.TaskEvent      as TV
+import qualified Control.Monad.Reader     as R
+import qualified Control.Monad.State      as S
+import qualified Control.Monad.Trans      as T
+import qualified Data.Aeson               as A
+import qualified Data.ByteString.Lazy     as BL
+import qualified Data.Foldable            as Foldable
+import qualified Data.UUID                as UUID
+import qualified Effects                  as F
+import qualified Event.Backend.Memory     as Mem
+import qualified Events                   as V
+import qualified HTask.Core.TaskContainer as HC
+import qualified HTask.Core.TaskEvent     as TV
 
-import           Data.Sequence        (Seq (..))
-import           Data.Time            (UTCTime)
+import           Data.Sequence            (Seq (..))
+import           Data.Time                (UTCTime)
 
 import           Data.Maybe
 

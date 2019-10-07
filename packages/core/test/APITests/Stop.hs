@@ -7,9 +7,9 @@ module APITests.Stop
 import qualified Data.UUID                 as UUID
 import qualified Effects                   as F
 import qualified Events                    as V
-import qualified HTask.Core.API                 as API
-import qualified HTask.Core.Task                as H
-import qualified HTask.Core.TaskEvent           as TV
+import qualified HTask.Core.API            as API
+import qualified HTask.Core.Task           as H
+import qualified HTask.Core.TaskEvent      as TV
 
 import           Data.Tagged               (Tagged (..))
 import           Data.Time                 (Day (ModifiedJulianDay),

@@ -6,9 +6,9 @@ module APITests.Add
 
 import qualified Effects                   as F
 import qualified Events                    as V
-import qualified HTask.Core.API                 as API
-import qualified HTask.Core.Task                as H
-import qualified HTask.Core.TaskEvent           as TV
+import qualified HTask.Core.API            as API
+import qualified HTask.Core.Task           as H
+import qualified HTask.Core.TaskEvent      as TV
 import           Test.QuickCheck.Monadic   as QCM
 
 import           Data.Tagged               (Tagged (..))
