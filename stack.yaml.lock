@@ -3,10 +3,49 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    subdir: packages/core
+    name: leadpixel-events
+    version: 0.1.0.0
+    git: https://gitea.leadpixel.org/leadpixel/event-source
+    pantry-tree:
+      size: 293
+      sha256: 8d84569a537ed69a8a189dfc867acbab0bd3198108a6bba75369313d1021e7d1
+    commit: 783822b447c43f0a1fe322c6607952d08a81b6c1
+  original:
+    subdir: packages/core
+    git: https://gitea.leadpixel.org/leadpixel/event-source
+    commit: 783822b447c43f0a1fe322c6607952d08a81b6c1
+- completed:
+    subdir: packages/backends/file
+    name: event-backend-file
+    version: 0.1.0.0
+    git: https://gitea.leadpixel.org/leadpixel/event-source
+    pantry-tree:
+      size: 240
+      sha256: 728a54381187608f80c0db16bf0cc7718c20b3a83957256b740d6cb7a7a6da38
+    commit: 783822b447c43f0a1fe322c6607952d08a81b6c1
+  original:
+    subdir: packages/backends/file
+    git: https://gitea.leadpixel.org/leadpixel/event-source
+    commit: 783822b447c43f0a1fe322c6607952d08a81b6c1
+- completed:
+    subdir: packages/provider
+    name: leadpixel-provider
+    version: 0.1.0.0
+    git: https://gitea.leadpixel.org/leadpixel/provider
+    pantry-tree:
+      size: 238
+      sha256: 05c796bf695344da29233f0b2c669bbdbc4dc1566a1057c8b582300ce93e4601
+    commit: b6c6b35b66b7b9b4fa96d4bd69177927b8709a75
+  original:
+    subdir: packages/provider
+    git: https://gitea.leadpixel.org/leadpixel/provider
+    commit: b6c6b35b66b7b9b4fa96d4bd69177927b8709a75
 snapshots:
 - completed:
-    size: 496698
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/13/10.yaml
-    sha256: cccd8a6de18d13cd00f751b25684b3ca1e548648ea41874de78904fec1b9cb36
-  original: lts-13.10
+    size: 532379
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/8.yaml
+    sha256: 2ad3210d2ad35f3176005d68369a18e4d984517bfaa2caade76f28ed0b2e0521
+  original: lts-16.8

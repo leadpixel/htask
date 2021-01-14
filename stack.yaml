@@ -1,11 +1,17 @@
-resolver: lts-13.10
+resolver: lts-16.8
 
 packages:
   - ./packages/core
   - ./packages/cli
 
-  - ./modules/events/packages/effects
-  - ./modules/events/packages/events
-  - ./modules/events/packages/event-backends/memory
-  - ./modules/events/packages/event-backends/file
-  - ./modules/events/packages/event-backends/sqlite
+extra-deps:
+  - git: https://gitea.leadpixel.org/leadpixel/event-source
+    commit: 783822b447c43f0a1fe322c6607952d08a81b6c1
+    subdirs:
+      - packages/core
+      - packages/backends/file
+
+  - git: https://gitea.leadpixel.org/leadpixel/provider
+    commit: b6c6b35b66b7b9b4fa96d4bd69177927b8709a75
+    subdirs:
+      - packages/provider

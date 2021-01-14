@@ -5,7 +5,6 @@ module APITests.Complete
   ) where
 
 import qualified Data.UUID                 as UUID
-import qualified Effects                   as F
 import qualified HTask.Core.API            as API
 import qualified HTask.Core.Task           as H
 

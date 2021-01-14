@@ -5,7 +5,6 @@ module APITests.Remove
   ) where
 
 import qualified Data.UUID                 as UUID
-import qualified Effects                   as F
 import qualified Events                    as V
 import qualified HTask.Core.API            as API
 import qualified HTask.Core.Task           as H

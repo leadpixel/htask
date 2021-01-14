@@ -18,7 +18,6 @@ import qualified Data.Aeson               as A
 import qualified Data.ByteString.Lazy     as BL
 import qualified Data.Foldable            as Foldable
 import qualified Data.UUID                as UUID
-import qualified Effects                  as F
 import qualified Event.Backend.Memory     as Mem
 import qualified Events                   as V
 import qualified HTask.Core.TaskContainer as HC

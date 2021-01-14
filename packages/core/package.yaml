@@ -11,14 +11,15 @@ description:         Please see the README on Github at <https://github.com/palf
 ghc-options: -Wall
 
 dependencies:
-- base >= 4.7 && < 5
-- aeson
-- mtl
-- tagged
-- transformers
-- effects
-- events
-- uuid
+  - base >= 4.7 && < 5
+  - aeson
+  - mtl
+  - tagged
+  - time
+  - transformers
+  - leadpixel-events
+  - leadpixel-provider
+  - uuid
 
 library:
   source-dirs: lib

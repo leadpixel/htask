@@ -12,14 +12,16 @@ ghc-options: -Wall
 
 dependencies:
   - base >= 4.7 && < 5
-  - effects
   - event-backend-file
-  - events
   - htask-lib
+  - leadpixel-events
+  - leadpixel-provider
+  - MonadRandom
   - mtl
   - optparse-applicative
   - tagged
   - text
+  - time
   - uuid
 
 

@@ -1,11 +1,12 @@
-{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE ConstraintKinds  #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 
 module HTask.CLI.Runners
   ( runAction
   ) where
 
-import qualified Effects                    as F
+import           Control.Monad.Random.Class
 import qualified HTask.Core.Task            as H
 
 import           HTask.CLI.Actions
@@ -25,7 +26,7 @@ import           HTask.CLI.Runners.Summary
 
 
 runAction
-  :: (HasEventBackend m, H.CanCreateTask m, F.CanRandom m)
+  :: (HasEventBackend m, H.CanCreateTask m, MonadRandom m)
   => Action -> m RunResult
 runAction Summary        = runSummary
 runAction (List d k)     = runList d k

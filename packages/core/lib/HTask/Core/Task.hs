@@ -1,5 +1,6 @@
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE ConstraintKinds  #-}
+{-# LANGUAGE DeriveGeneric    #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Core.Task
   ( Task (..)
@@ -11,12 +12,14 @@ module HTask.Core.Task
   , taskRefText
   ) where
 
-import qualified Data.UUID    as UUID
-import qualified Effects      as F
+import qualified Data.UUID          as UUID
 
-import           Data.Tagged  (Tagged (..), untag)
-import           Data.Text    (Text)
+import           Data.Tagged        (Tagged (..), untag)
+import           Data.Text          (Text)
+import           Data.Time          (UTCTime)
+import           Data.UUID          (UUID)
 import           GHC.Generics
+import           Leadpixel.Provider
 
 
 type TaskIdent = ()
@@ -34,19 +37,19 @@ data TaskStatus
 data Task = Task
   { taskRef     :: TaskRef
   , description :: Text
-  , createdAt   :: F.Timestamp
+  , createdAt   :: UTCTime
   , status      :: TaskStatus
   } deriving (Show, Eq, Generic)
 
 
-type CanCreateTask m = (Monad m, F.CanTime m, F.CanUuid m)
+type CanCreateTask m = (Monad m, Provider UTCTime m, Provider UUID m)
 
 
 createTask :: (CanCreateTask m) => Text -> m Task
 createTask tex
   = (\u m -> Task u tex m Pending)
-  <$> (Tagged <$> F.uuidGen)
-  <*> F.now
+  <$> (Tagged <$> gen)
+  <*> gen
 
 
 setTaskStatus :: TaskStatus -> Task -> Task

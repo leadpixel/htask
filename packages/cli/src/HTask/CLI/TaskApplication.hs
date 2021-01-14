@@ -15,10 +15,11 @@ module HTask.CLI.TaskApplication
 
 import qualified Control.Monad.State      as S
 import qualified Control.Monad.Trans      as T
-import qualified Effects                  as F
+import           Data.Time                (UTCTime)
 import qualified Events                   as V
 import           HTask.Core.Replay        (replayEventLog)
 import qualified HTask.Core.TaskContainer as HC
+import           Leadpixel.Provider
 
 
 type HasEventBackend m = (Monad m, V.HasEventSource m, V.HasEventSink m)
@@ -35,17 +36,11 @@ instance (Monad m) => HC.HasTasks (TaskApplication m) where
   updateExistingTask ref = TaskApp . HC.updateExistingTask ref
   removeTaskRef = TaskApp . HC.removeTaskRef
 
-instance (Monad m, F.CanTime m) => F.CanTime (TaskApplication m) where
-  now = T.lift F.now
-
-instance (Monad m, F.CanUuid m) => F.CanUuid (TaskApplication m) where
-  uuidGen = T.lift F.uuidGen
-
-instance (Monad m, F.CanRandom m) => F.CanRandom (TaskApplication m) where
-  getRandomRange = T.lift . F.getRandomRange
-
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskApplication m) where
   writeEvent = T.lift . V.writeEvent
+
+instance (Provider k m) => Provider k (TaskApplication m) where
+  gen = T.lift gen
 
 
 runTask

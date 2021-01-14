@@ -7,17 +7,17 @@ module HTask.CLI.Runners.Pick
   ) where
 
 
-import qualified Data.UUID                 as UUID
-import qualified Effects                   as F
-import qualified HTask.Core.API            as API
-import qualified HTask.Core.Task           as H
+import           Control.Monad.Random.Class
+import qualified Data.UUID                  as UUID
+import qualified HTask.Core.API             as API
+import qualified HTask.Core.Task            as H
 
 import           HTask.CLI.Output.Document
 import           HTask.CLI.TaskApplication
 
-import           Data.Semigroup            ((<>))
-import           Data.Tagged               (untag)
-import           Data.Text                 (Text)
+import           Data.Semigroup             ((<>))
+import           Data.Tagged                (untag)
+import           Data.Text                  (Text)
 
 
 hasStatus :: H.TaskStatus -> H.Task -> Bool
@@ -28,7 +28,7 @@ taskRefText :: H.Task -> Text
 taskRefText = UUID.toText . untag . H.taskRef
 
 
-runPick :: (F.CanRandom m, HasEventBackend m, H.CanCreateTask m) => m RunResult
+runPick :: (MonadRandom m, HasEventBackend m, H.CanCreateTask m) => m RunResult
 runPick = do
   ts <- runTask API.listTasks
   let ps = filter (hasStatus H.Pending) ts
@@ -44,7 +44,7 @@ runPick = do
       pure ["picking task: " <> H.description t]
 
 
-randomSelectOne :: (Monad m, F.CanRandom m) => [a] -> m (Maybe a)
+randomSelectOne :: (Monad m, MonadRandom m) => [a] -> m (Maybe a)
 randomSelectOne [] = pure Nothing
 randomSelectOne xs =
-  (\n -> Just $ xs !! n) <$> F.getRandomRange (0, length xs)
+  (\n -> Just $ xs !! n) <$> getRandomR (0, length xs)

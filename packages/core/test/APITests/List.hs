@@ -4,7 +4,6 @@ module APITests.List
   ( testList
   ) where
 
-import qualified Effects                   as F
 import qualified HTask.Core.API            as API
 
 import           Data.Time                 (Day (ModifiedJulianDay),

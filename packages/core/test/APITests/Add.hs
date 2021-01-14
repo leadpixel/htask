@@ -4,7 +4,6 @@ module APITests.Add
   ( testAdd
   ) where
 
-import qualified Effects                   as F
 import qualified Events                    as V
 import qualified HTask.Core.API            as API
 import qualified HTask.Core.Task           as H
