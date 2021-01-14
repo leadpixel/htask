@@ -1,7 +1,6 @@
 module HTask.CLI.Actions.List
   where
 
-import           Data.Semigroup      ((<>))
 import           HTask.CLI.Actions
 import           Options.Applicative
 

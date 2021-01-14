@@ -1,8 +1,7 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
-
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Main
   ( main
@@ -13,28 +12,27 @@ import qualified HTask.CLI.Options          as Opt
 import qualified HTask.CLI.Render           as Render
 import qualified HTask.CLI.Runners          as Runner
 
+import Data.Time
+import Data.UUID
 import           Control.Monad.Random.Class
 import           Event.Backend.File
 import           Leadpixel.Provider
 
 
--- instance (Monad m, F.CanTime m, T.MonadTrans t) => F.CanTime (t m) where
---   gen = T.lift F.gen
+newtype Thing a = Thing (FileEventBackend IO a)
+  deriving (Functor, Applicative, Monad)
 
--- instance (Monad m, F.CanUuid m, T.MonadTrans t) => F.CanUuid (t m) where
---   gen = T.lift F.gen
+-- instance Provider UTCTime Thing where
+--   gen = Thing $ T.lift gen
 
--- instance (Monad m, F.CanRandom m, T.MonadTrans t) => F.CanRandom (t m) where
---   gen = T.lift . F.gen
+-- instance Provider UUID Thing where
+--   gen = Thing $ T.lift gen
 
-instance (Provider k IO) => Provider k (FileEventBackend IO) where
-  gen = T.lift gen
-
-instance MonadRandom (FileEventBackend IO) where
-  getRandom = T.lift getRandom
-  getRandoms = T.lift getRandoms
-  getRandomR = T.lift . getRandomR
-  getRandomRs = T.lift . getRandomRs
+instance MonadRandom Thing where
+  getRandom = Thing $ T.lift getRandom
+  getRandoms = Thing $ T.lift getRandoms
+  getRandomR = Thing . T.lift . getRandomR
+  getRandomRs = Thing . T.lift . getRandomRs
 
 
 main :: IO ()

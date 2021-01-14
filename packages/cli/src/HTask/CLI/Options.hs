@@ -5,7 +5,6 @@ module HTask.CLI.Options
 
 import qualified Options.Applicative        as Opts
 
-import           Data.Semigroup             ((<>))
 import           HTask.CLI.Actions          (Action)
 import           HTask.CLI.Config           (Options (..))
 import           Options.Applicative        ((<|>))

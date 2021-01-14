@@ -18,7 +18,6 @@ import           HTask.CLI.Output.Document
 import           HTask.CLI.Output.Formatters
 import           HTask.CLI.TaskApplication
 
-import           Data.Semigroup              ((<>))
 import           Data.Text                   (Text)
 
 

@@ -10,7 +10,6 @@ module HTask.CLI.Output.Formatters
 
 import qualified HTask.Core.Task as H
 
-import           Data.Semigroup  (Semigroup, (<>))
 import           Data.String     (IsString)
 
 
