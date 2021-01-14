@@ -1,3 +1,0 @@
-[submodule "events"]
-	path = modules/events
-	url = http://gitea:3600/leadpixel/events.git
