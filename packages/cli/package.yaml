@@ -12,16 +12,16 @@ ghc-options: -Wall
 
 dependencies:
   - base >= 4.7 && < 5
+  - MonadRandom
   - event-backend-file
   - htask-lib
   - leadpixel-events
   - leadpixel-provider
-  - MonadRandom
   - mtl
   - optparse-applicative
   - tagged
   - text
-  - time
+  - unliftio-core
   - uuid
 
 
