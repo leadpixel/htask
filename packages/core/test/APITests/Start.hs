@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module APITests.Start
@@ -17,6 +18,7 @@ import           Data.UUID                 (UUID)
 import           Test.QuickCheck.Instances ()
 
 import           APITestMonad
+import           Leadpixel.Provider
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
@@ -40,7 +42,7 @@ op uuid = API.addTask "some task" >> API.startTask (UUID.toText uuid)
 
 canStartEvent :: TestTree
 canStartEvent = testCase "reports success when starting a task" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runApi (uuid, fakeTime) (op uuid)
   assertEqual "can start" (f uuid) x
 
@@ -57,7 +59,7 @@ canStartEvent = testCase "reports success when starting a task" $ do
 
 canStartEvent' :: TestTree
 canStartEvent' = testCase "marks the task as in-progress" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runTasks (uuid, fakeTime) (op uuid)
   assertEqual "can start"
     [ H.Task
@@ -72,7 +74,7 @@ canStartEvent' = testCase "marks the task as in-progress" $ do
 
 canStartEvent'' :: TestTree
 canStartEvent'' = testCase "cannot start a started task" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runEventLog (uuid, fakeTime) (op uuid >> API.startTask (UUID.toText uuid))
   assertEqual "expecting one 'add-task' intent"
     [ TV.AddTask "some task"
@@ -84,7 +86,7 @@ canStartEvent'' = testCase "cannot start a started task" $ do
 
 -- canStartEvent''' :: TestTree
 -- canStartEvent''' = testCase "cannot start a startped task" $ do
---   uuid <- F.uuidGen
+--   uuid <- gen
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.startTask (UUID.toText uuid))
 --   assertEqual "can start"
 --     [ H.Task
@@ -99,6 +101,6 @@ canStartEvent'' = testCase "cannot start a started task" $ do
 
 cannotStartNonExistentEvent :: TestTree
 cannotStartNonExistentEvent = testCase "fails if there is no matching event" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runApi (uuid, fakeTime) (API.startTask (UUID.toText uuid))
   assertEqual "expecting failure" API.FailedToFind x

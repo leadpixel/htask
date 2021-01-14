@@ -23,7 +23,7 @@ import           Leadpixel.Provider
 
 
 type TaskIdent = ()
-type TaskRef = Tagged TaskIdent UUID.UUID
+type TaskRef = Tagged TaskIdent UUID
 
 
 data TaskStatus

@@ -12,6 +12,7 @@ import           APITestMonad              (runApi)
 import           Data.Tagged               (Tagged (..))
 import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
+import           Leadpixel.Provider
 import           Test.QuickCheck.Instances ()
 import           Test.Tasty                (TestTree, testGroup)
 import           Test.Tasty.HUnit          (assertEqual, testCase)
@@ -39,7 +40,7 @@ testComplete = testGroup "complete"
 
 returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.completeTask (UUID.toText uuid))
   assertEqual "" (f uuid) x
     where
@@ -55,6 +56,6 @@ returnsCreatedUuid = testCase "returns the created uuid on success" $ do
 
 failsWhenUnableToFindMatch :: TestTree
 failsWhenUnableToFindMatch = testCase "fails when unable to find a matching task" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.completeTask "unknown")
   assertEqual "expecting failed to find" API.FailedToFind x

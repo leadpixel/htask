@@ -1,6 +1,8 @@
 {-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
 
 module APITestMonad
   ( TaskAppT (..)
@@ -18,13 +20,15 @@ import qualified Data.Aeson               as A
 import qualified Data.ByteString.Lazy     as BL
 import qualified Data.Foldable            as Foldable
 import qualified Data.UUID                as UUID
-import qualified Event.Backend.Memory     as Mem
 import qualified Events                   as V
 import qualified HTask.Core.TaskContainer as HC
 import qualified HTask.Core.TaskEvent     as TV
 
 import           Data.Sequence            (Seq (..))
 import           Data.Time                (UTCTime)
+import           Data.UUID                (UUID)
+import           Event.Backend.Memory     (MemoryBackend, runMemoryBackend)
+import           Leadpixel.Provider
 
 import           Data.Maybe
 
@@ -32,12 +36,6 @@ import           Data.Maybe
 newtype TaskAppT m a = TaskApp
   { unTaskApp :: S.StateT HC.Tasks m a
   } deriving (Functor, Applicative, Monad, T.MonadTrans)
-
-instance (Monad m, F.CanTime m) => F.CanTime (TaskAppT m) where
-  now = T.lift F.now
-
-instance (Monad m, F.CanUuid m) => F.CanUuid (TaskAppT m) where
-  uuidGen = T.lift F.uuidGen
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskAppT m) where
   writeEvent = T.lift . V.writeEvent
@@ -48,21 +46,24 @@ instance (Monad m) => HC.HasTasks (TaskAppT m) where
   updateExistingTask ref = TaskApp . HC.updateExistingTask ref
   removeTaskRef = TaskApp . HC.removeTaskRef
 
+instance (Provider k m) => Provider k (TaskAppT m) where
+  gen = T.lift gen
 
-type Args = (UUID.UUID, UTCTime)
+
+type Args = (UUID, UTCTime)
 
 newtype DataProviderT m a = DataProvider
   { unDataProvider :: R.ReaderT Args m a
   } deriving (Functor, Applicative, Monad, T.MonadTrans)
 
-instance (Monad m) => F.CanUuid (DataProviderT m) where
-  uuidGen = DataProvider $ R.reader fst
-
-instance (Monad m) => F.CanTime (DataProviderT m) where
-  now = DataProvider $ R.reader snd
-
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (DataProviderT m) where
   writeEvent = T.lift . V.writeEvent
+
+instance (Monad m) => Provider UUID (DataProviderT m) where
+  gen = fst <$> DataProvider R.ask
+
+instance (Monad m) => Provider UTCTime (DataProviderT m) where
+  gen = snd <$> DataProvider R.ask
 
 
 newtype WriteFailureT m a = WriteFailure
@@ -75,19 +76,13 @@ instance (Monad m) => HC.HasTasks (WriteFailureT m) where
   updateExistingTask ref = WriteFailure . HC.updateExistingTask ref
   removeTaskRef = WriteFailure . HC.removeTaskRef
 
-instance (Monad m, F.CanUuid m) => F.CanUuid (WriteFailureT m) where
-  uuidGen = T.lift F.uuidGen
-
-instance (Monad m, F.CanTime m) => F.CanTime (WriteFailureT m) where
-  now = T.lift F.now
-
-instance (Monad m) => V.HasEventSink (WriteFailureT m) where
-  writeEvent = fail "called fail"
+-- instance (Monad m) => V.HasEventSink (WriteFailureT m) where
+--   writeEvent = fail "called fail"
 
 
-runStack :: (Monad m) => Args -> TaskAppT (DataProviderT (Mem.MemoryBackend m)) a -> m ((a, HC.Tasks), Seq BL.ByteString)
+runStack :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m ((a, HC.Tasks), Seq BL.ByteString)
 runStack args op
-  = Mem.runMemoryBackend
+  = runMemoryBackend
   $ R.runReaderT
     ( unDataProvider
     $ S.runStateT
@@ -97,17 +92,17 @@ runStack args op
     args
 
 
-runApi :: (Monad m) => Args -> TaskAppT (DataProviderT (Mem.MemoryBackend m)) a -> m a
+runApi :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m a
 runApi args op
   = fst . fst <$> runStack args op
 
 
-runTasks :: (Monad m) => Args -> TaskAppT (DataProviderT (Mem.MemoryBackend m)) a -> m HC.Tasks
+runTasks :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m HC.Tasks
 runTasks args op
   = snd . fst <$> runStack args op
 
 
-runEventLog :: (Monad m) => Args -> TaskAppT (DataProviderT (Mem.MemoryBackend m)) a -> m [TV.TaskEvent]
+runEventLog :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m [TV.TaskEvent]
 runEventLog args op
   = extractLog . snd <$> runStack args op
 

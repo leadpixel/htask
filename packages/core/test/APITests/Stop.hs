@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module APITests.Stop
@@ -17,6 +18,7 @@ import           Data.UUID                 (UUID)
 import           Test.QuickCheck.Instances ()
 
 import           APITestMonad
+import           Leadpixel.Provider
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
@@ -40,7 +42,7 @@ op uuid = API.addTask "some task" >> API.stopTask (UUID.toText uuid)
 
 canStopEvent :: TestTree
 canStopEvent = testCase "reports success when stopping a task" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runApi (uuid, fakeTime) (op uuid)
   assertEqual "can stop" (f uuid) x
     where
@@ -56,7 +58,7 @@ canStopEvent = testCase "reports success when stopping a task" $ do
 
 canStopEvent' :: TestTree
 canStopEvent' = testCase "marks the task as pending" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runTasks (uuid, fakeTime) (op uuid)
   assertEqual "can stop"
     [ H.Task
@@ -71,7 +73,7 @@ canStopEvent' = testCase "marks the task as pending" $ do
 
 canStopEvent'' :: TestTree
 canStopEvent'' = testCase "cannot stop a stopped task" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runEventLog (uuid, fakeTime) (op uuid >> API.stopTask (UUID.toText uuid))
   assertEqual "expecting one 'add-task' intent"
     [ TV.AddTask "some task"
@@ -83,7 +85,7 @@ canStopEvent'' = testCase "cannot stop a stopped task" $ do
 
 -- canStopEvent''' :: TestTree
 -- canStopEvent''' = testCase "cannot stop a stopped task" $ do
---   uuid <- F.uuidGen
+--   uuid <- gen
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.stopTask (UUID.toText uuid))
 --   assertEqual "can stop"
 --     [ H.Task
@@ -98,6 +100,6 @@ canStopEvent'' = testCase "cannot stop a stopped task" $ do
 
 cannotStopNonExistentEvent :: TestTree
 cannotStopNonExistentEvent = testCase "fails if there is no matching event" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runApi (uuid, fakeTime) (API.stopTask (UUID.toText uuid))
   assertEqual "expecting failure" API.FailedToFind x

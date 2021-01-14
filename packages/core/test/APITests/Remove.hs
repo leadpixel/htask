@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module APITests.Remove
@@ -17,6 +18,7 @@ import           Data.UUID                 (UUID)
 import           Test.QuickCheck.Instances ()
 
 import           APITestMonad
+import           Leadpixel.Provider
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
@@ -40,7 +42,7 @@ op uuid = API.addTask "some task" >> API.removeTask (UUID.toText uuid)
 
 canRemoveEvent :: TestTree
 canRemoveEvent = testCase "reports success when removing a task" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runApi (uuid, fakeTime) (op uuid)
   assertEqual "can remove" (f uuid) x
 
@@ -57,14 +59,14 @@ canRemoveEvent = testCase "reports success when removing a task" $ do
 
 canRemoveEvent' :: TestTree
 canRemoveEvent' = testCase "removes the task" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runTasks (uuid, fakeTime) (op uuid)
   assertEqual "can remove" [] x
 
 
 canRemoveEvent'' :: TestTree
 canRemoveEvent'' = testCase "cannot remove a removeped task" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runEventLog (uuid, fakeTime) (op uuid >> API.removeTask (UUID.toText uuid))
   assertEqual "expecting one 'add-task' intent"
     [ TV.AddTask "some task"
@@ -75,7 +77,7 @@ canRemoveEvent'' = testCase "cannot remove a removeped task" $ do
 
 -- canRemoveEvent''' :: TestTree
 -- canRemoveEvent''' = testCase "cannot remove a removeped task" $ do
---   uuid <- F.uuidGen
+--   uuid <- gen
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.removeTask (Tagged uuid))
 --   assertEqual "can remove"
 --     [ H.Task
@@ -90,6 +92,6 @@ canRemoveEvent'' = testCase "cannot remove a removeped task" $ do
 
 cannotRemoveNonExistentEvent :: TestTree
 cannotRemoveNonExistentEvent = testCase "fails if there is no matching event" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runApi (uuid, fakeTime) (API.removeTask (UUID.toText uuid))
   assertEqual "expecting failure" API.FailedToFind x

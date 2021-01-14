@@ -10,6 +10,7 @@ extra-deps:
     subdirs:
       - packages/core
       - packages/backends/file
+      - packages/backends/memory
 
   - git: https://gitea.leadpixel.org/leadpixel/provider
     commit: b6c6b35b66b7b9b4fa96d4bd69177927b8709a75

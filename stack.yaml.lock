@@ -31,6 +31,19 @@ packages:
     git: https://gitea.leadpixel.org/leadpixel/event-source
     commit: 783822b447c43f0a1fe322c6607952d08a81b6c1
 - completed:
+    subdir: packages/backends/memory
+    name: event-backend-memory
+    version: 0.1.0.0
+    git: https://gitea.leadpixel.org/leadpixel/event-source
+    pantry-tree:
+      size: 244
+      sha256: 575152e7a0558811e07f6ba3b70615cc89c00ca1715098998d839aeba2df3801
+    commit: 783822b447c43f0a1fe322c6607952d08a81b6c1
+  original:
+    subdir: packages/backends/memory
+    git: https://gitea.leadpixel.org/leadpixel/event-source
+    commit: 783822b447c43f0a1fe322c6607952d08a81b6c1
+- completed:
     subdir: packages/provider
     name: leadpixel-provider
     version: 0.1.0.0

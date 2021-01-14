@@ -8,6 +8,7 @@ import qualified HTask.Core.API            as API
 
 import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
+import           Leadpixel.Provider
 import           Test.QuickCheck.Instances ()
 
 import           APITestMonad
@@ -39,27 +40,27 @@ testList = testGroup "add"
 
 returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runApi (uuid, fakeTime) API.listTasks
   assertEqual "expecting success" [] x
 
 
 storesCreatedTask :: TestTree
 storesCreatedTask = testCase "stores the created task" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runTasks (uuid, fakeTime) API.listTasks
   assertEqual "expecting one task" [] x
 
 
 rollsBackOnWriteFailure :: TestTree
 rollsBackOnWriteFailure = testCase "does not store task on write failure" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   (_, x) <- runWriteFailure (uuid, fakeTime) API.listTasks
   assertEqual "expecting nothing" [] x
 
 
 writesEvent :: TestTree
 writesEvent = testCase "stores one event" $ do
-  uuid <- F.uuidGen
+  uuid <- gen
   x <- runEventLog (uuid, fakeTime) API.listTasks
   assertEqual "expecting 'add-task' intent" [] x
