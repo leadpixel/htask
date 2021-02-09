@@ -47,7 +47,7 @@ instance (Monad m) => HC.HasTasks (TaskAppT m) where
   removeTaskRef = TaskApp . HC.removeTaskRef
 
 instance (Provider k m) => Provider k (TaskAppT m) where
-  gen = T.lift gen
+  provide = T.lift provide
 
 
 type Args = (UUID, UTCTime)
@@ -60,10 +60,10 @@ instance (Monad m, V.HasEventSink m) => V.HasEventSink (DataProviderT m) where
   writeEvent = T.lift . V.writeEvent
 
 instance (Monad m) => Provider UUID (DataProviderT m) where
-  gen = fst <$> DataProvider R.ask
+  provide = fst <$> DataProvider R.ask
 
 instance (Monad m) => Provider UTCTime (DataProviderT m) where
-  gen = snd <$> DataProvider R.ask
+  provide = snd <$> DataProvider R.ask
 
 
 newtype WriteFailureT m a = WriteFailure

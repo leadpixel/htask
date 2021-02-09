@@ -6,13 +6,13 @@ packages:
 
 extra-deps:
   - git: https://gitea.leadpixel.org/leadpixel/event-source
-    commit: 783822b447c43f0a1fe322c6607952d08a81b6c1
+    commit: 5f40a0d0c7236df6095da1842b730b46233c4656
     subdirs:
       - packages/core
       - packages/backends/file
       - packages/backends/memory
 
   - git: https://gitea.leadpixel.org/leadpixel/provider
-    commit: b6c6b35b66b7b9b4fa96d4bd69177927b8709a75
+    commit: 01a8f6d8d23310ae487f226cba69978135c24ac6
     subdirs:
       - packages/provider

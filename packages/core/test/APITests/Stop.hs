@@ -42,7 +42,7 @@ op uuid = API.addTask "some task" >> API.stopTask (UUID.toText uuid)
 
 canStopEvent :: TestTree
 canStopEvent = testCase "reports success when stopping a task" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runApi (uuid, fakeTime) (op uuid)
   assertEqual "can stop" (f uuid) x
     where
@@ -58,7 +58,7 @@ canStopEvent = testCase "reports success when stopping a task" $ do
 
 canStopEvent' :: TestTree
 canStopEvent' = testCase "marks the task as pending" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runTasks (uuid, fakeTime) (op uuid)
   assertEqual "can stop"
     [ H.Task
@@ -73,7 +73,7 @@ canStopEvent' = testCase "marks the task as pending" $ do
 
 canStopEvent'' :: TestTree
 canStopEvent'' = testCase "cannot stop a stopped task" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runEventLog (uuid, fakeTime) (op uuid >> API.stopTask (UUID.toText uuid))
   assertEqual "expecting one 'add-task' intent"
     [ TV.AddTask "some task"
@@ -85,7 +85,7 @@ canStopEvent'' = testCase "cannot stop a stopped task" $ do
 
 -- canStopEvent''' :: TestTree
 -- canStopEvent''' = testCase "cannot stop a stopped task" $ do
---   uuid <- gen
+--   uuid <- provide
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.stopTask (UUID.toText uuid))
 --   assertEqual "can stop"
 --     [ H.Task
@@ -100,6 +100,6 @@ canStopEvent'' = testCase "cannot stop a stopped task" $ do
 
 cannotStopNonExistentEvent :: TestTree
 cannotStopNonExistentEvent = testCase "fails if there is no matching event" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runApi (uuid, fakeTime) (API.stopTask (UUID.toText uuid))
   assertEqual "expecting failure" API.FailedToFind x

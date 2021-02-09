@@ -42,7 +42,7 @@ op uuid = API.addTask "some task" >> API.startTask (UUID.toText uuid)
 
 canStartEvent :: TestTree
 canStartEvent = testCase "reports success when starting a task" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runApi (uuid, fakeTime) (op uuid)
   assertEqual "can start" (f uuid) x
 
@@ -59,7 +59,7 @@ canStartEvent = testCase "reports success when starting a task" $ do
 
 canStartEvent' :: TestTree
 canStartEvent' = testCase "marks the task as in-progress" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runTasks (uuid, fakeTime) (op uuid)
   assertEqual "can start"
     [ H.Task
@@ -74,7 +74,7 @@ canStartEvent' = testCase "marks the task as in-progress" $ do
 
 canStartEvent'' :: TestTree
 canStartEvent'' = testCase "cannot start a started task" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runEventLog (uuid, fakeTime) (op uuid >> API.startTask (UUID.toText uuid))
   assertEqual "expecting one 'add-task' intent"
     [ TV.AddTask "some task"
@@ -86,7 +86,7 @@ canStartEvent'' = testCase "cannot start a started task" $ do
 
 -- canStartEvent''' :: TestTree
 -- canStartEvent''' = testCase "cannot start a startped task" $ do
---   uuid <- gen
+--   uuid <- provide
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.startTask (UUID.toText uuid))
 --   assertEqual "can start"
 --     [ H.Task
@@ -101,6 +101,6 @@ canStartEvent'' = testCase "cannot start a started task" $ do
 
 cannotStartNonExistentEvent :: TestTree
 cannotStartNonExistentEvent = testCase "fails if there is no matching event" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runApi (uuid, fakeTime) (API.startTask (UUID.toText uuid))
   assertEqual "expecting failure" API.FailedToFind x

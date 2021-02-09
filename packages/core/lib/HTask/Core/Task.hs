@@ -48,8 +48,8 @@ type CanCreateTask m = (Monad m, Provider UTCTime m, Provider UUID m)
 createTask :: (CanCreateTask m) => Text -> m Task
 createTask tex
   = (\u m -> Task u tex m Pending)
-  <$> (Tagged <$> gen)
-  <*> gen
+  <$> (Tagged <$> provide)
+  <*> provide
 
 
 setTaskStatus :: TaskStatus -> Task -> Task

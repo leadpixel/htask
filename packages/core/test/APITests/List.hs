@@ -40,27 +40,27 @@ testList = testGroup "add"
 
 returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runApi (uuid, fakeTime) API.listTasks
   assertEqual "expecting success" [] x
 
 
 storesCreatedTask :: TestTree
 storesCreatedTask = testCase "stores the created task" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runTasks (uuid, fakeTime) API.listTasks
   assertEqual "expecting one task" [] x
 
 
 rollsBackOnWriteFailure :: TestTree
 rollsBackOnWriteFailure = testCase "does not store task on write failure" $ do
-  uuid <- gen
+  uuid <- provide
   (_, x) <- runWriteFailure (uuid, fakeTime) API.listTasks
   assertEqual "expecting nothing" [] x
 
 
 writesEvent :: TestTree
 writesEvent = testCase "stores one event" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runEventLog (uuid, fakeTime) API.listTasks
   assertEqual "expecting 'add-task' intent" [] x

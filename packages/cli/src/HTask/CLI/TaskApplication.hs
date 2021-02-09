@@ -40,7 +40,7 @@ instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskApplication m) where
   writeEvent = T.lift . V.writeEvent
 
 instance (Provider k m) => Provider k (TaskApplication m) where
-  gen = T.lift gen
+  provide = T.lift provide
 
 
 runTask

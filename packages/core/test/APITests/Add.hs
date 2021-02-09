@@ -50,7 +50,7 @@ testAdd = testGroup "add"
 
 returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runApi (uuid, fakeTime) (API.addTask "some task")
   assertEqual "expecting success" (API.AddSuccess (Tagged uuid)) x
 
@@ -64,7 +64,7 @@ returnsCreatedUuidM = testProperty "returns the created uuid on success" $ \uuid
 
 storesCreatedTask :: TestTree
 storesCreatedTask = testCase "stores the created task" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runTasks (uuid, fakeTime) (API.addTask "some task")
   assertEqual "expecting one task"
     [ H.Task
@@ -77,28 +77,28 @@ storesCreatedTask = testCase "stores the created task" $ do
 
 -- rollsBackOnWriteFailure :: TestTree
 -- rollsBackOnWriteFailure = testCase "does not store task on write failure" $ do
---   uuid <- gen
+--   uuid <- provide
 --   (_, x) <- runWriteFailure (uuid, fakeTime) (API.addTask "other task")
 --   assertEqual "expecting nothing" [] x
 
 
 writesEvent :: TestTree
 writesEvent = testCase "stores one event" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runEventLog (uuid, fakeTime) (API.addTask "some task")
   assertEqual "expecting 'add-task' intent" [ TV.AddTask "some task" ] (TV.intent . V.payload <$> x)
 
 
 doesNotAllowDuplicateUuids :: TestTree
 doesNotAllowDuplicateUuids = testCase "cannot use a non-unique id" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.addTask "other task")
   assertEqual "expecting failure" API.FailedToAdd x
 
 
 doesNotStoreDuplicateTask :: TestTree
 doesNotStoreDuplicateTask = testCase "only stores the original task" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runTasks (uuid, fakeTime) (API.addTask "some task" >> API.addTask "other task")
   assertEqual "expecting one task"
     [ H.Task
@@ -112,7 +112,7 @@ doesNotStoreDuplicateTask = testCase "only stores the original task" $ do
 
 doesNotWriteFailedEvent :: TestTree
 doesNotWriteFailedEvent = testCase "only stores one event" $ do
-  uuid <- gen
+  uuid <- provide
   x <- runEventLog (uuid, fakeTime) (API.addTask "some task" >> API.addTask "other task")
   assertEqual "expecting one 'add-task' intent" [ TV.AddTask "some task" ] (TV.intent . V.payload <$> x)
 
