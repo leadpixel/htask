@@ -4,7 +4,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE ScopedTypeVariables        #-}
-{-# LANGUAGE TypeSynonymInstances       #-}
 
 module HTask.CLI.TaskApplication
   ( TaskApplication
@@ -39,7 +38,7 @@ instance (Monad m) => HC.HasTasks (TaskApplication m) where
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskApplication m) where
   writeEvent = T.lift . V.writeEvent
 
-instance (Provider k m) => Provider k (TaskApplication m) where
+instance (Monad m, Provider k m) => Provider k (TaskApplication m) where
   provide = T.lift provide
 
 

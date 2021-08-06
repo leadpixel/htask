@@ -5,14 +5,14 @@ packages:
   - ./packages/cli
 
 extra-deps:
-  - git: https://gitea.leadpixel.org/leadpixel/event-source
-    commit: 5f40a0d0c7236df6095da1842b730b46233c4656
+  - git: git@gitea.leadpixel.org:leadpixel/event-source
+    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
     subdirs:
       - packages/core
       - packages/backends/file
       - packages/backends/memory
 
-  - git: https://gitea.leadpixel.org/leadpixel/provider
-    commit: 01a8f6d8d23310ae487f226cba69978135c24ac6
+  - git: git@gitea.leadpixel.org:leadpixel/provider
+    commit: e880c45883d0a39ffc536b8781dd01632a5bdef4
     subdirs:
       - packages/provider

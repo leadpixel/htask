@@ -29,7 +29,7 @@ instance (Monad m, MonadUnliftIO m) => HasEventSource (App m) where
 instance (Monad m, MonadUnliftIO m) => HasEventSink (App m) where
   writeEvent = App . writeEvent
 
-instance (Provider k m) => Provider k (App m) where
+instance (Monad m, Provider k m) => Provider k (App m) where
   provide = App $ T.lift provide
 
 instance (MonadRandom m) => MonadRandom (App m) where

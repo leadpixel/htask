@@ -16,10 +16,9 @@ module APITestMonad
 import qualified Control.Monad.Reader     as R
 import qualified Control.Monad.State      as S
 import qualified Control.Monad.Trans      as T
-import qualified Data.Aeson               as A
-import qualified Data.ByteString.Lazy     as BL
+import qualified Data.Aeson               as Aeson
+import qualified Data.ByteString.Lazy     as Lazy
 import qualified Data.Foldable            as Foldable
-import qualified Data.UUID                as UUID
 import qualified Events                   as V
 import qualified HTask.Core.TaskContainer as HC
 import qualified HTask.Core.TaskEvent     as TV
@@ -46,7 +45,7 @@ instance (Monad m) => HC.HasTasks (TaskAppT m) where
   updateExistingTask ref = TaskApp . HC.updateExistingTask ref
   removeTaskRef = TaskApp . HC.removeTaskRef
 
-instance (Provider k m) => Provider k (TaskAppT m) where
+instance (Monad m, Provider k m) => Provider k (TaskAppT m) where
   provide = T.lift provide
 
 
@@ -80,7 +79,7 @@ instance (Monad m) => HC.HasTasks (WriteFailureT m) where
 --   writeEvent = fail "called fail"
 
 
-runStack :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m ((a, HC.Tasks), Seq BL.ByteString)
+runStack :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m ((a, HC.Tasks), Seq Lazy.ByteString)
 runStack args op
   = runMemoryBackend
   $ R.runReaderT
@@ -107,8 +106,8 @@ runEventLog args op
   = extractLog . snd <$> runStack args op
 
   where
-    extractLog :: Seq BL.ByteString -> [TV.TaskEvent]
-    extractLog = mapMaybe A.decode . Foldable.toList
+    extractLog :: Seq Lazy.ByteString -> [TV.TaskEvent]
+    extractLog = mapMaybe Aeson.decode . Foldable.toList
 
 
 runWriteFailure :: (Monad m) => Args -> WriteFailureT m a -> m (a, HC.Tasks)

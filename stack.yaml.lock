@@ -8,54 +8,54 @@ packages:
     subdir: packages/core
     name: leadpixel-events
     version: 0.2.0.0
-    git: https://gitea.leadpixel.org/leadpixel/event-source
+    git: git@gitea.leadpixel.org:leadpixel/event-source
     pantry-tree:
       size: 293
-      sha256: 92a88e9c5a284496ddba2d23d8c8f82d5165b7c7e3cfa030c172145a50517f7e
-    commit: 5f40a0d0c7236df6095da1842b730b46233c4656
+      sha256: b33494454c3e7b85d5a5cfc6d5694e3272be47e507a0e7c34aa2b18c057f6c38
+    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
   original:
     subdir: packages/core
-    git: https://gitea.leadpixel.org/leadpixel/event-source
-    commit: 5f40a0d0c7236df6095da1842b730b46233c4656
+    git: git@gitea.leadpixel.org:leadpixel/event-source
+    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
 - completed:
     subdir: packages/backends/file
     name: event-backend-file
     version: 0.1.0.0
-    git: https://gitea.leadpixel.org/leadpixel/event-source
+    git: git@gitea.leadpixel.org:leadpixel/event-source
     pantry-tree:
       size: 240
-      sha256: 728a54381187608f80c0db16bf0cc7718c20b3a83957256b740d6cb7a7a6da38
-    commit: 5f40a0d0c7236df6095da1842b730b46233c4656
+      sha256: 956cb2a24d395e26821ec8d466b609ba1c317821c7f9bfe20295fb7f7cae79d4
+    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
   original:
     subdir: packages/backends/file
-    git: https://gitea.leadpixel.org/leadpixel/event-source
-    commit: 5f40a0d0c7236df6095da1842b730b46233c4656
+    git: git@gitea.leadpixel.org:leadpixel/event-source
+    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
 - completed:
     subdir: packages/backends/memory
     name: event-backend-memory
     version: 0.1.0.0
-    git: https://gitea.leadpixel.org/leadpixel/event-source
+    git: git@gitea.leadpixel.org:leadpixel/event-source
     pantry-tree:
       size: 244
-      sha256: 575152e7a0558811e07f6ba3b70615cc89c00ca1715098998d839aeba2df3801
-    commit: 5f40a0d0c7236df6095da1842b730b46233c4656
+      sha256: dab39e97f713cda81a4d21e6eb80097328f01cc90e1940c4db69981a29494431
+    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
   original:
     subdir: packages/backends/memory
-    git: https://gitea.leadpixel.org/leadpixel/event-source
-    commit: 5f40a0d0c7236df6095da1842b730b46233c4656
+    git: git@gitea.leadpixel.org:leadpixel/event-source
+    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
 - completed:
     subdir: packages/provider
     name: leadpixel-provider
-    version: 0.2.0.0
-    git: https://gitea.leadpixel.org/leadpixel/provider
+    version: 1.0.0.0
+    git: git@gitea.leadpixel.org:leadpixel/provider
     pantry-tree:
-      size: 239
-      sha256: 491689884bcad819e958db8fe09e1c3af20e8b1529360fe1f03e3a75d3c60611
-    commit: 01a8f6d8d23310ae487f226cba69978135c24ac6
+      size: 516
+      sha256: d9447c58971145e469ebb7c5b7d8af296e1a7633b06e0035ea55d0dbd409cac9
+    commit: e880c45883d0a39ffc536b8781dd01632a5bdef4
   original:
     subdir: packages/provider
-    git: https://gitea.leadpixel.org/leadpixel/provider
-    commit: 01a8f6d8d23310ae487f226cba69978135c24ac6
+    git: git@gitea.leadpixel.org:leadpixel/provider
+    commit: e880c45883d0a39ffc536b8781dd01632a5bdef4
 snapshots:
 - completed:
     size: 532379
