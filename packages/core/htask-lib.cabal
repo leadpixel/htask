@@ -1,0 +1,84 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 856320bb6c5083d6d884cb4a5881a8ec0f1c5c27c9d8ef60410c6117d0590778
+
+name:           htask-lib
+version:        0.2.0.0
+description:    Please see the README on Github at <https://github.com/palf/htask#readme>
+homepage:       https://github.com/palf/htask#readme
+bug-reports:    https://github.com/palf/htask/issues
+author:         Jack Palfrey
+maintainer:     jack.palf@gmail.com
+copyright:      2018 Jack Palfrey
+license:        BSD3
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/palf/htask
+
+library
+  exposed-modules:
+      HTask.Core.API
+      HTask.Core.Task
+      HTask.Core.TaskContainer
+      HTask.Core.TaskEvent
+      HTask.Core.Replay
+  other-modules:
+      Paths_htask_lib
+  hs-source-dirs:
+      lib
+  ghc-options: -Wall
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , conduit-combinators
+    , leadpixel-events
+    , leadpixel-provider
+    , mtl
+    , tagged
+    , text
+    , time
+    , transformers
+    , uuid
+  default-language: Haskell2010
+
+test-suite htask-test
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      APITestMonad
+      APITests.Add
+      APITests.Complete
+      APITests.List
+      APITests.Remove
+      APITests.Start
+      APITests.Stop
+      Paths_htask_lib
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuickCheck
+    , aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , event-backend-memory
+    , htask-lib
+    , leadpixel-events
+    , leadpixel-provider
+    , mtl
+    , quickcheck-instances
+    , tagged
+    , tasty
+    , tasty-hunit
+    , tasty-quickcheck
+    , time
+    , transformers
+    , uuid
+  default-language: Haskell2010

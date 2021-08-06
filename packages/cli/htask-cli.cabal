@@ -1,0 +1,72 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: f45ed0b9021a65910df4bd40c8be4c399fb7c09f8e1e683668fd622b0eda5235
+
+name:           htask-cli
+version:        0.2.0.0
+description:    Please see the README on Github at <https://github.com/palf/htask#readme>
+homepage:       https://github.com/palf/htask#readme
+bug-reports:    https://github.com/palf/htask/issues
+author:         Jack Palfrey
+maintainer:     jack.palf@gmail.com
+copyright:      2018 Jack Palfrey
+license:        BSD3
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/palf/htask
+
+executable htask
+  main-is: Main.hs
+  other-modules:
+      HTask.CLI.Actions
+      HTask.CLI.Actions.Add
+      HTask.CLI.Actions.Complete
+      HTask.CLI.Actions.Done
+      HTask.CLI.Actions.Drop
+      HTask.CLI.Actions.List
+      HTask.CLI.Actions.Pick
+      HTask.CLI.Actions.Remove
+      HTask.CLI.Actions.Start
+      HTask.CLI.Actions.Stop
+      HTask.CLI.Actions.Summary
+      HTask.CLI.Config
+      HTask.CLI.Options
+      HTask.CLI.Output.Document
+      HTask.CLI.Output.Formatters
+      HTask.CLI.Render
+      HTask.CLI.Runners
+      HTask.CLI.Runners.Add
+      HTask.CLI.Runners.Complete
+      HTask.CLI.Runners.Done
+      HTask.CLI.Runners.Drop
+      HTask.CLI.Runners.List
+      HTask.CLI.Runners.Pick
+      HTask.CLI.Runners.Remove
+      HTask.CLI.Runners.Start
+      HTask.CLI.Runners.Stop
+      HTask.CLI.Runners.Summary
+      HTask.CLI.TaskApplication
+      Paths_htask_cli
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      MonadRandom
+    , base >=4.7 && <5
+    , event-backend-file
+    , htask-lib
+    , leadpixel-events
+    , leadpixel-provider
+    , mtl
+    , optparse-applicative
+    , tagged
+    , text
+    , unliftio-core
+    , uuid
+  default-language: Haskell2010
