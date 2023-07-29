@@ -12,7 +12,7 @@ import qualified Events                      as V
 import qualified HTask.Core.API              as API
 import qualified HTask.Core.Task             as H
 
-import           Control.Monad.IO.Class    (MonadIO)
+import           Control.Monad.IO.Class      (MonadIO)
 import           Data.Function
 import           Data.List
 import           Data.Tagged
