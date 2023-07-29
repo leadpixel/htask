@@ -1,4 +1,4 @@
-_common/legal: !include "../legal.yaml"
+_legal: !include "../legal.yaml"
 
 name:                leadpixel-events
 version:             0.2.0.0

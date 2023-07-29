@@ -1,4 +1,4 @@
-_common/legal: !include "../legal.yaml"
+_legal: !include "../legal.yaml"
 
 name:                event-backend-file
 version:             0.1.0.0
@@ -24,7 +24,7 @@ library:
     - transformers
 
 tests:
-  backend-file-test:
+  event-backend-file:
     main:                Main.hs
     source-dirs:         test
     ghc-options:

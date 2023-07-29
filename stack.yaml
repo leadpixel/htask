@@ -2,11 +2,11 @@ resolver:
   url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/20/13.yaml
 
 packages:
-  - ./packages/core
-  - ./packages/cli
-
   - ./packages/provider
 
   - ./packages/event-core
   - ./packages/event-backend-file
   - ./packages/event-backend-memory
+
+  - ./packages/htask-core
+  - ./packages/htask-cli

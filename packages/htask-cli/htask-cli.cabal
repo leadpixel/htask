@@ -53,7 +53,7 @@ executable htask
       MonadRandom
     , base >=4.7 && <5
     , event-backend-file
-    , htask-lib
+    , htask-core
     , leadpixel-events
     , leadpixel-provider
     , monads-tf

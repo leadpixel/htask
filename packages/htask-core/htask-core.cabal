@@ -3,10 +3,8 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: 745fb922ef15909ca757fc14ea8bfd761b7db671d3a327a80f7751b936333b77
 
-name:           htask-lib
+name:           htask-core
 version:        0.2.0.0
 author:         Jack Palfrey
 maintainer:     jack.palf@gmail.com
@@ -22,7 +20,7 @@ library
       HTask.Core.TaskEvent
       HTask.Core.Replay
   other-modules:
-      Paths_htask_lib
+      Paths_htask_core
   hs-source-dirs:
       lib
   ghc-options: -Wall
@@ -40,7 +38,7 @@ library
     , uuid
   default-language: Haskell2010
 
-test-suite core
+test-suite htask-core
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
@@ -51,7 +49,7 @@ test-suite core
       APITests.Remove
       APITests.Start
       APITests.Stop
-      Paths_htask_lib
+      Paths_htask_core
   hs-source-dirs:
       test
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
@@ -62,7 +60,7 @@ test-suite core
     , bytestring
     , containers
     , event-backend-memory
-    , htask-lib
+    , htask-core
     , leadpixel-events
     , leadpixel-provider
     , mtl

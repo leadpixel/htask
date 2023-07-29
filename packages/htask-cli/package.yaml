@@ -1,4 +1,4 @@
-_common/legal: !include "../legal.yaml"
+_legal: !include "../legal.yaml"
 
 name:                htask-cli
 version:             0.2.0.0
@@ -21,7 +21,7 @@ executables:
     dependencies:
       - MonadRandom
       - event-backend-file
-      - htask-lib
+      - htask-core
       - leadpixel-events
       - leadpixel-provider
       - mtl

@@ -1,6 +1,6 @@
-_common/legal: !include "../legal.yaml"
+_legal: !include "../legal.yaml"
 
-name:                htask-lib
+name:                htask-core
 version:             0.2.0.0
 
 <<: *legal
@@ -31,7 +31,7 @@ library:
     - uuid
 
 tests:
-  core:
+  htask-core:
     main:                Main.hs
     source-dirs:         test
     ghc-options:
@@ -44,7 +44,7 @@ tests:
       - bytestring
       - containers
       - event-backend-memory
-      - htask-lib
+      - htask-core
       - leadpixel-events
       - leadpixel-provider
       - mtl

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f69241b169c3f0a326e88522fd868806085875a69a5aa6e4e1dadfdbc2b3fc53
+-- hash: 3ff98fcf3987165672aee75c6f3db05faacdf510e5a107b03d2e926b90f393a0
 
 name:           event-backend-memory
 version:        0.1.0.0
@@ -38,7 +38,7 @@ library
     , transformers
   default-language: Haskell2010
 
-test-suite backend-memory-test
+test-suite event-backend-memory
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:

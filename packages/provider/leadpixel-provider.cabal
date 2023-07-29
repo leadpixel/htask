@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 531a410b3ac9f08b24e15d9ae7fef99a77429c10651de425387085d1d59d5c42
+-- hash: 93494b7858420aac1696828629ccc3c96fb52ec58aa12eb0fd1b4acc92f04024
 
 name:           leadpixel-provider
 version:        1.0.0.0
@@ -27,7 +27,7 @@ library
     , transformers
   default-language: Haskell2010
 
-test-suite provider-tests
+test-suite provider
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
