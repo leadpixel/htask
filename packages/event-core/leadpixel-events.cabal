@@ -1,0 +1,31 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 0692f7d3267459a8a8bacdff27c07c1c06dbc0efe677e2934e288fc680b53150
+
+name:           leadpixel-events
+version:        0.2.0.0
+author:         Jack Palfrey
+maintainer:     jack.palf@gmail.com
+copyright:      2020 LeadPixel
+license:        BSD3
+build-type:     Simple
+
+library
+  exposed-modules:
+      Events
+  other-modules:
+      Events.Backends
+      Events.Event
+      Paths_leadpixel_events
+  hs-source-dirs:
+      lib
+  ghc-options: -Wall
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , time
+  default-language: Haskell2010

@@ -11,6 +11,7 @@ import qualified Data.UUID                   as UUID
 import qualified HTask.Core.API              as API
 import qualified HTask.Core.Task             as H
 
+import           Control.Monad.IO.Class    (MonadIO)
 import           Data.Function
 import           Data.List
 import           Data.Tagged
@@ -29,7 +30,7 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-runSummary :: (HasEventBackend m) => m RunResult
+runSummary :: (MonadIO m, HasEventBackend m) => m RunResult
 runSummary
   = renderSummary <$> runTask API.listTasks
 

@@ -5,6 +5,7 @@ module APITests.Complete
   ) where
 
 import qualified Data.UUID                 as UUID
+import qualified Data.UUID.V4              as UUID
 import qualified HTask.Core.API            as API
 import qualified HTask.Core.Task           as H
 
@@ -14,8 +15,8 @@ import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
 import           Leadpixel.Provider
 import           Test.QuickCheck.Instances ()
-import           Test.Tasty                (TestTree, testGroup)
-import           Test.Tasty.HUnit          (assertEqual, testCase)
+import           Test.Tasty
+import           Test.Tasty.HUnit
 
 
 fakeTime :: UTCTime
@@ -40,9 +41,9 @@ testComplete = testGroup "complete"
 
 returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
-  uuid <- provide
+  uuid <- UUID.nextRandom
   x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.completeTask (UUID.toText uuid))
-  assertEqual "" (f uuid) x
+  f uuid @=? x
     where
       f uuid = API.ModifySuccess
         ( H.Task
@@ -56,6 +57,6 @@ returnsCreatedUuid = testCase "returns the created uuid on success" $ do
 
 failsWhenUnableToFindMatch :: TestTree
 failsWhenUnableToFindMatch = testCase "fails when unable to find a matching task" $ do
-  uuid <- provide
+  uuid <- UUID.nextRandom
   x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.completeTask "unknown")
   assertEqual "expecting failed to find" API.FailedToFind x

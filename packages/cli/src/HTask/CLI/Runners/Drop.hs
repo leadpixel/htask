@@ -31,7 +31,7 @@ runDrop
 
   where
     dropTask
-      = (filter inProgress <$> API.listTasks) >>= mapM (API.stopTask . taskRefText)
+      = API.listTasks >>= mapM (API.stopTask . taskRefText) . filter inProgress
 
     formatOutcome
       = resultSuccess . fmap formatRow

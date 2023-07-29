@@ -1,0 +1,38 @@
+name:                event-backend-memory
+version:             0.1.0.0
+github:              "leadpixel/events"
+license:             BSD3
+author:              "Jack Palfrey"
+maintainer:          "jack.palf@gmail.com"
+copyright:           "2019 Jack Palfrey"
+
+description:         Please see the README on Github at <https://github.com/leadpixel/events#readme>
+
+ghc-options: -Wall
+
+dependencies:
+  - base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+  exposed-modules: Event.Backend.Memory
+  dependencies:
+    - aeson
+    - bytestring
+    - containers
+    - leadpixel-events
+    - transformers
+
+tests:
+  backend-memory-test:
+    main:                Main.hs
+    source-dirs:         test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - event-backend-memory
+      - tasty
+      - tasty-hunit
+      - time

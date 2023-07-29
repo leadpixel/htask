@@ -1,0 +1,18 @@
+_common/legal: !include "../legal.yaml"
+
+name:                leadpixel-events
+version:             0.2.0.0
+
+<<: *legal
+
+ghc-options: -Wall
+
+dependencies:
+  - base >= 4.7 && < 5
+
+library:
+  source-dirs: lib
+  exposed-modules: Events
+  dependencies:
+    - aeson
+    - time

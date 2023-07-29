@@ -1,0 +1,47 @@
+_common/legal: !include "../legal.yaml"
+
+name:                event-backend-file
+version:             0.1.0.0
+
+<<: *legal
+
+ghc-options: -Wall
+
+dependencies:
+  - base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+  exposed-modules: Event.Backend.File
+  dependencies:
+    - aeson
+    - bytestring
+    - conduit
+    - unliftio-core
+    - leadpixel-events
+    - mono-traversable
+    - mtl
+    - transformers
+
+tests:
+  backend-file-test:
+    main:                Main.hs
+    source-dirs:         test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - aeson
+      - bytestring
+      - conduit
+      - directory
+      - event-backend-file
+      - leadpixel-events
+      - mono-traversable
+      - mtl
+      - tasty
+      - tasty-hunit
+      - time
+      - transformers
+      - unliftio-core

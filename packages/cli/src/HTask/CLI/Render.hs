@@ -15,7 +15,9 @@ renderResult = mapM_ (putStrLn . Text.unpack) . renderToConsole
 
 renderToConsole :: RunResult -> [Text]
 renderToConsole r
-  = if success r then formatSuccess (text r) else formatError (text r)
+  = ( if success r
+       then formatSuccess
+       else formatError ) (text r)
 
 
 formatError :: [Text] -> [Text]

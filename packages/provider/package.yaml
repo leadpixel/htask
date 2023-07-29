@@ -1,0 +1,34 @@
+_common/legal: !include "../legal.yaml"
+
+name:                leadpixel-provider
+version:             1.0.0.0
+
+<<: *legal
+
+ghc-options: -Wall
+
+dependencies:
+  - base >= 4.7 && < 5
+
+library:
+  source-dirs: lib
+  dependencies:
+    - transformers
+
+tests:
+  provider-tests:
+    main: Main.hs
+    source-dirs: test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - leadpixel-provider
+      - mtl
+      - random
+      - tasty
+      - tasty-hunit
+      - time
+      - transformers
+      - uuid

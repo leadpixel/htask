@@ -17,14 +17,17 @@ module HTask.Core.API
   ) where
 
 import qualified Data.Text                as Text
+import qualified Data.Time                as Time
 import qualified Events                   as V
 import qualified HTask.Core.Task          as H
 import qualified HTask.Core.TaskContainer as HC
 import qualified HTask.Core.TaskEvent     as TV
 
+import           Control.Monad.IO.Class   (MonadIO, liftIO)
 import           Data.Functor             (($>))
 import           Data.List
 import           Data.Text                (Text)
+import           Data.Time                (UTCTime)
 
 
 data AddResult
@@ -40,12 +43,16 @@ data ModifyResult
   deriving (Show, Eq)
 
 
-type CanAddTask m = (Monad m, V.HasEventSink m, V.CanCreateEvent m, HC.HasTasks m, H.CanCreateTask m)
-type CanModifyTask m = (Monad m, V.HasEventSink m, V.CanCreateEvent m, HC.HasTasks m)
+type CanAddTask m = (Monad m, V.HasEventSink m, HC.HasTasks m, H.CanCreateTask m)
+type CanModifyTask m = (Monad m, V.HasEventSink m, HC.HasTasks m)
+
+
+readTime :: (MonadIO m) => m UTCTime
+readTime = liftIO Time.getCurrentTime
 
 
 addTask
-  :: (CanAddTask m)
+  :: (CanAddTask m, MonadIO m)
   => Text -> m AddResult
 addTask tx = do
   tk <- H.createTask tx
@@ -53,13 +60,13 @@ addTask tx = do
 
   if p
     then
-      (V.createEvent (TV.TaskEventDetail (H.taskRef tk) (TV.AddTask tx)) >>= V.writeEvent) $> AddSuccess (H.taskRef tk)
+      (V.createEvent readTime (TV.TaskEventDetail (H.taskRef tk) (TV.AddTask tx)) >>= V.writeEvent) $> AddSuccess (H.taskRef tk)
 
     else
       pure FailedToAdd
 
 
-findTask :: (Monad m, HC.HasTasks m) => Text -> m (Maybe H.Task)
+findTask :: (MonadIO m, HC.HasTasks m) => Text -> m (Maybe H.Task)
 findTask tx
   = find (uuidStartsWith tx)
   <$> listTasks
@@ -70,13 +77,13 @@ findTask tx
       = Text.isPrefixOf t . H.taskRefText . H.taskRef
 
 
-withMatch :: (Monad m, HC.HasTasks m) => Text -> (H.Task -> m ModifyResult) -> m ModifyResult
+withMatch :: (MonadIO m, HC.HasTasks m) => Text -> (H.Task -> m ModifyResult) -> m ModifyResult
 withMatch tx op
   = findTask tx >>= maybe (pure FailedToFind) op
 
 
 startTask
-  :: (CanModifyTask m)
+  :: (CanModifyTask m, MonadIO m)
   => Text -> m ModifyResult
 startTask tx =
   withMatch tx $ \tsk -> do
@@ -84,16 +91,17 @@ startTask tx =
     p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
 
     case p of
-      Just t -> do
-        V.createEvent (TV.TaskEventDetail ref (TV.StartTask ref)) >>= V.writeEvent
-        pure $ ModifySuccess t
-
       Nothing ->
         pure FailedToModify
 
+      Just t -> do
+        x <- V.createEvent readTime (TV.TaskEventDetail ref (TV.StartTask ref))
+        V.writeEvent x
+        pure $ ModifySuccess t
+
 
 stopTask
-  :: (CanModifyTask m)
+  :: (CanModifyTask m, MonadIO m)
   => Text -> m ModifyResult
 stopTask tx =
   withMatch tx $ \tsk -> do
@@ -101,16 +109,16 @@ stopTask tx =
     p <- HC.updateExistingTask ref $ H.setTaskStatus H.Pending
 
     case p of
-      Just t -> do
-        V.createEvent (TV.TaskEventDetail ref (TV.StopTask ref)) >>= V.writeEvent
-        pure $ ModifySuccess t
-
       Nothing ->
         pure FailedToModify
 
+      Just t -> do
+        V.createEvent readTime (TV.TaskEventDetail ref (TV.StopTask ref)) >>= V.writeEvent
+        pure $ ModifySuccess t
+
 
 completeTask
-  :: (CanModifyTask m)
+  :: (CanModifyTask m, MonadIO m)
   => Text -> m ModifyResult
 completeTask tx =
   withMatch tx $ \tsk -> do
@@ -118,16 +126,16 @@ completeTask tx =
     p <- HC.updateExistingTask ref $ H.setTaskStatus H.Complete
 
     case p of
-      Just t -> do
-        V.createEvent (TV.TaskEventDetail ref (TV.CompleteTask ref)) >>= V.writeEvent
-        pure $ ModifySuccess t
-
       Nothing ->
         pure FailedToModify
 
+      Just t -> do
+        V.createEvent readTime (TV.TaskEventDetail ref (TV.CompleteTask ref)) >>= V.writeEvent
+        pure $ ModifySuccess t
+
 
 removeTask
-  :: (CanModifyTask m)
+  :: (CanModifyTask m, MonadIO m)
   => Text -> m ModifyResult
 removeTask tx =
   withMatch tx $ \tsk -> do
@@ -136,7 +144,7 @@ removeTask tx =
 
     if p
       then do
-        V.createEvent (TV.TaskEventDetail ref (TV.RemoveTask ref)) >>= V.writeEvent
+        V.createEvent readTime (TV.TaskEventDetail ref (TV.RemoveTask ref)) >>= V.writeEvent
         pure $ ModifySuccess tsk
 
       else
@@ -145,4 +153,3 @@ removeTask tx =
 
 listTasks :: (HC.HasTasks m) => m HC.Tasks
 listTasks = HC.getTasks
-

@@ -1,25 +1,18 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f45ed0b9021a65910df4bd40c8be4c399fb7c09f8e1e683668fd622b0eda5235
+-- hash: e8a9c12a25c9e282f44a292ace7b48571c267053ad08d9ff71217fec3fedab9b
 
 name:           htask-cli
 version:        0.2.0.0
-description:    Please see the README on Github at <https://github.com/palf/htask#readme>
-homepage:       https://github.com/palf/htask#readme
-bug-reports:    https://github.com/palf/htask/issues
 author:         Jack Palfrey
 maintainer:     jack.palf@gmail.com
-copyright:      2018 Jack Palfrey
+copyright:      2020 LeadPixel
 license:        BSD3
 build-type:     Simple
-
-source-repository head
-  type: git
-  location: https://github.com/palf/htask
 
 executable htask
   main-is: Main.hs
@@ -55,7 +48,7 @@ executable htask
       Paths_htask_cli
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wall -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       MonadRandom
     , base >=4.7 && <5
@@ -63,10 +56,13 @@ executable htask
     , htask-lib
     , leadpixel-events
     , leadpixel-provider
+    , monads-tf
     , mtl
     , optparse-applicative
     , tagged
     , text
+    , time
+    , transformers
     , unliftio-core
     , uuid
   default-language: Haskell2010

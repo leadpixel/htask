@@ -8,13 +8,14 @@ module HTask.CLI.Runners.Stop
 import qualified HTask.Core.API            as API
 import qualified HTask.Core.Task           as H
 
+import           Control.Monad.IO.Class    (MonadIO)
 import           HTask.CLI.Output.Document
 import           HTask.CLI.TaskApplication
 
 import           Data.Text                 (Text)
 
 
-runStop :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
+runStop :: (MonadIO m, HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runStop t
   = formatOutcome <$> runTask (API.stopTask t)
 

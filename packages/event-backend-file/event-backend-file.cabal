@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b6c453a68aa9d461a41196ebe3609a606e9fc876e1e3a435b725956df955bf07
+-- hash: f37a62fe2df7745ea19f44141828495ab06853b231a043a58212ad2986ce2ce6
 
-name:           htask-lib
-version:        0.2.0.0
+name:           event-backend-file
+version:        0.1.0.0
 author:         Jack Palfrey
 maintainer:     jack.palf@gmail.com
 copyright:      2020 LeadPixel
@@ -16,62 +16,45 @@ build-type:     Simple
 
 library
   exposed-modules:
-      HTask.Core.API
-      HTask.Core.Task
-      HTask.Core.TaskContainer
-      HTask.Core.TaskEvent
-      HTask.Core.Replay
+      Event.Backend.File
   other-modules:
-      Paths_htask_lib
+      Paths_event_backend_file
   hs-source-dirs:
-      lib
+      src
   ghc-options: -Wall
   build-depends:
       aeson
     , base >=4.7 && <5
-    , conduit-combinators
+    , bytestring
+    , conduit
     , leadpixel-events
-    , leadpixel-provider
+    , mono-traversable
     , mtl
-    , tagged
-    , text
-    , time
     , transformers
-    , uuid
+    , unliftio-core
   default-language: Haskell2010
 
-test-suite htask-test
+test-suite backend-file-test
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
-      APITestMonad
-      APITests.Add
-      APITests.Complete
-      APITests.List
-      APITests.Remove
-      APITests.Start
-      APITests.Stop
-      Paths_htask_lib
+      Paths_event_backend_file
   hs-source-dirs:
       test
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      QuickCheck
-    , aeson
+      aeson
     , base >=4.7 && <5
     , bytestring
-    , containers
-    , event-backend-memory
-    , htask-lib
+    , conduit
+    , directory
+    , event-backend-file
     , leadpixel-events
-    , leadpixel-provider
+    , mono-traversable
     , mtl
-    , quickcheck-instances
-    , tagged
     , tasty
     , tasty-hunit
-    , tasty-quickcheck
     , time
     , transformers
-    , uuid
+    , unliftio-core
   default-language: Haskell2010

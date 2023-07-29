@@ -1,0 +1,55 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 604d7471246093665f6d0ac504933cee17c7d49ee233207973b980426689b304
+
+name:           event-backend-memory
+version:        0.1.0.0
+description:    Please see the README on Github at <https://github.com/leadpixel/events#readme>
+homepage:       https://github.com/leadpixel/events#readme
+bug-reports:    https://github.com/leadpixel/events/issues
+author:         Jack Palfrey
+maintainer:     jack.palf@gmail.com
+copyright:      2019 Jack Palfrey
+license:        BSD3
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/leadpixel/events
+
+library
+  exposed-modules:
+      Event.Backend.Memory
+  other-modules:
+      Paths_event_backend_memory
+  hs-source-dirs:
+      src
+  ghc-options: -Wall
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , leadpixel-events
+    , transformers
+  default-language: Haskell2010
+
+test-suite backend-memory-test
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      Paths_event_backend_memory
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , event-backend-memory
+    , tasty
+    , tasty-hunit
+    , time
+  default-language: Haskell2010

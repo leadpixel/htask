@@ -30,7 +30,7 @@ runDone
 
   where
     doneTask
-      = (filter inProgress <$> API.listTasks) >>= mapM (API.completeTask . taskRefText)
+      = API.listTasks >>= mapM (API.completeTask . taskRefText) . filter inProgress
 
     formatOutcome
       = resultSuccess . fmap formatRow

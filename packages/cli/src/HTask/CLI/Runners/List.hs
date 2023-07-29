@@ -12,6 +12,7 @@ import qualified Events                      as V
 import qualified HTask.Core.API              as API
 import qualified HTask.Core.Task             as H
 
+import           Control.Monad.IO.Class    (MonadIO)
 import           Data.Function
 import           Data.List
 import           Data.Tagged
@@ -56,7 +57,7 @@ statusDisplayOrder  H.Abandoned   H.InProgress =  GT
 statusDisplayOrder  H.Abandoned   H.Pending    =  GT
 
 
-runList :: (Monad m, V.HasEventSource m) => Bool -> Bool -> m RunResult
+runList :: (MonadIO m, V.HasEventSource m) => Bool -> Bool -> m RunResult
 runList showUUID showAll
   = resultSuccess . fmap formatOutput . selectTasks
   <$> runTask API.listTasks

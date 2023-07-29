@@ -6,11 +6,12 @@ module HTask.Core.TaskContainer
   , emptyTasks
   ) where
 
-import qualified Control.Monad.State as S
+import qualified Control.Monad.Trans.State as State
 import           HTask.Core.Task
 
-import           Data.List           (find)
-import           Data.Maybe          (isNothing)
+import           Control.Monad.Trans.State (StateT)
+import           Data.List                 (find)
+import           Data.Maybe                (isNothing)
 
 
 type Tasks = [Task]
@@ -23,15 +24,15 @@ class HasTasks m where
   removeTaskRef :: TaskRef -> m Bool
 
 
-instance (Monad m) => HasTasks (S.StateT Tasks m) where
-  getTasks = S.get
+instance (Monad m) => HasTasks (StateT Tasks m) where
+  getTasks = State.get
 
   addNewTask t = do
     ts <- getTasks
     let p = findTask ts (taskRef t)
     if isNothing p
        then do
-         S.put (t : ts)
+         State.put (t : ts)
          pure True
        else pure False
 
@@ -41,7 +42,7 @@ instance (Monad m) => HasTasks (S.StateT Tasks m) where
       (pure Nothing)
       (\t -> do
         let t' = op t
-        S.put (t' : removeTaskByRef ref ts)
+        State.put (t' : removeTaskByRef ref ts)
         pure $ Just t')
       (findTask ts ref)
 
@@ -50,7 +51,7 @@ instance (Monad m) => HasTasks (S.StateT Tasks m) where
     maybe
       (pure False)
       (\_t -> do
-        S.put (removeTaskByRef ref ts)
+        State.put (removeTaskByRef ref ts)
         pure True)
       (findTask ts ref)
 

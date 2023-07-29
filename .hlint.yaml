@@ -1,36 +1,19 @@
-# HLint configuration file
-# https://github.com/ndmitchell/hlint
-##########################
-
-# This file contains a template configuration file, which is typically
-# placed as .hlint.yaml in the root of your project
-
-
-# Specify additional command line arguments
-
-# - arguments: [--color, --cpp-simple, -XQuasiQuotes]
-
-
-# Control which extensions/flags/modules/functions can be used
-
-# - extensions:
-#   - default: true #  all extension are banned by default
-#   - name: [OverloadedStrings, ViewPatterns] #  only these listed extensions can be used
-#   - {name: CPP, within: CrossPlatform}#  CPP can only be used in a given module
-
-# - flags:
-#   - {name: -w, within: []}#  -w is allowed nowhere
+- ignore: {name: "Avoid restricted function"} # 17 hints
 
 - modules:
-  - {name: [Conduit], as: C}
+  - {name: [Conduit], as: Conduit}
   - {name: [Control.Concurrent.STM], as: STM}
   - {name: [Control.Concurrent], as: Conc}
   - {name: [Control.Exception], as: Ex}
   - {name: [Control.Monad.Free], as: Free}
-  - {name: [Control.Monad.Reader], as: R}
-  - {name: [Control.Monad.State], as: S}
-  - {name: [Control.Monad.Trans], as: T}
-  - {name: [Control.Monad.Writer], as: W}
+  - {name: [Control.Monad.Reader], as: Reader}
+  - {name: [Control.Monad.State], as: State}
+  - {name: [Control.Monad.Trans.Reader], as: Reader}
+  - {name: [Control.Monad.Trans.Writer], as: Writer}
+  - {name: [Control.Monad.Trans.Except], as: Except}
+  - {name: [Control.Monad.Trans.State], as: State}
+  - {name: [Control.Monad.Trans], as: Trans}
+  - {name: [Control.Monad.Writer], as: Writer}
   - {name: [Data.Aeson], as: Aeson}
   - {name: [Data.ByteString.Lazy], as: Lazy}
   - {name: [Data.ByteString], as: Strict}
@@ -38,7 +21,7 @@
   - {name: [Data.Yaml], as: Yaml}
   - {name: [Network.Wreq], as: Wreq}
   - {name: [System.IO], as: Sys}
-#   - {name: [Data.Set, Data.HashSet], as: Set}#  if you import Data.Set qualified, it must be as 'Set'
+  - {name: [Test.QuickCheck], as: QC}
 #   - {name: Control.Arrow, within: []}#  Certain modules are banned entirely
 
 - functions:
@@ -54,20 +37,22 @@
   - {name: putStrLn, within: [Main]}
 
 
-# Add custom hints for this project
 
-# Will suggest replacing "wibbleMany [myvar]" with "wibbleOne myvar"
-# - error: {lhs: "wibbleMany [x]", rhs: wibbleOne x}
-# - error: {name: "reorder case", lhs: "case a of ; Just v -> x ; Nothing -> y", rhs: "case a of ; Nothing -> y ; Just v -> x "}
-# - error: {name: "reorder case", lhs: "case a of ; Right v -> y ; Left e -> x ", rhs: "case a of ; Left e -> x ; Right v -> y"}
-- error: {name: "move pure", lhs: "case a of ; Nothing -> pure y ; Just v -> pure x", rhs: "pure $ case a of ; Just v -> x ; Nothing -> y"}
-- error: {name: "move pure", lhs: "case a of ; Left e -> pure x ; Right v -> pure y", rhs: "pure $ case a of ; Left e -> x ; Right v -> y"}
+- warn: {name: "reorder case", lhs: "case a of ; Just v -> x ; Nothing -> y", rhs: "case a of ; Nothing -> y ; Just v -> x "}
+- warn: {name: "reorder case", lhs: "case a of ; Right v -> y ; Left e -> x ", rhs: "case a of ; Left e -> x ; Right v -> y"}
+- warn: {name: "move pure", lhs: "case a of ; Nothing -> pure y ; Just v -> pure x", rhs: "pure $ case a of ; Just v -> x ; Nothing -> y"}
+- warn: {name: "move pure", lhs: "case a of ; Left e -> pure x ; Right v -> pure y", rhs: "pure $ case a of ; Left e -> x ; Right v -> y"}
+- warn: {name: "move pure", lhs: "maybe (pure f) (pure . g) x", rhs: "pure $ maybe f g x"}
+- warn: {name: "assert blank", lhs: "assertEqual \"\" x y", rhs: "x @=? y"}
+- warn: {name: "assert bool", lhs: "assertBool s x", rhs: "x @? s"}
+- warn: {name: "remove brackets", lhs: "(f . g) . h", rhs: "f . g . h"}
+- warn: {name: "prefer ($>) over (>> pure)", lhs: "f >> pure g", rhs: "f $> g"}
+- warn: {name: "prefer maybe to case", lhs: "case x of ; Nothing -> f ; Just v -> g v", rhs: "maybe f g x"}
+- warn: {name: "prefer either to case", lhs: "case x of ; Left e -> f e ; Right v -> g v", rhs: "either f g x"}
+- warn: {name: "prefer fmap", lhs: "f <&> g", rhs: "g <$> f"}
 
 
-# Turn on hints that are off by default
-
-# Ban "module X(module X) where", to require a real export list
-# - warn: {name: Use explicit module export list}
+- warn: {name: Use explicit module export list}
 
 # Replace a $ b $ c with a . b $ c
 # - group: {name: dollar, enabled: true}
@@ -76,15 +61,7 @@
 - group: {name: generalise, enabled: true}
 
 
-# Ignore some builtin hints
 # - ignore: {name: Use let}
 # - ignore: {name: Use const, within: SpecialModule}#  Only within certain modules
 - ignore: {name: Reduce duplication}
-
-
-# Define some custom infix operators
-# - fixity: infixr 3 ~^#^~
-
-
-# To generate a suitable file for HLint do:
-# $ hlint --default > .hlint.yaml
+- ignore: {name: Use lambda-case}

@@ -3,62 +3,11 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages:
-- completed:
-    subdir: packages/core
-    name: leadpixel-events
-    version: 0.2.0.0
-    git: git@gitea.leadpixel.org:leadpixel/event-source
-    pantry-tree:
-      size: 293
-      sha256: b33494454c3e7b85d5a5cfc6d5694e3272be47e507a0e7c34aa2b18c057f6c38
-    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
-  original:
-    subdir: packages/core
-    git: git@gitea.leadpixel.org:leadpixel/event-source
-    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
-- completed:
-    subdir: packages/backends/file
-    name: event-backend-file
-    version: 0.1.0.0
-    git: git@gitea.leadpixel.org:leadpixel/event-source
-    pantry-tree:
-      size: 240
-      sha256: 956cb2a24d395e26821ec8d466b609ba1c317821c7f9bfe20295fb7f7cae79d4
-    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
-  original:
-    subdir: packages/backends/file
-    git: git@gitea.leadpixel.org:leadpixel/event-source
-    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
-- completed:
-    subdir: packages/backends/memory
-    name: event-backend-memory
-    version: 0.1.0.0
-    git: git@gitea.leadpixel.org:leadpixel/event-source
-    pantry-tree:
-      size: 244
-      sha256: dab39e97f713cda81a4d21e6eb80097328f01cc90e1940c4db69981a29494431
-    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
-  original:
-    subdir: packages/backends/memory
-    git: git@gitea.leadpixel.org:leadpixel/event-source
-    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
-- completed:
-    subdir: packages/provider
-    name: leadpixel-provider
-    version: 1.0.0.0
-    git: git@gitea.leadpixel.org:leadpixel/provider
-    pantry-tree:
-      size: 516
-      sha256: d9447c58971145e469ebb7c5b7d8af296e1a7633b06e0035ea55d0dbd409cac9
-    commit: e880c45883d0a39ffc536b8781dd01632a5bdef4
-  original:
-    subdir: packages/provider
-    git: git@gitea.leadpixel.org:leadpixel/provider
-    commit: e880c45883d0a39ffc536b8781dd01632a5bdef4
+packages: []
 snapshots:
 - completed:
-    size: 532379
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/8.yaml
-    sha256: 2ad3210d2ad35f3176005d68369a18e4d984517bfaa2caade76f28ed0b2e0521
-  original: lts-16.8
+    sha256: b37c0abab16c7de352c45b85f8ecc8530b084209a2c42987a96c92b4a5e3cd65
+    size: 648924
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/20/13.yaml
+  original:
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/20/13.yaml

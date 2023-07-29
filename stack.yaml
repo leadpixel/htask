@@ -1,18 +1,12 @@
-resolver: lts-16.8
+resolver:
+  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/20/13.yaml
 
 packages:
   - ./packages/core
   - ./packages/cli
 
-extra-deps:
-  - git: git@gitea.leadpixel.org:leadpixel/event-source
-    commit: e2ae0a7118575bb80e7dc8c128819ce1ab696dc9
-    subdirs:
-      - packages/core
-      - packages/backends/file
-      - packages/backends/memory
+  - ./packages/provider
 
-  - git: git@gitea.leadpixel.org:leadpixel/provider
-    commit: e880c45883d0a39ffc536b8781dd01632a5bdef4
-    subdirs:
-      - packages/provider
+  - ./packages/event-core
+  - ./packages/event-backend-file
+  - ./packages/event-backend-memory

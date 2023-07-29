@@ -7,16 +7,16 @@ module HTask.CLI.Runners.Pick
   ) where
 
 
-import           Control.Monad.Random.Class
 import qualified Data.UUID                  as UUID
 import qualified HTask.Core.API             as API
 import qualified HTask.Core.Task            as H
 
-import           HTask.CLI.Output.Document
-import           HTask.CLI.TaskApplication
-
+import           Control.Monad.Random.Class
 import           Data.Tagged                (untag)
 import           Data.Text                  (Text)
+
+import           HTask.CLI.Output.Document
+import           HTask.CLI.TaskApplication
 
 
 hasStatus :: H.TaskStatus -> H.Task -> Bool

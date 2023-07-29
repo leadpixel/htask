@@ -1,0 +1,112 @@
+cradle:
+  stack:
+    - path: "./packages/cli/src/Main.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions/Add.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions/Complete.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions/Done.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions/Drop.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions/List.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions/Pick.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions/Remove.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions/Start.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions/Stop.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Actions/Summary.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Config.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Options.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Output/Document.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Output/Formatters.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Render.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners/Add.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners/Complete.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners/Done.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners/Drop.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners/List.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners/Pick.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners/Remove.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners/Start.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners/Stop.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/Runners/Summary.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/HTask/CLI/TaskApplication.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/cli/src/Paths_htask_cli.hs"
+      component: "htask-cli:exe:htask"
+
+    - path: "./packages/core/lib"
+      component: "htask-lib:lib"
+
+    - path: "./packages/core/test"
+      component: "htask-lib:test:htask-test"
+
+    - path: "./packages/event-backend-file/src"
+      component: "event-backend-file:lib"
+
+    - path: "./packages/event-backend-file/test"
+      component: "event-backend-file:test:backend-file-test"
+
+    - path: "./packages/event-core/lib"
+      component: "leadpixel-events:lib"
+
+    - path: "./packages/provider/lib"
+      component: "leadpixel-provider:lib"
+
+    - path: "./packages/provider/test"
+      component: "leadpixel-provider:test:provider-tests"

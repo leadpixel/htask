@@ -1,25 +1,14 @@
+_common/legal: !include "../legal.yaml"
+
 name:                htask-lib
 version:             0.2.0.0
-github:              "palf/htask"
-license:             BSD3
-author:              "Jack Palfrey"
-maintainer:          "jack.palf@gmail.com"
-copyright:           "2018 Jack Palfrey"
 
-description:         Please see the README on Github at <https://github.com/palf/htask#readme>
+<<: *legal
 
 ghc-options: -Wall
 
 dependencies:
   - base >= 4.7 && < 5
-  - aeson
-  - mtl
-  - tagged
-  - time
-  - transformers
-  - leadpixel-events
-  - leadpixel-provider
-  - uuid
 
 library:
   source-dirs: lib
@@ -30,25 +19,40 @@ library:
     - HTask.Core.TaskEvent
     - HTask.Core.Replay
   dependencies:
-  - conduit-combinators
-  - text
+    - aeson
+    - conduit-combinators
+    - leadpixel-events
+    - leadpixel-provider
+    - mtl
+    - tagged
+    - text
+    - time
+    - transformers
+    - uuid
 
 tests:
   htask-test:
     main:                Main.hs
     source-dirs:         test
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - htask-lib
-    - bytestring
-    - tasty
-    - tasty-hunit
-    - tasty-quickcheck
-    - QuickCheck
-    - quickcheck-instances
-    - event-backend-memory
-    - time
-    - containers
+      - QuickCheck
+      - aeson
+      - bytestring
+      - containers
+      - event-backend-memory
+      - htask-lib
+      - leadpixel-events
+      - leadpixel-provider
+      - mtl
+      - quickcheck-instances
+      - tagged
+      - tasty
+      - tasty-hunit
+      - tasty-quickcheck
+      - time
+      - transformers
+      - uuid
