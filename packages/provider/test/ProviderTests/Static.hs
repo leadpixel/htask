@@ -14,10 +14,7 @@ import           Test.Tasty.HUnit
 
 newtype TestApp a
   = TestApp { unApp :: ReaderT Int IO a }
-  deriving (Applicative, Functor, Monad)
-
-instance Provider Int TestApp where
-  provide = TestApp ask
+  deriving (Applicative, Functor, Monad, Provider Int)
 
 
 runTest :: TestApp a -> Int -> IO a

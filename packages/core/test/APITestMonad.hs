@@ -22,6 +22,7 @@ import qualified Events                     as V
 import qualified HTask.Core.TaskContainer   as HC
 import qualified HTask.Core.TaskEvent       as TV
 
+import           Control.Monad.IO.Class     (MonadIO)
 import           Control.Monad.Trans.Class  (MonadTrans, lift)
 import           Control.Monad.Trans.Reader (ReaderT, runReaderT)
 import           Control.Monad.Trans.State  (StateT, runStateT)
@@ -36,16 +37,10 @@ import           Data.Maybe
 
 newtype TaskAppT m a = TaskApp
   { unTaskApp :: StateT HC.Tasks m a
-  } deriving (Functor, Applicative, Monad, MonadTrans)
+  } deriving (Functor, Applicative, Monad, MonadTrans, HC.HasTasks, MonadIO)
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskAppT m) where
   writeEvent = lift . V.writeEvent
-
-instance (Monad m) => HC.HasTasks (TaskAppT m) where
-  getTasks = TaskApp HC.getTasks
-  addNewTask = TaskApp . HC.addNewTask
-  updateExistingTask ref = TaskApp . HC.updateExistingTask ref
-  removeTaskRef = TaskApp . HC.removeTaskRef
 
 instance (Monad m, Provider k m) => Provider k (TaskAppT m) where
   provide = lift provide
@@ -53,9 +48,10 @@ instance (Monad m, Provider k m) => Provider k (TaskAppT m) where
 
 type Args = (UUID, UTCTime)
 
+-- TODO: what is the point of this?
 newtype DataProviderT m a = DataProvider
   { unDataProvider :: ReaderT Args m a
-  } deriving (Functor, Applicative, Monad, MonadTrans)
+  } deriving (Functor, Applicative, Monad, MonadTrans, MonadIO)
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (DataProviderT m) where
   writeEvent = lift . V.writeEvent
@@ -69,16 +65,7 @@ instance (Monad m) => Provider UTCTime (DataProviderT m) where
 
 newtype WriteFailureT m a = WriteFailure
   { unWriteFail :: StateT HC.Tasks m a
-  } deriving (Functor, Applicative, Monad, MonadTrans)
-
-instance (Monad m) => HC.HasTasks (WriteFailureT m) where
-  getTasks = WriteFailure HC.getTasks
-  addNewTask = WriteFailure . HC.addNewTask
-  updateExistingTask ref = WriteFailure . HC.updateExistingTask ref
-  removeTaskRef = WriteFailure . HC.removeTaskRef
-
--- instance (Monad m) => V.HasEventSink (WriteFailureT m) where
---   writeEvent = fail "called fail"
+  } deriving (Functor, Applicative, Monad, MonadTrans, HC.HasTasks)
 
 
 runStack :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m ((a, HC.Tasks), Seq Lazy.ByteString)

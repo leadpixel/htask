@@ -31,7 +31,7 @@ library:
     - uuid
 
 tests:
-  htask-test:
+  core:
     main:                Main.hs
     source-dirs:         test
     ghc-options:

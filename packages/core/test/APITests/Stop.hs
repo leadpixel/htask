@@ -6,11 +6,13 @@ module APITests.Stop
   ) where
 
 import qualified Data.UUID                 as UUID
+import qualified Data.UUID.V4              as UUID
 import qualified Events                    as V
 import qualified HTask.Core.API            as API
 import qualified HTask.Core.Task           as H
 import qualified HTask.Core.TaskEvent      as TV
 
+import           Control.Monad.IO.Class    (MonadIO)
 import           Data.Tagged               (Tagged (..))
 import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
@@ -36,13 +38,13 @@ testStop = testGroup "stop"
   ]
 
 
-op :: (API.CanAddTask m, API.CanModifyTask m) => UUID -> m API.ModifyResult
+op :: (MonadIO m, API.CanAddTask m, API.CanModifyTask m) => UUID -> m API.ModifyResult
 op uuid = API.addTask "some task" >> API.stopTask (UUID.toText uuid)
 
 
 canStopEvent :: TestTree
 canStopEvent = testCase "reports success when stopping a task" $ do
-  uuid <- provide
+  uuid <- UUID.nextRandom
   x <- runApi (uuid, fakeTime) (op uuid)
   assertEqual "can stop" (f uuid) x
     where
@@ -58,7 +60,7 @@ canStopEvent = testCase "reports success when stopping a task" $ do
 
 canStopEvent' :: TestTree
 canStopEvent' = testCase "marks the task as pending" $ do
-  uuid <- provide
+  uuid <- UUID.nextRandom
   x <- runTasks (uuid, fakeTime) (op uuid)
   assertEqual "can stop"
     [ H.Task
@@ -73,7 +75,7 @@ canStopEvent' = testCase "marks the task as pending" $ do
 
 canStopEvent'' :: TestTree
 canStopEvent'' = testCase "cannot stop a stopped task" $ do
-  uuid <- provide
+  uuid <- UUID.nextRandom
   x <- runEventLog (uuid, fakeTime) (op uuid >> API.stopTask (UUID.toText uuid))
   assertEqual "expecting one 'add-task' intent"
     [ TV.AddTask "some task"
@@ -85,7 +87,7 @@ canStopEvent'' = testCase "cannot stop a stopped task" $ do
 
 -- canStopEvent''' :: TestTree
 -- canStopEvent''' = testCase "cannot stop a stopped task" $ do
---   uuid <- provide
+--   uuid <- UUID.nextRandom
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.stopTask (UUID.toText uuid))
 --   assertEqual "can stop"
 --     [ H.Task
@@ -100,6 +102,6 @@ canStopEvent'' = testCase "cannot stop a stopped task" $ do
 
 cannotStopNonExistentEvent :: TestTree
 cannotStopNonExistentEvent = testCase "fails if there is no matching event" $ do
-  uuid <- provide
+  uuid <- UUID.nextRandom
   x <- runApi (uuid, fakeTime) (API.stopTask (UUID.toText uuid))
   assertEqual "expecting failure" API.FailedToFind x

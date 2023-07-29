@@ -22,7 +22,7 @@ import           Data.Maybe                 (mapMaybe)
 import           Events
 
 
-newtype FileEventBackend m a = F { runF :: ReaderT FilePath m a }
+newtype FileEventBackend m a = Backend { runBackend :: ReaderT FilePath m a }
   deriving (Functor, Applicative, Monad, MonadTrans, MonadIO)
 
 instance (MonadUnliftIO m) => HasEventSource (FileEventBackend m) where
@@ -34,12 +34,12 @@ instance (MonadUnliftIO m) => HasEventSink (FileEventBackend m) where
 
 
 runFileBackend :: FilePath -> FileEventBackend m a -> m a
-runFileBackend = flip (runReaderT . runF)
+runFileBackend = flip (runReaderT . runBackend)
 
 
 conduitReadEvents :: (MonadUnliftIO m, Aeson.FromJSON a) => FileEventBackend m [a]
 conduitReadEvents
-  = F (ReaderT (fmap decodeEvents . loadFileLines Conduit.sinkList))
+  = Backend (ReaderT (fmap decodeEvents . loadFileLines Conduit.sinkList))
 
   where
     loadFileLines :: (Monad m, MonadUnliftIO m) => ConduitT Strict.ByteString Conduit.Void m [Strict.ByteString] -> FilePath -> m [Strict.ByteString]
@@ -50,7 +50,7 @@ conduitReadEvents
 
 conduitWriteEvent :: (MonadUnliftIO m, Aeson.ToJSON a) => Event a -> FileEventBackend m ()
 conduitWriteEvent =
-  F . ReaderT . fileAppend . encodeEvent
+  Backend . ReaderT . fileAppend . encodeEvent
 
   where
     fileAppend :: (Monad m, MonadUnliftIO m) => Strict.ByteString -> FilePath -> m ()
@@ -61,7 +61,7 @@ conduitWriteEvent =
 
 conduitWriteMany :: (MonadUnliftIO m, Aeson.ToJSON a) => [Event a] -> FileEventBackend m ()
 conduitWriteMany =
-  F . ReaderT . fileAppend . fmap encodeEvent
+  Backend . ReaderT . fileAppend . fmap encodeEvent
 
   where
     fileAppend :: (Monad m, MonadUnliftIO m) => [Strict.ByteString] -> FilePath -> m ()

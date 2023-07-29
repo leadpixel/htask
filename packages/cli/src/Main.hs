@@ -27,6 +27,16 @@ import           Events
 import           Leadpixel.Provider
 
 
+newtype WrapIO a = WrapIO { unwrapIO :: IO a }
+  deriving (Functor, Applicative, Monad, MonadIO, MonadUnliftIO, MonadRandom)
+
+instance Provider UTCTime WrapIO where
+  provide = WrapIO Time.getCurrentTime
+
+instance Provider UUID WrapIO where
+  provide = WrapIO UUID.nextRandom
+
+
 newtype App m a = App { unApp :: FileEventBackend m a }
   deriving (Functor, Applicative, Monad, MonadIO, HasEventSource, HasEventSink)
 
@@ -40,19 +50,8 @@ instance (MonadRandom m) => MonadRandom (App m) where
   getRandomRs = App . lift . getRandomRs
 
 
--- TODO: remove orphans
-instance Provider UTCTime WrapIO where
-  provide = WrapIO Time.getCurrentTime
-
-instance Provider UUID WrapIO where
-  provide = WrapIO UUID.nextRandom
-
 runApp :: FilePath -> App m a -> m a
 runApp file app = runFileBackend file (unApp app)
-
-
-newtype WrapIO a = WrapIO { unwrapIO :: IO a }
-  deriving (Functor, Applicative, Monad, MonadIO, MonadUnliftIO, MonadRandom)
 
 
 main :: IO ()

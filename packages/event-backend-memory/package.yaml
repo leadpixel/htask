@@ -32,7 +32,11 @@ tests:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
+      - bytestring
+      - containers
       - event-backend-memory
+      - leadpixel-events
       - tasty
       - tasty-hunit
       - time
+

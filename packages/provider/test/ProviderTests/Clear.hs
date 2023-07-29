@@ -26,7 +26,7 @@ instance Provider Int TestApp where
   provide = TestApp updateValue
 
 instance Provider UUID TestApp where
-  provide = TestApp $ liftIO UUID.nextRandom
+  provide = liftIO UUID.nextRandom
 
 
 updateValue :: (MonadIO m, MonadState (Maybe Int) m) => m Int

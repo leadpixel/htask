@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 604d7471246093665f6d0ac504933cee17c7d49ee233207973b980426689b304
+-- hash: f69241b169c3f0a326e88522fd868806085875a69a5aa6e4e1dadfdbc2b3fc53
 
 name:           event-backend-memory
 version:        0.1.0.0
@@ -48,7 +48,10 @@ test-suite backend-memory-test
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
+    , containers
     , event-backend-memory
+    , leadpixel-events
     , tasty
     , tasty-hunit
     , time

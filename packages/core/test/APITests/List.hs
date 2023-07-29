@@ -4,6 +4,7 @@ module APITests.List
   ( testList
   ) where
 
+import qualified Data.UUID.V4              as UUID
 import qualified HTask.Core.API            as API
 
 import           Data.Time                 (Day (ModifiedJulianDay),
@@ -40,27 +41,27 @@ testList = testGroup "add"
 
 returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
-  uuid <- provide
+  uuid <- UUID.nextRandom
   x <- runApi (uuid, fakeTime) API.listTasks
   assertEqual "expecting success" [] x
 
 
 storesCreatedTask :: TestTree
 storesCreatedTask = testCase "stores the created task" $ do
-  uuid <- provide
+  uuid <- UUID.nextRandom
   x <- runTasks (uuid, fakeTime) API.listTasks
   assertEqual "expecting one task" [] x
 
 
 rollsBackOnWriteFailure :: TestTree
 rollsBackOnWriteFailure = testCase "does not store task on write failure" $ do
-  uuid <- provide
+  uuid <- UUID.nextRandom
   (_, x) <- runWriteFailure (uuid, fakeTime) API.listTasks
   assertEqual "expecting nothing" [] x
 
 
 writesEvent :: TestTree
 writesEvent = testCase "stores one event" $ do
-  uuid <- provide
+  uuid <- UUID.nextRandom
   x <- runEventLog (uuid, fakeTime) API.listTasks
   assertEqual "expecting 'add-task' intent" [] x

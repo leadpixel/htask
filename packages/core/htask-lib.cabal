@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b6c453a68aa9d461a41196ebe3609a606e9fc876e1e3a435b725956df955bf07
+-- hash: 745fb922ef15909ca757fc14ea8bfd761b7db671d3a327a80f7751b936333b77
 
 name:           htask-lib
 version:        0.2.0.0
@@ -40,7 +40,7 @@ library
     , uuid
   default-language: Haskell2010
 
-test-suite htask-test
+test-suite core
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
