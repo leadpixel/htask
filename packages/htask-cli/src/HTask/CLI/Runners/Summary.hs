@@ -82,4 +82,4 @@ printTaskForSummary t =
       <> withStatusColor (H.status t) (H.description t)
 
     printRef :: Text
-    printRef = (UUID.toText . untag . H.taskRef) t
+    printRef = (UUID.toText . untag . H.taskUuid) t

@@ -21,8 +21,8 @@ inProgress :: H.Task -> Bool
 inProgress t = H.status t == H.InProgress
 
 
-taskRefText :: H.Task -> Text
-taskRefText = UUID.toText . untag . H.taskRef
+taskUuidText :: H.Task -> Text
+taskUuidText = UUID.toText . untag . H.taskUuid
 
 
 runDrop :: (HasEventBackend m, H.CanCreateTask m) => m RunResult
@@ -31,7 +31,7 @@ runDrop
 
   where
     dropTask
-      = API.listTasks >>= mapM (API.stopTask . taskRefText) . filter inProgress
+      = API.listTasks >>= mapM (API.stopTask . taskUuidText) . filter inProgress
 
     formatOutcome
       = resultSuccess . fmap formatRow

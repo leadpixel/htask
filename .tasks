@@ -1,52 +1,23 @@
-{"payload":{"intent":{"tag":"AddTask","contents":"first task"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-12T22:21:06.138587223Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"second task"},"detailRef":"bc34a572-8deb-48a4-b684-04e5a9cd4796"},"timestamp":"2018-02-12T22:21:06.138587223Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-12T22:22:46.974834794Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-12T23:29:18.302319024Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-12T23:32:52.142202611Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"new"},"detailRef":"cc89d91e-2d21-4b00-bcc5-ec899fd6184e"},"timestamp":"2018-02-13T00:01:37.081727275Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"new"},"detailRef":"37d2e40f-66cf-4940-a0fb-17752f993d60"},"timestamp":"2018-02-13T00:03:35.035145336Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"stuff"},"detailRef":"eb5df1c8-9423-41e5-8a89-fd393fb03407"},"timestamp":"2018-02-13T00:22:58.116300811Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-13T00:35:14.985386173Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"eb5df1c8-9423-41e5-8a89-fd393fb03407"},"detailRef":"eb5df1c8-9423-41e5-8a89-fd393fb03407"},"timestamp":"2018-02-13T00:35:26.690347263Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-13T00:37:12.228363199Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-13T00:37:17.744263111Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-13T00:40:13.761241474Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"bc34a572-8deb-48a4-b684-04e5a9cd4796"},"detailRef":"bc34a572-8deb-48a4-b684-04e5a9cd4796"},"timestamp":"2018-02-13T10:59:27.860775Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"detailRef":"bc32a572-8deb-48a4-b684-04e5a9cd0796"},"timestamp":"2018-02-13T12:09:44.586039Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"cc89d91e-2d21-4b00-bcc5-ec899fd6184e"},"detailRef":"cc89d91e-2d21-4b00-bcc5-ec899fd6184e"},"timestamp":"2018-02-13T12:09:45.917582Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"37d2e40f-66cf-4940-a0fb-17752f993d60"},"detailRef":"37d2e40f-66cf-4940-a0fb-17752f993d60"},"timestamp":"2018-02-13T12:09:46.770069Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"eb5df1c8-9423-41e5-8a89-fd393fb03407"},"detailRef":"eb5df1c8-9423-41e5-8a89-fd393fb03407"},"timestamp":"2018-02-13T12:09:47.805511Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"bash autocompletion for uuids"},"detailRef":"33b25cf8-67f3-46b7-ab71-74ad209e47c5"},"timestamp":"2018-02-13T12:33:19.394785Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"test"},"detailRef":"edca5495-7b3a-4d30-a9a0-55ed504d649f"},"timestamp":"2018-02-13T12:35:26.175543Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"bash autocompletion"},"detailRef":"9bb2ce37-2af5-4716-ad51-3c66f72553b0"},"timestamp":"2018-02-13T12:36:14.653374Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"disallow duplicate descriptions"},"detailRef":"f856b048-0e4e-49ce-8c4d-465255d22388"},"timestamp":"2018-02-13T12:36:45.723446Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"test"},"detailRef":"b75230ee-a94c-4746-9f7f-101e048ef5fa"},"timestamp":"2018-02-13T12:37:08.367608Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"short-hand for uuids"},"detailRef":"a8feaeff-f4a5-47e8-81fa-07634d5cee59"},"timestamp":"2018-02-13T12:37:34.647644Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"improve help text"},"detailRef":"407980ee-9714-4acf-8442-3067c97387e8"},"timestamp":"2018-02-13T12:37:57.382938Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"nicer output after successful add"},"detailRef":"8b0a6640-8784-442c-9fab-a1ba49747315"},"timestamp":"2018-02-13T12:38:11.210971Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"only show disambiguating text for uuids"},"detailRef":"1beb9145-d9c0-4790-aa46-e65d50bad80d"},"timestamp":"2018-02-13T12:38:35.915026Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"drop into vim when command incomplete"},"detailRef":"6f3b943e-0b83-4168-b8e7-0f05cb587ec2"},"timestamp":"2018-02-13T12:38:52.952385Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"9bb2ce37-2af5-4716-ad51-3c66f72553b0"},"detailRef":"9bb2ce37-2af5-4716-ad51-3c66f72553b0"},"timestamp":"2018-02-13T12:39:17.351533Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"drop into $EDITOR when command incomplete"},"detailRef":"6cb925ef-5e97-4cb6-8cdc-9dc07c301af7"},"timestamp":"2018-02-13T12:39:34.199149Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"6f3b943e-0b83-4168-b8e7-0f05cb587ec2"},"detailRef":"6f3b943e-0b83-4168-b8e7-0f05cb587ec2"},"timestamp":"2018-02-13T12:40:17.836113Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"edca5495-7b3a-4d30-a9a0-55ed504d649f"},"detailRef":"edca5495-7b3a-4d30-a9a0-55ed504d649f"},"timestamp":"2018-02-13T12:40:27.004355Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"b75230ee-a94c-4746-9f7f-101e048ef5fa"},"detailRef":"b75230ee-a94c-4746-9f7f-101e048ef5fa"},"timestamp":"2018-02-13T12:40:27.016781Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"test log merge across branches"},"detailRef":"7748d845-e4e8-424f-9a98-e9b84b5a00f8"},"timestamp":"2018-02-13T12:41:16.686287Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"gc -> prune unnecessary events"},"detailRef":"53c85ff4-2838-46d3-a64c-268864be71c6"},"timestamp":"2018-02-13T12:42:52.026555Z"}
+{"payload":{"intent":{"tag":"AddTask","contents":"prune unnecessary events"},"detailRef":"53c85ff4-2838-46d3-a64c-268864be71c6"},"timestamp":"2018-02-13T12:42:52.026555Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"show output in sections by status"},"detailRef":"a20aef97-fe9b-471c-9a5e-589e066f608c"},"timestamp":"2018-02-13T12:44:06.304684Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"colorise output"},"detailRef":"55cdb9ce-56f4-4335-a1db-128a4e16bd98"},"timestamp":"2018-02-13T12:44:14.033199Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"right"},"detailRef":"a89b571a-f6b8-4382-a6fe-589a4b5efa80"},"timestamp":"2018-02-13T12:45:05.006061Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"left"},"detailRef":"6265f107-d78c-42b5-baad-ea8dbfc1d2a4"},"timestamp":"2018-02-13T12:45:17.525765Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"git conflict resolution helper"},"detailRef":"ee468ca4-a0e1-4e61-a4c7-ce5ba609cbeb"},"timestamp":"2018-02-13T12:47:06.731704Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"sort by timestamp before reading log"},"detailRef":"808fb9e7-cee8-487d-9fa7-92252176bf19"},"timestamp":"2018-02-13T12:48:28.003175Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"remove task by description"},"detailRef":"0de2709c-ecb2-4a24-9128-55ef21468437"},"timestamp":"2018-02-13T12:50:12.853667Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"a89b571a-f6b8-4382-a6fe-589a4b5efa80"},"detailRef":"a89b571a-f6b8-4382-a6fe-589a4b5efa80"},"timestamp":"2018-02-13T12:50:44.750868Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"6265f107-d78c-42b5-baad-ea8dbfc1d2a4"},"detailRef":"6265f107-d78c-42b5-baad-ea8dbfc1d2a4"},"timestamp":"2018-02-13T12:50:47.47152Z"}
 {"payload":{"intent":{"tag":"StartTask","contents":"a8feaeff-f4a5-47e8-81fa-07634d5cee59"},"detailRef":"a8feaeff-f4a5-47e8-81fa-07634d5cee59"},"timestamp":"2018-02-13T12:51:28.12296Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"remove quotes from output"},"detailRef":"0d5bd15f-d58b-41a4-8479-89fec4606551"},"timestamp":"2018-02-13T12:51:49.825888Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"change default output to current task + active tasks + top 5 pending"},"detailRef":"cc688a58-0dfd-48ca-8c03-105844990be2"},"timestamp":"2018-02-13T12:52:28.954858Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"documentation"},"detailRef":"faec62f9-d539-4608-96b3-d4ff8f5bdb40"},"timestamp":"2018-02-13T12:53:39.943652Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"impress jeff"},"detailRef":"9633fcb5-99ad-4e6c-b2df-80fce1442ba8"},"timestamp":"2018-02-13T12:55:21.002127Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"allow specifying a location for task file"},"detailRef":"1b422da4-6fd1-4d14-a559-a616b4c3db73"},"timestamp":"2018-02-13T12:56:44.731779Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"test"},"detailRef":"24baa9b6-c88a-4f5d-9dc9-ceca8292b890"},"timestamp":"2018-02-13T12:56:49.691828Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"remove quotes from output"},"detailRef":"eddf9307-4127-4abc-8540-980328353f70"},"timestamp":"2018-02-13T12:57:15.510512Z"}
@@ -54,7 +25,6 @@
 {"payload":{"intent":{"tag":"RemoveTask","contents":"3fd0a953-c3c5-4e5e-bb8b-7ab5a8179c9c"},"detailRef":"3fd0a953-c3c5-4e5e-bb8b-7ab5a8179c9c"},"timestamp":"2018-02-13T12:57:37.83586Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"eddf9307-4127-4abc-8540-980328353f70"},"detailRef":"eddf9307-4127-4abc-8540-980328353f70"},"timestamp":"2018-02-13T12:57:44.840203Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"24baa9b6-c88a-4f5d-9dc9-ceca8292b890"},"detailRef":"24baa9b6-c88a-4f5d-9dc9-ceca8292b890"},"timestamp":"2018-02-13T12:57:49.452015Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"9633fcb5-99ad-4e6c-b2df-80fce1442ba8"},"detailRef":"9633fcb5-99ad-4e6c-b2df-80fce1442ba8"},"timestamp":"2018-02-13T12:57:55.664009Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"implement simple priority"},"detailRef":"4d5d0f86-ebb8-4a67-86c3-c26099fc9240"},"timestamp":"2018-02-13T12:58:18.592025Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"cleanup mode - sort event log by timestamp"},"detailRef":"f3b52b44-5274-4380-86ab-cc043b2c6b41"},"timestamp":"2018-02-13T12:59:48.37896Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"'pick' command for task assignment ???"},"detailRef":"37376c00-8ced-4bed-9b75-af2731b92d4e"},"timestamp":"2018-02-13T13:00:50.196009Z"}
@@ -68,48 +38,25 @@
 {"payload":{"intent":{"tag":"CompleteTask","contents":"a5bde4c6-73b2-43e3-af29-7b99ef9b1903"},"detailRef":"a5bde4c6-73b2-43e3-af29-7b99ef9b1903"},"timestamp":"2018-02-13T13:55:51.92836Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"some form of task heirarchy"},"detailRef":"e488db9c-b138-4847-a58f-ac4ae46d81ee"},"timestamp":"2018-02-13T13:56:38.960531Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"list options for long- or short- output"},"detailRef":"17b334b7-0b8f-4d5d-b8c4-e9f512acd566"},"timestamp":"2018-02-13T13:57:35.89694Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"remove duplicate  calls"},"detailRef":"3c06dcd3-97df-41f3-9797-f899f8507df5"},"timestamp":"2018-02-13T14:03:08.249056Z"}
+{"payload":{"intent":{"tag":"AddTask","contents":"remove duplicate calls"},"detailRef":"3c06dcd3-97df-41f3-9797-f899f8507df5"},"timestamp":"2018-02-13T14:03:08.249056Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"remove duplicate runTasks calls"},"detailRef":"e06fe93f-f077-46d1-85d9-8a78d4188026"},"timestamp":"2018-02-13T14:03:15.583469Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"what about\\nnewlines?"},"detailRef":"525cabcf-18f1-47d8-9d84-be150fb2cb4a"},"timestamp":"2018-02-13T14:04:48.124689Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"what about\nnewlines?"},"detailRef":"9f49748f-ed93-4895-92ac-33a959c403a7"},"timestamp":"2018-02-13T14:05:03.563463Z"}
+{"payload":{"intent":{"tag":"AddTask","contents":"handle newlines\ngracefully"},"detailRef":"9f49748f-ed93-4895-92ac-33a959c403a7"},"timestamp":"2018-02-13T14:05:03.563463Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"disallow empty task description"},"detailRef":"f9bc06ae-adba-4521-bdd1-eac416f84e00"},"timestamp":"2018-02-13T14:06:07.272212Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":""},"detailRef":"5093b7ad-ee99-479e-acae-7b8003066838"},"timestamp":"2018-02-13T14:06:10.153339Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"warning when failing to parse or apply an event"},"detailRef":"0e641069-072f-4d2b-b40c-98c2848cacff"},"timestamp":"2018-02-13T14:10:35.129358Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"warning when failing to parse or apply an event"},"detailRef":"ae6438e8-93c8-4c02-9d66-7ede61be4a42"},"timestamp":"2018-02-13T14:12:25.335121Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"ae6438e8-93c8-4c02-9d66-7ede61be4a42"},"detailRef":"ae6438e8-93c8-4c02-9d66-7ede61be4a42"},"timestamp":"2018-02-13T14:12:48.100757Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"3c06dcd3-97df-41f3-9797-f899f8507df5"},"detailRef":"3c06dcd3-97df-41f3-9797-f899f8507df5"},"timestamp":"2018-02-13T14:16:04.081873Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"temp"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:11:10.939435757Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:23:39.419667516Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:27:00.800799595Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:27:10.699279438Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:27:20.515275336Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:31:11.88197779Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:31:22.830665292Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:32:12.726364792Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:32:43.83432048Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:32:59.633896278Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:33:23.962192415Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"detailRef":"19148bc8-cf77-43eb-b8d3-5f5af9a5950c"},"timestamp":"2018-02-13T22:34:19.028081529Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"a8feaeff-f4a5-47e8-81fa-07634d5cee59"},"detailRef":"a8feaeff-f4a5-47e8-81fa-07634d5cee59"},"timestamp":"2018-02-13T22:34:28.82296572Z"}
 {"payload":{"intent":{"tag":"StartTask","contents":"17b334b7-0b8f-4d5d-b8c4-e9f512acd566"},"detailRef":"17b334b7-0b8f-4d5d-b8c4-e9f512acd566"},"timestamp":"2018-02-13T22:36:13.14619575Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"add shortcut to complete current task (done)"},"detailRef":"bfb4bd17-c8fb-47da-ab1e-17abeb427a14"},"timestamp":"2018-02-13T22:55:47.399458329Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"17b334b7-0b8f-4d5d-b8c4-e9f512acd566"},"detailRef":"17b334b7-0b8f-4d5d-b8c4-e9f512acd566"},"timestamp":"2018-02-13T22:56:47.150335405Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"525cabcf-18f1-47d8-9d84-be150fb2cb4a"},"detailRef":"525cabcf-18f1-47d8-9d84-be150fb2cb4a"},"timestamp":"2018-02-13T22:57:29.310314368Z"}
 {"payload":{"intent":{"tag":"StartTask","contents":"1b422da4-6fd1-4d14-a559-a616b4c3db73"},"detailRef":"1b422da4-6fd1-4d14-a559-a616b4c3db73"},"timestamp":"2018-02-13T23:00:24.136196153Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"temp"},"detailRef":"cfb4c826-cfad-4d5a-9019-66a867040458"},"timestamp":"2018-02-14T09:13:52.205465Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"cfb4c826-cfad-4d5a-9019-66a867040458"},"detailRef":"cfb4c826-cfad-4d5a-9019-66a867040458"},"timestamp":"2018-02-14T09:14:32.668779Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"cfb4c826-cfad-4d5a-9019-66a867040458"},"detailRef":"cfb4c826-cfad-4d5a-9019-66a867040458"},"timestamp":"2018-02-14T09:14:45.462956Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"allow customization in .taskrc"},"detailRef":"660c5f08-fc51-4cd0-a145-6dc5ee7533a0"},"timestamp":"2018-02-14T09:33:17.891274Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"temp"},"detailRef":"179b4c67-7a16-4cbc-ae3b-59fff0025833"},"timestamp":"2018-02-14T09:58:26.453487Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"prompt to create target file if not found"},"detailRef":"99b81a6f-dee6-4944-abee-cd4f39652449"},"timestamp":"2018-02-14T11:16:04.786678Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"temp"},"detailRef":"39751706-2c57-48d4-b1aa-3235ecd9e05b"},"timestamp":"2018-02-14T11:33:25.004736Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"39751706-2c57-48d4-b1aa-3235ecd9e05b"},"detailRef":"39751706-2c57-48d4-b1aa-3235ecd9e05b"},"timestamp":"2018-02-14T11:54:37.502623Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"179b4c67-7a16-4cbc-ae3b-59fff0025833"},"detailRef":"179b4c67-7a16-4cbc-ae3b-59fff0025833"},"timestamp":"2018-02-14T11:54:40.232999Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"allow specifying multiple ids to remove"},"detailRef":"f6b06664-91fa-431c-80ca-3e8f96711a8b"},"timestamp":"2018-02-14T11:54:56.749585Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"only allow one inProgress at once"},"detailRef":"e46c8eef-eb57-47c2-b99c-2e8b6ab8de49"},"timestamp":"2018-02-14T11:57:14.966056Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"create Stop event"},"detailRef":"cdf070da-1a0b-4351-aba3-7864cad59da9"},"timestamp":"2018-02-14T11:57:24.11181Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"temp"},"detailRef":"6027f715-818c-410b-a6e9-ae507b78cf8a"},"timestamp":"2018-02-14T12:40:22.489909Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"6027f715-818c-410b-a6e9-ae507b78cf8a"},"detailRef":"6027f715-818c-410b-a6e9-ae507b78cf8a"},"timestamp":"2018-02-14T12:40:39.669423Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"create summary command as default"},"detailRef":"e2cd389c-f1fa-4f5e-9531-44d4660c05bd"},"timestamp":"2018-02-14T12:41:05.775817Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"1b422da4-6fd1-4d14-a559-a616b4c3db73"},"detailRef":"1b422da4-6fd1-4d14-a559-a616b4c3db73"},"timestamp":"2018-02-14T14:12:22.213832Z"}
 {"payload":{"intent":{"tag":"StartTask","contents":"e2cd389c-f1fa-4f5e-9531-44d4660c05bd"},"detailRef":"e2cd389c-f1fa-4f5e-9531-44d4660c05bd"},"timestamp":"2018-02-14T14:12:54.079928Z"}
@@ -126,16 +73,11 @@
 {"payload":{"intent":{"tag":"StartTask","contents":"bfb4bd17-c8fb-47da-ab1e-17abeb427a14"},"detailRef":"bfb4bd17-c8fb-47da-ab1e-17abeb427a14"},"timestamp":"2018-02-14T22:12:31.772375642Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"bfb4bd17-c8fb-47da-ab1e-17abeb427a14"},"detailRef":"bfb4bd17-c8fb-47da-ab1e-17abeb427a14"},"timestamp":"2018-02-14T22:36:48.912214097Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"37376c00-8ced-4bed-9b75-af2731b92d4e"},"detailRef":"37376c00-8ced-4bed-9b75-af2731b92d4e"},"timestamp":"2018-02-14T22:36:48.916725187Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"temp"},"detailRef":"bc8911be-16da-4987-8da7-1fbbaca7d9e5"},"timestamp":"2018-02-14T22:40:20.031581085Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"bc8911be-16da-4987-8da7-1fbbaca7d9e5"},"detailRef":"bc8911be-16da-4987-8da7-1fbbaca7d9e5"},"timestamp":"2018-02-14T22:40:30.428105175Z"}
-{"payload":{"intent":{"tag":"CompleteTask","contents":"bc8911be-16da-4987-8da7-1fbbaca7d9e5"},"detailRef":"bc8911be-16da-4987-8da7-1fbbaca7d9e5"},"timestamp":"2018-02-14T22:40:33.885073391Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"bc8911be-16da-4987-8da7-1fbbaca7d9e5"},"detailRef":"bc8911be-16da-4987-8da7-1fbbaca7d9e5"},"timestamp":"2018-02-15T13:14:24.668921Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"custom git merge strategy for task log file (https://stackoverflow.com/questions/23140240/git-how-do-i-add-a-custom-merge-strategy/23140455#23140455)"},"detailRef":"a88278e4-266a-4a11-a465-fd137a3561c9"},"timestamp":"2018-02-15T13:15:05.113978Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"option to add auto task deletion event in N days from creation"},"detailRef":"c645fda6-13f8-4ed6-a2df-045c811d6e5d"},"timestamp":"2018-02-19T11:58:49.009001Z"}
 {"payload":{"intent":{"tag":"StartTask","contents":"f9bc06ae-adba-4521-bdd1-eac416f84e00"},"detailRef":"f9bc06ae-adba-4521-bdd1-eac416f84e00"},"timestamp":"2018-02-19T12:20:14.249505Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"create hdesign to record design decisions"},"detailRef":"92c3381c-e9a2-43f5-9a63-8e178aab636b"},"timestamp":"2018-02-19T12:45:20.302725Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"porcelain command for htask merge"},"detailRef":"26ffda85-f2bf-4ee2-9be9-3f463a571a14"},"timestamp":"2018-02-19T14:22:41.405338Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"f9bc06ae-adba-4521-bdd1-eac416f84e00"},"detailRef":"f9bc06ae-adba-4521-bdd1-eac416f84e00"},"timestamp":"2018-02-19T15:26:32.195213Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"a88278e4-266a-4a11-a465-fd137a3561c9"},"detailRef":"a88278e4-266a-4a11-a465-fd137a3561c9"},"timestamp":"2018-02-19T16:07:27.395813Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"ee468ca4-a0e1-4e61-a4c7-ce5ba609cbeb"},"detailRef":"ee468ca4-a0e1-4e61-a4c7-ce5ba609cbeb"},"timestamp":"2018-02-19T16:07:30.289687Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"cc688a58-0dfd-48ca-8c03-105844990be2"},"detailRef":"cc688a58-0dfd-48ca-8c03-105844990be2"},"timestamp":"2018-02-19T16:08:04.85114Z"}
@@ -155,18 +97,14 @@
 {"payload":{"intent":{"tag":"StartTask","contents":"cfda7a5f-f9e5-4b5f-9ea0-7862019ffa44"},"detailRef":"cfda7a5f-f9e5-4b5f-9ea0-7862019ffa44"},"timestamp":"2018-02-19T17:23:55.691186511Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"swap out list for sequence"},"detailRef":"d725397f-4a27-4846-8c5f-41bd0c9e31d9"},"timestamp":"2018-02-19T17:33:25.048796569Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"create 'porcelain' global flag for parseable output"},"detailRef":"082feeed-1752-440d-b621-9b3490224444"},"timestamp":"2018-02-20T09:17:36.395486617Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"htask-jira bridge"},"detailRef":"e33e2d0a-dc33-4cfb-9a29-8ede7e0f3b83"},"timestamp":"2018-02-20T09:17:46.45663084Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"create 'json' global flag for json output"},"detailRef":"03417d5f-c7d4-4949-b486-134dd055a279"},"timestamp":"2018-02-20T09:18:39.966527325Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"cfda7a5f-f9e5-4b5f-9ea0-7862019ffa44"},"detailRef":"cfda7a5f-f9e5-4b5f-9ea0-7862019ffa44"},"timestamp":"2018-02-20T09:48:34.227851886Z"}
 {"payload":{"intent":{"tag":"StartTask","contents":"082feeed-1752-440d-b621-9b3490224444"},"detailRef":"082feeed-1752-440d-b621-9b3490224444"},"timestamp":"2018-02-20T09:50:08.029269261Z"}
 {"payload":{"intent":{"tag":"StartTask","contents":"03417d5f-c7d4-4949-b486-134dd055a279"},"detailRef":"03417d5f-c7d4-4949-b486-134dd055a279"},"timestamp":"2018-02-21T20:33:27.193664993Z"}
 {"payload":{"intent":{"tag":"StopTask","contents":"03417d5f-c7d4-4949-b486-134dd055a279"},"detailRef":"03417d5f-c7d4-4949-b486-134dd055a279"},"timestamp":"2018-02-23T07:39:37.928500388Z"}
 {"payload":{"intent":{"tag":"StopTask","contents":"082feeed-1752-440d-b621-9b3490224444"},"detailRef":"082feeed-1752-440d-b621-9b3490224444"},"timestamp":"2018-02-23T07:39:41.466051306Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"s3 backend for task file"},"detailRef":"d5d56ec7-353c-427d-bbba-9aeb80288cf6"},"timestamp":"2018-02-23T07:39:55.784334758Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"recurse up for task file"},"detailRef":"8c98eb25-419c-4977-b909-0b04265dad69"},"timestamp":"2018-02-23T07:45:35.314049364Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"task file over ssh"},"detailRef":"081b3f28-740b-4b8d-88eb-5d94a2e85949"},"timestamp":"2018-02-23T08:20:21.59473821Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"custom colors"},"detailRef":"f1a7a9ca-4078-4b22-84f4-f8c214a1190b"},"timestamp":"2018-02-23T08:22:05.258688946Z"}
-{"payload":{"intent":{"tag":"AddTask","contents":"something fishy"},"detailRef":"8ffc5961-08a4-4341-b1d6-724ac989ed31"},"timestamp":"2018-03-06T14:34:50.729491955Z"}
 {"payload":{"intent":{"tag":"StartTask","contents":"f3b52b44-5274-4380-86ab-cc043b2c6b41"},"detailRef":"f3b52b44-5274-4380-86ab-cc043b2c6b41"},"timestamp":"2018-03-07T18:05:28.01476843Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"f3b52b44-5274-4380-86ab-cc043b2c6b41"},"detailRef":"f3b52b44-5274-4380-86ab-cc043b2c6b41"},"timestamp":"2018-03-07T18:05:32.318515649Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"8b0a6640-8784-442c-9fab-a1ba49747315"},"detailRef":"8b0a6640-8784-442c-9fab-a1ba49747315"},"timestamp":"2018-03-07T18:05:59.366431114Z"}
@@ -176,16 +114,11 @@
 {"payload":{"intent":{"tag":"AddTask","contents":"remove uuid from events"},"detailRef":"31766311-bd6b-4d61-944c-6b206e5dee11"},"timestamp":"2018-03-18T21:03:42.122571249Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"record task author/owner"},"detailRef":"b864c0e7-81f0-4b28-af60-b6124c6c05b6"},"timestamp":"2018-03-18T21:11:32.656428393Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"error output"},"detailRef":"9e5bd22e-6fa7-4bd3-9f22-19cba9ab519e"},"timestamp":"2018-03-18T21:24:56.888644683Z"}
-{"payload":{"intent":{"tag":"StartTask","contents":"8ffc5961-08a4-4341-b1d6-724ac989ed31"},"detailRef":"8ffc5961-08a4-4341-b1d6-724ac989ed31"},"timestamp":"2018-03-18T21:45:54.657711223Z"}
-{"payload":{"intent":{"tag":"StopTask","contents":"8ffc5961-08a4-4341-b1d6-724ac989ed31"},"detailRef":"8ffc5961-08a4-4341-b1d6-724ac989ed31"},"timestamp":"2018-03-18T21:46:00.558130831Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"8ffc5961-08a4-4341-b1d6-724ac989ed31"},"detailRef":"8ffc5961-08a4-4341-b1d6-724ac989ed31"},"timestamp":"2018-03-18T21:46:04.173422522Z"}
 {"payload":{"intent":{"tag":"StartTask","contents":"9e5bd22e-6fa7-4bd3-9f22-19cba9ab519e"},"detailRef":"9e5bd22e-6fa7-4bd3-9f22-19cba9ab519e"},"timestamp":"2018-03-21T08:26:47.56648842Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"9e5bd22e-6fa7-4bd3-9f22-19cba9ab519e"},"detailRef":"9e5bd22e-6fa7-4bd3-9f22-19cba9ab519e"},"timestamp":"2018-03-21T08:27:01.751893248Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"8c98eb25-419c-4977-b909-0b04265dad69"},"detailRef":"8c98eb25-419c-4977-b909-0b04265dad69"},"timestamp":"2018-03-22T08:52:13.798015684Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"26ffda85-f2bf-4ee2-9be9-3f463a571a14"},"detailRef":"26ffda85-f2bf-4ee2-9be9-3f463a571a14"},"timestamp":"2018-03-22T08:52:13.842241225Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"26ffda85-f2bf-4ee2-9be9-3f463a571a14"},"detailRef":"26ffda85-f2bf-4ee2-9be9-3f463a571a14"},"timestamp":"2018-03-22T08:52:13.870840917Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"99b81a6f-dee6-4944-abee-cd4f39652449"},"detailRef":"99b81a6f-dee6-4944-abee-cd4f39652449"},"timestamp":"2018-03-22T08:52:13.90385625Z"}
-{"payload":{"intent":{"tag":"CompleteTask","contents":"9f49748f-ed93-4895-92ac-33a959c403a7"},"detailRef":"9f49748f-ed93-4895-92ac-33a959c403a7"},"timestamp":"2018-03-22T08:52:13.934501884Z"}
 {"payload":{"intent":{"tag":"CompleteTask","contents":"faec62f9-d539-4608-96b3-d4ff8f5bdb40"},"detailRef":"faec62f9-d539-4608-96b3-d4ff8f5bdb40"},"timestamp":"2018-03-22T08:52:13.959718827Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"6cb925ef-5e97-4cb6-8cdc-9dc07c301af7"},"detailRef":"6cb925ef-5e97-4cb6-8cdc-9dc07c301af7"},"timestamp":"2018-03-22T08:52:13.99297499Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"f856b048-0e4e-49ce-8c4d-465255d22388"},"detailRef":"f856b048-0e4e-49ce-8c4d-465255d22388"},"timestamp":"2018-03-22T08:52:14.039545122Z"}
@@ -209,7 +142,6 @@
 {"payload":{"intent":{"tag":"RemoveTask","contents":"e46c8eef-eb57-47c2-b99c-2e8b6ab8de49"},"detailRef":"e46c8eef-eb57-47c2-b99c-2e8b6ab8de49"},"timestamp":"2019-08-21T07:49:13.294334354Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"92c3381c-e9a2-43f5-9a63-8e178aab636b"},"detailRef":"92c3381c-e9a2-43f5-9a63-8e178aab636b"},"timestamp":"2019-08-21T07:49:19.124288492Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"081b3f28-740b-4b8d-88eb-5d94a2e85949"},"detailRef":"081b3f28-740b-4b8d-88eb-5d94a2e85949"},"timestamp":"2019-08-21T07:49:43.754015769Z"}
-{"payload":{"intent":{"tag":"RemoveTask","contents":"d5d56ec7-353c-427d-bbba-9aeb80288cf6"},"detailRef":"d5d56ec7-353c-427d-bbba-9aeb80288cf6"},"timestamp":"2019-08-21T07:49:45.375712601Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"f1a7a9ca-4078-4b22-84f4-f8c214a1190b"},"detailRef":"f1a7a9ca-4078-4b22-84f4-f8c214a1190b"},"timestamp":"2019-08-21T07:49:55.219196016Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"808fb9e7-cee8-487d-9fa7-92252176bf19"},"detailRef":"808fb9e7-cee8-487d-9fa7-92252176bf19"},"timestamp":"2019-08-21T07:50:16.106277392Z"}
 {"payload":{"intent":{"tag":"RemoveTask","contents":"f835e6f8-6903-4a19-9e03-b32c3ad22a66"},"detailRef":"f835e6f8-6903-4a19-9e03-b32c3ad22a66"},"timestamp":"2019-08-21T07:50:34.931405858Z"}
@@ -224,3 +156,9 @@
 {"payload":{"intent":{"tag":"RemoveTask","contents":"f7a894bc-d724-418d-a319-d755fffcc778"},"detailRef":"f7a894bc-d724-418d-a319-d755fffcc778"},"timestamp":"2019-08-21T07:54:04.077998167Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"prompt to create file/backend"},"detailRef":"3a545400-42da-4615-857e-e90655e7e0b8"},"timestamp":"2019-08-25T19:00:16.208610059Z"}
 {"payload":{"intent":{"tag":"AddTask","contents":"move config to task-config.yaml"},"detailRef":"6dfed51d-7ea6-4098-ae77-300043101caf"},"timestamp":"2019-08-25T21:29:48.756670189Z"}
+{"payload":{"detailRef":"e949c1d9-4dbd-448e-9075-f7b69674035f","intent":{"contents":"default to ~/.tasks instead of current directory","tag":"AddTask"}},"timestamp":"2023-07-29T09:28:18.699105387Z"}
+{"payload":{"detailRef":"6feced14-7d80-420c-b57a-49377a473942","intent":{"contents":"6feced14-7d80-420c-b57a-49377a473942","tag":"StopTask"}},"timestamp":"2023-07-29T10:56:33.263829147Z"}
+{"payload":{"detailRef":"2254ba3f-95c2-484e-bbdf-3d6370e5b8cd","intent":{"contents":"2254ba3f-95c2-484e-bbdf-3d6370e5b8cd","tag":"StopTask"}},"timestamp":"2023-07-29T10:56:39.029544006Z"}
+{"payload":{"detailRef":"2254ba3f-95c2-484e-bbdf-3d6370e5b8cd","intent":{"contents":"2254ba3f-95c2-484e-bbdf-3d6370e5b8cd","tag":"StopTask"}},"timestamp":"2023-07-29T10:56:41.300118319Z"}
+{"payload":{"detailRef":"f9bc06ae-adba-4521-bdd1-eac416f84e00","intent":{"contents":"f9bc06ae-adba-4521-bdd1-eac416f84e00","tag":"StopTask"}},"timestamp":"2023-07-29T10:56:49.145015242Z"}
+{"payload":{"detailRef":"c0ceb91b-d8bc-4b7b-9deb-c8fb3bead1e3","intent":{"contents":"print warning when unable to apply an event","tag":"AddTask"}},"timestamp":"2023-07-29T10:57:52.665127426Z"}

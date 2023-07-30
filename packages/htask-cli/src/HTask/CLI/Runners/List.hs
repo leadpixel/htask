@@ -90,4 +90,4 @@ nicePrint d t
   <> withStatusColor (H.status t) (H.description t)
 
   where
-    printUUID = UUID.toText (untag (H.taskRef t)) <> " "
+    printUUID = UUID.toText (untag (H.taskUuid t)) <> " "

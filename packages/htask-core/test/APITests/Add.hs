@@ -13,12 +13,9 @@ import qualified HTask.Core.TaskEvent      as TV
 
 import           Data.Tagged               (Tagged (..))
 import           Data.Time                 (UTCTime (..))
-import           Leadpixel.Provider
 import           Test.QuickCheck.Instances ()
-import           Test.QuickCheck.Monadic   as QCM
 import           Test.Tasty
 import           Test.Tasty.HUnit
-import           Test.Tasty.QuickCheck
 
 import           APITestMonad
 
@@ -61,7 +58,7 @@ storesCreatedTask = testCase "stores the created task" $ do
   x <- runTasks (uuid, fakeTime) (API.addTask "some task")
   assertEqual "expecting one task"
     [ H.Task
-      { H.taskRef = Tagged uuid
+      { H.taskUuid = Tagged uuid
       , H.description = "some task"
       , H.createdAt = fakeTime
       , H.status = H.Pending
@@ -95,7 +92,7 @@ doesNotStoreDuplicateTask = testCase "only stores the original task" $ do
   x <- runTasks (uuid, fakeTime) (API.addTask "some task" >> API.addTask "other task")
   assertEqual "expecting one task"
     [ H.Task
-      { H.taskRef = Tagged uuid
+      { H.taskUuid = Tagged uuid
       , H.description = "some task"
       , H.createdAt = fakeTime
       , H.status = H.Pending

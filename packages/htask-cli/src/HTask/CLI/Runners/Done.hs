@@ -20,8 +20,8 @@ inProgress :: H.Task -> Bool
 inProgress t = H.status t == H.InProgress
 
 
-taskRefText :: H.Task -> Text
-taskRefText = UUID.toText . untag . H.taskRef
+taskUuidText :: H.Task -> Text
+taskUuidText = UUID.toText . untag . H.taskUuid
 
 
 runDone :: (HasEventBackend m, H.CanCreateTask m) => m RunResult
@@ -30,7 +30,7 @@ runDone
 
   where
     doneTask
-      = API.listTasks >>= mapM (API.completeTask . taskRefText) . filter inProgress
+      = API.listTasks >>= mapM (API.completeTask . taskUuidText) . filter inProgress
 
     formatOutcome
       = resultSuccess . fmap formatRow

@@ -10,6 +10,7 @@ module HTask.Core.API
   , addTask
   , findTask
   , startTask
+  , H.taskUuidToText
   , stopTask
   , completeTask
   , removeTask
@@ -24,14 +25,13 @@ import qualified HTask.Core.TaskContainer as HC
 import qualified HTask.Core.TaskEvent     as TV
 
 import           Control.Monad.IO.Class   (MonadIO, liftIO)
-import           Data.Functor             (($>))
 import           Data.List
 import           Data.Text                (Text)
 import           Data.Time                (UTCTime)
 
 
 data AddResult
-  = AddSuccess H.TaskRef
+  = AddSuccess H.TaskUuid
   | FailedToAdd
   deriving (Show, Eq)
 
@@ -59,8 +59,11 @@ addTask tx = do
   p <- HC.addNewTask tk
 
   if p
-    then
-      (V.createEvent readTime (TV.TaskEventDetail (H.taskRef tk) (TV.AddTask tx)) >>= V.writeEvent) $> AddSuccess (H.taskRef tk)
+    then do
+      let detail = TV.TaskEventDetail (H.taskUuid tk) (TV.AddTask tx)
+      x <- V.createEvent readTime detail
+      V.writeEvent x
+      pure $ AddSuccess (H.taskUuid tk)
 
     else
       pure FailedToAdd
@@ -74,7 +77,7 @@ findTask tx
   where
     uuidStartsWith :: Text -> H.Task -> Bool
     uuidStartsWith t
-      = Text.isPrefixOf t . H.taskRefText . H.taskRef
+      = Text.isPrefixOf t . H.taskUuidToText . H.taskUuid
 
 
 withMatch :: (MonadIO m, HC.HasTasks m) => Text -> (H.Task -> m ModifyResult) -> m ModifyResult
@@ -87,7 +90,7 @@ startTask
   => Text -> m ModifyResult
 startTask tx =
   withMatch tx $ \tsk -> do
-    let ref = H.taskRef tsk
+    let ref = H.taskUuid tsk
     p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
 
     case p of
@@ -105,7 +108,7 @@ stopTask
   => Text -> m ModifyResult
 stopTask tx =
   withMatch tx $ \tsk -> do
-    let ref = H.taskRef tsk
+    let ref = H.taskUuid tsk
     p <- HC.updateExistingTask ref $ H.setTaskStatus H.Pending
 
     case p of
@@ -122,7 +125,7 @@ completeTask
   => Text -> m ModifyResult
 completeTask tx =
   withMatch tx $ \tsk -> do
-    let ref = H.taskRef tsk
+    let ref = H.taskUuid tsk
     p <- HC.updateExistingTask ref $ H.setTaskStatus H.Complete
 
     case p of
@@ -139,8 +142,8 @@ removeTask
   => Text -> m ModifyResult
 removeTask tx =
   withMatch tx $ \tsk -> do
-    let ref = H.taskRef tsk
-    p <- HC.removeTaskRef ref
+    let ref = H.taskUuid tsk
+    p <- HC.removeTaskUuid ref
 
     if p
       then do

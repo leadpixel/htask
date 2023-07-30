@@ -1,15 +1,16 @@
 {-# LANGUAGE ConstraintKinds  #-}
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeApplications #-}
 
 module HTask.Core.Task
   ( Task (..)
-  , TaskRef
+  , TaskUuid
   , TaskStatus (..)
   , CanCreateTask
   , createTask
   , setTaskStatus
-  , taskRefText
+  , taskUuidToText
   ) where
 
 import qualified Data.UUID          as UUID
@@ -23,7 +24,7 @@ import           Leadpixel.Provider
 
 
 type TaskIdent = ()
-type TaskRef = Tagged TaskIdent UUID
+type TaskUuid = Tagged TaskIdent UUID
 
 
 data TaskStatus
@@ -35,7 +36,7 @@ data TaskStatus
 
 
 data Task = Task
-  { taskRef     :: TaskRef
+  { taskUuid    :: TaskUuid
   , description :: Text
   , createdAt   :: UTCTime
   , status      :: TaskStatus
@@ -48,13 +49,13 @@ type CanCreateTask m = (Monad m, Provider UTCTime m, Provider UUID m)
 createTask :: (CanCreateTask m) => Text -> m Task
 createTask tex
   = (\u m -> Task u tex m Pending)
-  <$> (Tagged <$> provide)
-  <*> provide
+  <$> (Tagged <$> provide @UUID)
+  <*> provide @UTCTime
 
 
 setTaskStatus :: TaskStatus -> Task -> Task
 setTaskStatus s t = t { status = s }
 
 
-taskRefText :: TaskRef -> Text
-taskRefText = UUID.toText . untag
+taskUuidToText :: TaskUuid -> Text
+taskUuidToText = UUID.toText . untag

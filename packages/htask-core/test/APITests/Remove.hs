@@ -20,7 +20,6 @@ import           Data.UUID                 (UUID)
 import           Test.QuickCheck.Instances ()
 
 import           APITestMonad
-import           Leadpixel.Provider
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
@@ -51,7 +50,7 @@ canRemoveEvent = testCase "reports success when removing a task" $ do
   where
     f uuid = API.ModifySuccess
       ( H.Task
-        { H.taskRef = Tagged uuid
+        { H.taskUuid = Tagged uuid
         , H.description = "some task"
         , H.createdAt = fakeTime
         , H.status = H.Pending
@@ -83,7 +82,7 @@ canRemoveEvent'' = testCase "cannot remove a removeped task" $ do
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.removeTask (Tagged uuid))
 --   assertEqual "can remove"
 --     [ H.Task
---       { H.taskRef = Tagged uuid
+--       { H.taskUuid = Tagged uuid
 --       , H.description = "some task"
 --       , H.createdAt = fakeTime
 --       , H.status = H.InProgress

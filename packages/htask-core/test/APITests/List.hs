@@ -9,7 +9,6 @@ import qualified HTask.Core.API            as API
 
 import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
-import           Leadpixel.Provider
 import           Test.QuickCheck.Instances ()
 
 import           APITestMonad

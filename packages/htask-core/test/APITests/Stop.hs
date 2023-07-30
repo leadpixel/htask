@@ -20,7 +20,6 @@ import           Data.UUID                 (UUID)
 import           Test.QuickCheck.Instances ()
 
 import           APITestMonad
-import           Leadpixel.Provider
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
@@ -50,7 +49,7 @@ canStopEvent = testCase "reports success when stopping a task" $ do
     where
       f uuid = API.ModifySuccess
         ( H.Task
-          { H.taskRef = Tagged uuid
+          { H.taskUuid = Tagged uuid
           , H.description = "some task"
           , H.createdAt = fakeTime
           , H.status = H.Pending
@@ -64,7 +63,7 @@ canStopEvent' = testCase "marks the task as pending" $ do
   x <- runTasks (uuid, fakeTime) (op uuid)
   assertEqual "can stop"
     [ H.Task
-      { H.taskRef = Tagged uuid
+      { H.taskUuid = Tagged uuid
       , H.description = "some task"
       , H.createdAt = fakeTime
       , H.status = H.Pending
@@ -91,7 +90,7 @@ canStopEvent'' = testCase "cannot stop a stopped task" $ do
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.stopTask (UUID.toText uuid))
 --   assertEqual "can stop"
 --     [ H.Task
---       { H.taskRef = Tagged uuid
+--       { H.taskUuid = Tagged uuid
 --       , H.description = "some task"
 --       , H.createdAt = fakeTime
 --       , H.status = H.Pending

@@ -23,8 +23,8 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-taskRefText :: H.Task -> Text
-taskRefText = UUID.toText . untag . H.taskRef
+taskUuidToText :: H.Task -> Text
+taskUuidToText = UUID.toText . untag . H.taskUuid
 
 
 runPick :: (MonadRandom m, HasEventBackend m, H.CanCreateTask m) => m RunResult
@@ -39,7 +39,7 @@ runPick = do
 
   where
     startTask t = do
-      _ <- runTask (API.startTask $ taskRefText t)
+      _ <- runTask (API.startTask $ taskUuidToText t)
       pure ["picking task: " <> H.description t]
 
 

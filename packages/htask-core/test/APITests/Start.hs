@@ -20,7 +20,6 @@ import           Data.UUID                 (UUID)
 import           Test.QuickCheck.Instances ()
 
 import           APITestMonad
-import           Leadpixel.Provider
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
@@ -51,7 +50,7 @@ canStartEvent = testCase "reports success when starting a task" $ do
   where
     f uuid = API.ModifySuccess
       ( H.Task
-        { H.taskRef = Tagged uuid
+        { H.taskUuid = Tagged uuid
         , H.description = "some task"
         , H.createdAt = fakeTime
         , H.status = H.InProgress
@@ -65,7 +64,7 @@ canStartEvent' = testCase "marks the task as in-progress" $ do
   x <- runTasks (uuid, fakeTime) (op uuid)
   assertEqual "can start"
     [ H.Task
-      { H.taskRef = Tagged uuid
+      { H.taskUuid = Tagged uuid
       , H.description = "some task"
       , H.createdAt = fakeTime
       , H.status = H.InProgress
@@ -92,7 +91,7 @@ canStartEvent'' = testCase "cannot start a started task" $ do
 --   x <- runTasks (uuid, fakeTime) (op uuid >> API.startTask (UUID.toText uuid))
 --   assertEqual "can start"
 --     [ H.Task
---       { H.taskRef = Tagged uuid
+--       { H.taskUuid = Tagged uuid
 --       , H.description = "some task"
 --       , H.createdAt = fakeTime
 --       , H.status = H.InProgress

@@ -108,6 +108,6 @@ manyEvents2 = testCase "repeated writing (batch)" $ do
   let ev = createFakeEvent 1
   let evs = replicate 100000 ev
   xs <- run $ do
-    V.writeEvents evs
+    mapM_ V.writeEvent evs
     readEvents
   assertEqual "expecting 100000 items" 100000 (length xs)

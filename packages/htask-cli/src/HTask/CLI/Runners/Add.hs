@@ -19,17 +19,14 @@ runAdd t
   = formatOutcome <$> runTask (API.addTask t)
 
   where
-    formatOutcome x
-      = case x of
-          API.AddSuccess ref ->
-            resultSuccessAdd ref
+    formatOutcome (API.AddSuccess ref)
+      = resultSuccessAdd ref
 
-          API.FailedToAdd ->
-            resultError "failed to add"
+    formatOutcome API.FailedToAdd
+      = resultError "failed to add"
 
-      where
-        resultSuccessAdd ref
-          = resultSuccess
-              [ "added task: " <> t
-              , "ref: " <> H.taskRefText ref
-              ]
+    resultSuccessAdd ref
+      = resultSuccess
+          [ "added task: " <> t
+          , "ref: " <> H.taskUuidToText ref
+          ]

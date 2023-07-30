@@ -13,7 +13,6 @@ import           APITestMonad              (runApi)
 import           Data.Tagged               (Tagged (..))
 import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
-import           Leadpixel.Provider
 import           Test.QuickCheck.Instances ()
 import           Test.Tasty
 import           Test.Tasty.HUnit
@@ -47,7 +46,7 @@ returnsCreatedUuid = testCase "returns the created uuid on success" $ do
     where
       f uuid = API.ModifySuccess
         ( H.Task
-          { H.taskRef = Tagged uuid
+          { H.taskUuid = Tagged uuid
           , H.description = "some task"
           , H.createdAt = fakeTime
           , H.status = H.Complete

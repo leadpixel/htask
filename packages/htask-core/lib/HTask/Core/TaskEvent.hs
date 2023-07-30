@@ -19,10 +19,10 @@ import           GHC.Generics
 
 data TaskIntent
   = AddTask Text
-  | StartTask H.TaskRef
-  | StopTask H.TaskRef
-  | CompleteTask H.TaskRef
-  | RemoveTask H.TaskRef
+  | StartTask H.TaskUuid
+  | StopTask H.TaskUuid
+  | CompleteTask H.TaskUuid
+  | RemoveTask H.TaskUuid
   deriving (Show, Eq, Generic)
 
 instance ToJSON TaskIntent
@@ -30,7 +30,7 @@ instance FromJSON TaskIntent
 
 
 data TaskEventDetail = TaskEventDetail
-  { detailRef :: H.TaskRef
+  { detailRef :: H.TaskUuid
   , intent    :: TaskIntent
   } deriving (Show, Eq, Generic)
 
