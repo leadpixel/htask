@@ -5,24 +5,22 @@ module HTask.CLI.Runners.Add
   ( runAdd
   ) where
 
-import qualified HTask.Core.API            as API
-import qualified HTask.Core.Task           as H
-
-import           HTask.CLI.Output.Document
-import           HTask.CLI.TaskApplication
+import qualified HTask.Core                as H
 
 import           Data.Text                 (Text)
+import           HTask.CLI.Output.Document
+import           HTask.CLI.TaskApplication
 
 
 runAdd :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runAdd t
-  = formatOutcome <$> runTask (API.addTask t)
+  = formatOutcome <$> runTask (H.addTask t)
 
   where
-    formatOutcome (API.AddSuccess ref)
+    formatOutcome (H.AddSuccess ref)
       = resultSuccessAdd ref
 
-    formatOutcome API.FailedToAdd
+    formatOutcome H.FailedToAdd
       = resultError "failed to add"
 
     resultSuccessAdd ref

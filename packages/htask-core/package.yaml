@@ -13,14 +13,11 @@ dependencies:
 library:
   source-dirs: lib
   exposed-modules:
-    - HTask.Core.API
-    - HTask.Core.Task
-    - HTask.Core.TaskContainer
-    - HTask.Core.TaskEvent
-    - HTask.Core.Replay
+    - HTask.Core
   dependencies:
     - aeson
     - conduit-combinators
+    - containers
     - leadpixel-events
     - leadpixel-provider
     - mtl

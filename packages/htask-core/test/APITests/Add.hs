@@ -7,9 +7,7 @@ module APITests.Add
 import qualified Data.Time                 as Time
 import qualified Data.UUID.V4              as UUID
 import qualified Events                    as V
-import qualified HTask.Core.API            as API
-import qualified HTask.Core.Task           as H
-import qualified HTask.Core.TaskEvent      as TV
+import qualified HTask.Core                as H
 
 import           Data.Tagged               (Tagged (..))
 import           Data.Time                 (UTCTime (..))
@@ -48,60 +46,59 @@ testAdd = testGroup "add"
 returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
   uuid <- UUID.nextRandom
-  x <- runApi (uuid, fakeTime) (API.addTask "some task")
-  assertEqual "expecting success" (API.AddSuccess (Tagged uuid)) x
+  x <- runApi (uuid, fakeTime) (H.addTask "some task")
+  assertEqual "expecting success" (H.AddSuccess (Tagged uuid)) x
 
 
 storesCreatedTask :: TestTree
 storesCreatedTask = testCase "stores the created task" $ do
   uuid <- UUID.nextRandom
-  x <- runTasks (uuid, fakeTime) (API.addTask "some task")
+  x <- runTasks (uuid, fakeTime) (H.addTask "some task")
   assertEqual "expecting one task"
-    [ H.Task
+    (pure  H.Task
       { H.taskUuid = Tagged uuid
       , H.description = "some task"
       , H.createdAt = fakeTime
       , H.status = H.Pending
       }
-    ] x
+    ) x
 
 -- rollsBackOnWriteFailure :: TestTree
 -- rollsBackOnWriteFailure = testCase "does not store task on write failure" $ do
 --   uuid <- UUID.nextRandom
---   (_, x) <- runWriteFailure (uuid, fakeTime) (API.addTask "other task")
+--   (_, x) <- runWriteFailure (uuid, fakeTime) (H.addTask "other task")
 --   assertEqual "expecting nothing" [] x
 
 
 writesEvent :: TestTree
 writesEvent = testCase "stores one event" $ do
   uuid <- UUID.nextRandom
-  x <- runEventLog (uuid, fakeTime) (API.addTask "some task")
-  assertEqual "expecting 'add-task' intent" [ TV.AddTask "some task" ] (TV.intent . V.payload <$> x)
+  x <- runEventLog (uuid, fakeTime) (H.addTask "some task")
+  assertEqual "expecting 'add-task' intent" [ H.AddTask "some task" ] (H.intent . V.payload <$> x)
 
 
 doesNotAllowDuplicateUuids :: TestTree
 doesNotAllowDuplicateUuids = testCase "cannot use a non-unique id" $ do
   uuid <- UUID.nextRandom
-  x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.addTask "other task")
-  assertEqual "expecting failure" API.FailedToAdd x
+  x <- runApi (uuid, fakeTime) (H.addTask "some task" >> H.addTask "other task")
+  assertEqual "expecting failure" H.FailedToAdd x
 
 
 doesNotStoreDuplicateTask :: TestTree
 doesNotStoreDuplicateTask = testCase "only stores the original task" $ do
   uuid <- UUID.nextRandom
-  x <- runTasks (uuid, fakeTime) (API.addTask "some task" >> API.addTask "other task")
+  x <- runTasks (uuid, fakeTime) (H.addTask "some task" >> H.addTask "other task")
   assertEqual "expecting one task"
-    [ H.Task
+    (pure H.Task
       { H.taskUuid = Tagged uuid
       , H.description = "some task"
       , H.createdAt = fakeTime
       , H.status = H.Pending
-      }
-    ] x
+      }) x
 
 
 doesNotWriteFailedEvent :: TestTree
 doesNotWriteFailedEvent = testCase "only stores one event" $ do
   uuid <- UUID.nextRandom
-  x <- runEventLog (uuid, fakeTime) (API.addTask "some task" >> API.addTask "other task")
-  assertEqual "expecting one 'add-task' intent" [ TV.AddTask "some task" ] (TV.intent . V.payload <$> x)
+  x <- runEventLog (uuid, fakeTime) (H.addTask "some task" >> H.addTask "other task")
+  assertEqual "expecting one 'add-task' intent" [ H.AddTask "some task" ] (H.intent . V.payload <$> x)

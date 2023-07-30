@@ -3,8 +3,6 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: e8a9c12a25c9e282f44a292ace7b48571c267053ad08d9ff71217fec3fedab9b
 
 name:           htask-cli
 version:        0.2.0.0
@@ -52,6 +50,7 @@ executable htask
   build-depends:
       MonadRandom
     , base >=4.7 && <5
+    , containers
     , event-backend-file
     , htask-core
     , leadpixel-events

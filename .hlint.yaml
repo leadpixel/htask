@@ -22,6 +22,7 @@
   - {name: [Network.Wreq], as: Wreq}
   - {name: [System.IO], as: Sys}
   - {name: [Test.QuickCheck], as: QC}
+  - {name: [HTask.Core], as: H}
 #   - {name: Control.Arrow, within: []}#  Certain modules are banned entirely
 
 - functions:

@@ -5,27 +5,25 @@ module HTask.CLI.Runners.Complete
   ( runComplete
   ) where
 
-import qualified HTask.Core.API            as API
-import qualified HTask.Core.Task           as H
-
-import           HTask.CLI.Output.Document
-import           HTask.CLI.TaskApplication
+import qualified HTask.Core                as H
 
 import           Data.Text                 (Text)
+import           HTask.CLI.Output.Document
+import           HTask.CLI.TaskApplication
 
 
 runComplete :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runComplete t
-  = formatOutcome <$> runTask (API.completeTask t)
+  = formatOutcome <$> runTask (H.completeTask t)
 
   where
     formatOutcome x
       = case x of
-          API.ModifySuccess tsk ->
+          H.ModifySuccess tsk ->
             resultSuccess ["completing task: " <> H.description tsk]
 
-          API.FailedToFind ->
+          H.FailedToFind ->
             resultError "unable to find matching task"
 
-          API.FailedToModify ->
+          H.FailedToModify ->
             resultError "unable to modify matching task"

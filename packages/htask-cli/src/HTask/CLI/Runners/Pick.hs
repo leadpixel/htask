@@ -7,14 +7,12 @@ module HTask.CLI.Runners.Pick
   ) where
 
 
-import qualified Data.UUID                  as UUID
-import qualified HTask.Core.API             as API
-import qualified HTask.Core.Task            as H
+import qualified Data.Sequence              as Seq
+import qualified HTask.Core                 as H
 
-import           Control.Monad.Random.Class
-import           Data.Tagged                (untag)
+import           Control.Monad.Random.Class (MonadRandom (getRandomR))
+import           Data.Sequence              (Seq, (!?))
 import           Data.Text                  (Text)
-
 import           HTask.CLI.Output.Document
 import           HTask.CLI.TaskApplication
 
@@ -23,14 +21,14 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
-taskUuidToText :: H.Task -> Text
-taskUuidToText = UUID.toText . untag . H.taskUuid
+taskToText :: H.Task -> Text
+taskToText = H.taskUuidToText . H.taskUuid
 
 
 runPick :: (MonadRandom m, HasEventBackend m, H.CanCreateTask m) => m RunResult
 runPick = do
-  ts <- runTask API.listTasks
-  let ps = filter (hasStatus H.Pending) ts
+  ts <- runTask H.listTasks
+  let ps = Seq.filter (hasStatus H.Pending) ts
   k <- randomSelectOne ps
   maybe
     (pure $ resultError "no task to pick")
@@ -39,11 +37,11 @@ runPick = do
 
   where
     startTask t = do
-      _ <- runTask (API.startTask $ taskUuidToText t)
+      _ <- runTask (H.startTask $ taskToText t)
       pure ["picking task: " <> H.description t]
 
 
-randomSelectOne :: (Monad m, MonadRandom m) => [a] -> m (Maybe a)
-randomSelectOne [] = pure Nothing
+randomSelectOne :: (Monad m, MonadRandom m) => Seq a -> m (Maybe a)
+randomSelectOne Seq.Empty = pure Nothing
 randomSelectOne xs =
-  (\n -> Just $ xs !! n) <$> getRandomR (0, length xs)
+  (xs !?) <$> getRandomR (0, Seq.length xs)

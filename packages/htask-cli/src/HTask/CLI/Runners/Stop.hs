@@ -5,28 +5,26 @@ module HTask.CLI.Runners.Stop
   ( runStop
   ) where
 
-import qualified HTask.Core.API            as API
-import qualified HTask.Core.Task           as H
+import qualified HTask.Core                as H
 
 import           Control.Monad.IO.Class    (MonadIO)
+import           Data.Text                 (Text)
 import           HTask.CLI.Output.Document
 import           HTask.CLI.TaskApplication
-
-import           Data.Text                 (Text)
 
 
 runStop :: (MonadIO m, HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runStop t
-  = formatOutcome <$> runTask (API.stopTask t)
+  = formatOutcome <$> runTask (H.stopTask t)
 
   where
     formatOutcome x
       = case x of
-          API.ModifySuccess tsk ->
+          H.ModifySuccess tsk ->
             resultSuccess ["stopping task: " <> H.description tsk]
 
-          API.FailedToFind ->
+          H.FailedToFind ->
             resultError "unable to find matching task"
 
-          API.FailedToModify ->
+          H.FailedToModify ->
             resultError "unable to modify matching task"

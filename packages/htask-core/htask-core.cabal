@@ -14,12 +14,13 @@ build-type:     Simple
 
 library
   exposed-modules:
+      HTask.Core
+  other-modules:
       HTask.Core.API
+      HTask.Core.Replay
       HTask.Core.Task
       HTask.Core.TaskContainer
       HTask.Core.TaskEvent
-      HTask.Core.Replay
-  other-modules:
       Paths_htask_core
   hs-source-dirs:
       lib
@@ -28,6 +29,7 @@ library
       aeson
     , base >=4.7 && <5
     , conduit-combinators
+    , containers
     , leadpixel-events
     , leadpixel-provider
     , mtl

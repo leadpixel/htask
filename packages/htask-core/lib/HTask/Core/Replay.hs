@@ -6,41 +6,43 @@ module HTask.Core.Replay
   ) where
 
 import qualified Events                   as V
-import qualified HTask.Core.Task          as H
-import qualified HTask.Core.TaskContainer as HC
-import qualified HTask.Core.TaskEvent     as TV
+
+import           Data.Sequence            (Seq)
+import           HTask.Core.Task
+import           HTask.Core.TaskContainer
+import           HTask.Core.TaskEvent
 
 
 replayEventLog
-  :: (Monad m, HC.HasTasks m, Foldable f)
-  => f TV.TaskEvent -> m HC.Tasks
+  :: (Monad m, HasTasks m, Foldable f)
+  => f TaskEvent -> m (Seq Task)
 replayEventLog k
-  = mapM_ applyRawEvent k >> HC.getTasks
+  = mapM_ applyRawEvent k >> getTasks
 
 
 applyRawEvent
-  :: (Monad m, HC.HasTasks m)
-  => TV.TaskEvent -> m ()
+  :: (Monad m, HasTasks m)
+  => TaskEvent -> m ()
 applyRawEvent ev = do
   let td = V.payload ev
-  case TV.intent td of
-    (TV.AddTask text) -> do
-      let t = H.Task (TV.detailRef td) text (V.timestamp ev) H.Pending
-      _p <- HC.addNewTask t
+  case intent td of
+    (AddTask text) -> do
+      let t = Task (detailRef td) text (V.timestamp ev) Pending
+      _p <- addNewTask t
       pure ()
 
-    (TV.StartTask ref) -> do
-      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.InProgress
+    (StartTask ref) -> do
+      _p <- updateExistingTask ref $ setTaskStatus InProgress
       pure ()
 
-    (TV.StopTask ref) -> do
-      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Pending
+    (StopTask ref) -> do
+      _p <- updateExistingTask ref $ setTaskStatus Pending
       pure ()
 
-    (TV.CompleteTask ref) -> do
-      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Complete
+    (CompleteTask ref) -> do
+      _p <- updateExistingTask ref $ setTaskStatus Complete
       pure ()
 
-    (TV.RemoveTask ref) -> do
-      _p <- HC.updateExistingTask ref $ H.setTaskStatus H.Abandoned
+    (RemoveTask ref) -> do
+      _p <- updateExistingTask ref $ setTaskStatus Abandoned
       pure ()

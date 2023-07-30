@@ -8,7 +8,7 @@ module HTask.CLI.Output.Formatters
   , indent
   ) where
 
-import qualified HTask.Core.Task as H
+import qualified HTask.Core as H
 
 import           Data.String     (IsString)
 

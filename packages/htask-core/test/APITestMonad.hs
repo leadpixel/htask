@@ -19,14 +19,13 @@ import qualified Data.Aeson                 as Aeson
 import qualified Data.ByteString.Lazy       as Lazy
 import qualified Data.Foldable              as Foldable
 import qualified Events                     as V
-import qualified HTask.Core.TaskContainer   as HC
-import qualified HTask.Core.TaskEvent       as TV
+import qualified HTask.Core                 as H
 
 import           Control.Monad.IO.Class     (MonadIO)
 import           Control.Monad.Trans.Class  (MonadTrans, lift)
 import           Control.Monad.Trans.Reader (ReaderT, runReaderT)
 import           Control.Monad.Trans.State  (StateT, runStateT)
-import           Data.Sequence              (Seq (..))
+import           Data.Sequence              (Seq)
 import           Data.Time                  (UTCTime)
 import           Data.UUID                  (UUID)
 import           Event.Backend.Memory       (MemoryBackend, runMemoryBackend)
@@ -36,8 +35,8 @@ import           Data.Maybe
 
 
 newtype TaskAppT m a = TaskApp
-  { unTaskApp :: StateT HC.Tasks m a
-  } deriving (Functor, Applicative, Monad, MonadTrans, HC.HasTasks, MonadIO)
+  { unTaskApp :: StateT (Seq H.Task) m a
+  } deriving (Functor, Applicative, Monad, MonadTrans, H.HasTasks, MonadIO)
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskAppT m) where
   writeEvent = lift . V.writeEvent
@@ -64,18 +63,18 @@ instance (Monad m) => Provider UTCTime (DataProviderT m) where
 
 
 newtype WriteFailureT m a = WriteFailure
-  { unWriteFail :: StateT HC.Tasks m a
-  } deriving (Functor, Applicative, Monad, MonadTrans, HC.HasTasks)
+  { unWriteFail :: StateT (Seq H.Task) m a
+  } deriving (Functor, Applicative, Monad, MonadTrans, H.HasTasks)
 
 
-runStack :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m ((a, HC.Tasks), Seq Lazy.ByteString)
+runStack :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m ((a, Seq H.Task), Seq Lazy.ByteString)
 runStack args op
   = runMemoryBackend
   $ runReaderT
     ( unDataProvider
     $ runStateT
       (unTaskApp op)
-      HC.emptyTasks
+      mempty
     )
     args
 
@@ -85,22 +84,22 @@ runApi args op
   = fst . fst <$> runStack args op
 
 
-runTasks :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m HC.Tasks
+runTasks :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m (Seq H.Task)
 runTasks args op
   = snd . fst <$> runStack args op
 
 
-runEventLog :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m [TV.TaskEvent]
+runEventLog :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m [H.TaskEvent]
 runEventLog args op
   = extractLog . snd <$> runStack args op
 
   where
-    extractLog :: Seq Lazy.ByteString -> [TV.TaskEvent]
+    extractLog :: Seq Lazy.ByteString -> [H.TaskEvent]
     extractLog = mapMaybe Aeson.decode . Foldable.toList
 
 
-runWriteFailure :: (Monad m) => Args -> WriteFailureT m a -> m (a, HC.Tasks)
+runWriteFailure :: (Monad m) => Args -> WriteFailureT m a -> m (a, Seq H.Task)
 runWriteFailure _args op
   = runStateT
       (unWriteFail op)
-      HC.emptyTasks
+      mempty

@@ -5,7 +5,7 @@ module APITests.List
   ) where
 
 import qualified Data.UUID.V4              as UUID
-import qualified HTask.Core.API            as API
+import qualified HTask.Core                as H
 
 import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
@@ -22,45 +22,38 @@ fakeTime = UTCTime (ModifiedJulianDay 0) 0
 
 testList :: TestTree
 testList = testGroup "add"
-  [ testSuccess
-  , testFailure
-  ]
-
-  where
-    testSuccess = testGroup "success"
+  [ testGroup "success"
       [ returnsCreatedUuid
       , storesCreatedTask
       , rollsBackOnWriteFailure
       , writesEvent
       ]
-
-    testFailure = testGroup "failure"
-      []
+  ]
 
 
 returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
   uuid <- UUID.nextRandom
-  x <- runApi (uuid, fakeTime) API.listTasks
-  assertEqual "expecting success" [] x
+  x <- runApi (uuid, fakeTime) H.listTasks
+  assertEqual "expecting success" mempty x
 
 
 storesCreatedTask :: TestTree
 storesCreatedTask = testCase "stores the created task" $ do
   uuid <- UUID.nextRandom
-  x <- runTasks (uuid, fakeTime) API.listTasks
-  assertEqual "expecting one task" [] x
+  x <- runTasks (uuid, fakeTime) H.listTasks
+  assertEqual "expecting one task" mempty x
 
 
 rollsBackOnWriteFailure :: TestTree
 rollsBackOnWriteFailure = testCase "does not store task on write failure" $ do
   uuid <- UUID.nextRandom
-  (_, x) <- runWriteFailure (uuid, fakeTime) API.listTasks
-  assertEqual "expecting nothing" [] x
+  (_, x) <- runWriteFailure (uuid, fakeTime) H.listTasks
+  assertEqual "expecting nothing" mempty x
 
 
 writesEvent :: TestTree
 writesEvent = testCase "stores one event" $ do
   uuid <- UUID.nextRandom
-  x <- runEventLog (uuid, fakeTime) API.listTasks
-  assertEqual "expecting 'add-task' intent" [] x
+  x <- runEventLog (uuid, fakeTime) H.listTasks
+  assertEqual "expecting 'add-task' intent" mempty x

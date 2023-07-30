@@ -20,16 +20,17 @@ executables:
       - -with-rtsopts=-N
     dependencies:
       - MonadRandom
+      - containers
       - event-backend-file
       - htask-core
       - leadpixel-events
       - leadpixel-provider
+      - monads-tf
       - mtl
       - optparse-applicative
-      - time
-      - transformers
-      - monads-tf
       - tagged
       - text
+      - time
+      - transformers
       - unliftio-core
       - uuid

@@ -6,8 +6,7 @@ module APITests.Complete
 
 import qualified Data.UUID                 as UUID
 import qualified Data.UUID.V4              as UUID
-import qualified HTask.Core.API            as API
-import qualified HTask.Core.Task           as H
+import qualified HTask.Core                as H
 
 import           APITestMonad              (runApi)
 import           Data.Tagged               (Tagged (..))
@@ -41,10 +40,10 @@ testComplete = testGroup "complete"
 returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
   uuid <- UUID.nextRandom
-  x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.completeTask (UUID.toText uuid))
+  x <- runApi (uuid, fakeTime) (H.addTask "some task" >> H.completeTask (UUID.toText uuid))
   f uuid @=? x
     where
-      f uuid = API.ModifySuccess
+      f uuid = H.ModifySuccess
         ( H.Task
           { H.taskUuid = Tagged uuid
           , H.description = "some task"
@@ -57,5 +56,5 @@ returnsCreatedUuid = testCase "returns the created uuid on success" $ do
 failsWhenUnableToFindMatch :: TestTree
 failsWhenUnableToFindMatch = testCase "fails when unable to find a matching task" $ do
   uuid <- UUID.nextRandom
-  x <- runApi (uuid, fakeTime) (API.addTask "some task" >> API.completeTask "unknown")
-  assertEqual "expecting failed to find" API.FailedToFind x
+  x <- runApi (uuid, fakeTime) (H.addTask "some task" >> H.completeTask "unknown")
+  assertEqual "expecting failed to find" H.FailedToFind x

@@ -6,8 +6,9 @@ module HTask.CLI.Runners
   ( runAction
   ) where
 
+import qualified HTask.Core                 as H
+
 import           Control.Monad.Random.Class
-import qualified HTask.Core.Task            as H
 
 import           HTask.CLI.Actions
 import           HTask.CLI.Output.Document

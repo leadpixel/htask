@@ -4,7 +4,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE ScopedTypeVariables        #-}
-{-# LANGUAGE StandaloneDeriving         #-}
 
 module Main
   ( main
@@ -12,6 +11,7 @@ module Main
 
 import qualified Data.Time                  as Time
 import qualified Data.UUID.V4               as UUID
+import qualified Events                     as V
 import qualified HTask.CLI.Options          as Opt
 import qualified HTask.CLI.Render           as Render
 import qualified HTask.CLI.Runners          as Runner
@@ -23,7 +23,6 @@ import           Control.Monad.Trans.Class  (lift)
 import           Data.Time                  (UTCTime)
 import           Data.UUID                  (UUID)
 import           Event.Backend.File
-import           Events
 import           Leadpixel.Provider
 
 
@@ -38,7 +37,7 @@ instance Provider UUID WrapIO where
 
 
 newtype App m a = App { unApp :: FileEventBackend m a }
-  deriving (Functor, Applicative, Monad, MonadIO, HasEventSource, HasEventSink)
+  deriving (Functor, Applicative, Monad, MonadIO, V.HasEventSource, V.HasEventSink)
 
 instance (Monad m, Provider k m) => Provider k (App m) where
   provide = App $ lift provide

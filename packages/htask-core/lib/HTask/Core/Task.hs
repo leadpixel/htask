@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstraintKinds  #-}
+{-# LANGUAGE DataKinds  #-}
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeApplications #-}
@@ -23,8 +24,7 @@ import           GHC.Generics
 import           Leadpixel.Provider
 
 
-type TaskIdent = ()
-type TaskUuid = Tagged TaskIdent UUID
+type TaskUuid = Tagged "taskId" UUID
 
 
 data TaskStatus

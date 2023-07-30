@@ -5,27 +5,25 @@ module HTask.CLI.Runners.Remove
   ( runRemove
   ) where
 
-import qualified HTask.Core.API            as API
-import qualified HTask.Core.Task           as H
-
-import           HTask.CLI.Output.Document
-import           HTask.CLI.TaskApplication
+import qualified HTask.Core                as H
 
 import           Data.Text                 (Text)
+import           HTask.CLI.Output.Document
+import           HTask.CLI.TaskApplication
 
 
 runRemove :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
 runRemove t
-  = formatOutcome <$> runTask (API.removeTask t)
+  = formatOutcome <$> runTask (H.removeTask t)
 
   where
     formatOutcome x
       = case x of
-          API.ModifySuccess tsk ->
+          H.ModifySuccess tsk ->
             resultSuccess ["removing task: " <> H.description tsk]
 
-          API.FailedToFind ->
+          H.FailedToFind ->
             resultError "unable to find matching task"
 
-          API.FailedToModify ->
+          H.FailedToModify ->
             resultError "unable to modify matching task"

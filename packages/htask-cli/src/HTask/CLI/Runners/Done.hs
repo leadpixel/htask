@@ -5,23 +5,21 @@ module HTask.CLI.Runners.Done
   ( runDone
   ) where
 
-import qualified Data.UUID                 as UUID
-import qualified HTask.Core.API            as API
-import qualified HTask.Core.Task           as H
+import qualified Data.Sequence             as Seq
+import qualified HTask.Core                as H
 
+import           Data.Foldable
+import           Data.Text                 (Text)
 import           HTask.CLI.Output.Document
 import           HTask.CLI.TaskApplication
-
-import           Data.Tagged               (untag)
-import           Data.Text                 (Text)
 
 
 inProgress :: H.Task -> Bool
 inProgress t = H.status t == H.InProgress
 
 
-taskUuidText :: H.Task -> Text
-taskUuidText = UUID.toText . untag . H.taskUuid
+taskToText :: H.Task -> Text
+taskToText = H.taskUuidToText . H.taskUuid
 
 
 runDone :: (HasEventBackend m, H.CanCreateTask m) => m RunResult
@@ -30,18 +28,18 @@ runDone
 
   where
     doneTask
-      = API.listTasks >>= mapM (API.completeTask . taskUuidText) . filter inProgress
+      = H.listTasks >>= mapM (H.completeTask . taskToText) . Seq.filter inProgress
 
     formatOutcome
-      = resultSuccess . fmap formatRow
+      = resultSuccess . toList . fmap formatRow
 
     formatRow x
       = case x of
-          API.ModifySuccess tsk ->
+          H.ModifySuccess tsk ->
             "completing task: " <> H.description tsk
 
-          API.FailedToFind ->
+          H.FailedToFind ->
             "unable to find matching task"
 
-          API.FailedToModify ->
+          H.FailedToModify ->
             "unable to modify matching task"

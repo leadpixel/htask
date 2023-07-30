@@ -8,9 +8,7 @@ module APITests.Stop
 import qualified Data.UUID                 as UUID
 import qualified Data.UUID.V4              as UUID
 import qualified Events                    as V
-import qualified HTask.Core.API            as API
-import qualified HTask.Core.Task           as H
-import qualified HTask.Core.TaskEvent      as TV
+import qualified HTask.Core                as H
 
 import           Control.Monad.IO.Class    (MonadIO)
 import           Data.Tagged               (Tagged (..))
@@ -37,8 +35,8 @@ testStop = testGroup "stop"
   ]
 
 
-op :: (MonadIO m, API.CanAddTask m, API.CanModifyTask m) => UUID -> m API.ModifyResult
-op uuid = API.addTask "some task" >> API.stopTask (UUID.toText uuid)
+op :: (MonadIO m, H.CanAddTask m, H.CanModifyTask m) => UUID -> m H.ModifyResult
+op uuid = H.addTask "some task" >> H.stopTask (UUID.toText uuid)
 
 
 canStopEvent :: TestTree
@@ -47,7 +45,7 @@ canStopEvent = testCase "reports success when stopping a task" $ do
   x <- runApi (uuid, fakeTime) (op uuid)
   assertEqual "can stop" (f uuid) x
     where
-      f uuid = API.ModifySuccess
+      f uuid = H.ModifySuccess
         ( H.Task
           { H.taskUuid = Tagged uuid
           , H.description = "some task"
@@ -62,32 +60,32 @@ canStopEvent' = testCase "marks the task as pending" $ do
   uuid <- UUID.nextRandom
   x <- runTasks (uuid, fakeTime) (op uuid)
   assertEqual "can stop"
-    [ H.Task
+    (pure  H.Task
       { H.taskUuid = Tagged uuid
       , H.description = "some task"
       , H.createdAt = fakeTime
       , H.status = H.Pending
       }
-    ]
+    )
     x
 
 
 canStopEvent'' :: TestTree
 canStopEvent'' = testCase "cannot stop a stopped task" $ do
   uuid <- UUID.nextRandom
-  x <- runEventLog (uuid, fakeTime) (op uuid >> API.stopTask (UUID.toText uuid))
+  x <- runEventLog (uuid, fakeTime) (op uuid >> H.stopTask (UUID.toText uuid))
   assertEqual "expecting one 'add-task' intent"
-    [ TV.AddTask "some task"
-    , TV.StopTask (Tagged uuid)
-    , TV.StopTask (Tagged uuid)
+    [ H.AddTask "some task"
+    , H.StopTask (Tagged uuid)
+    , H.StopTask (Tagged uuid)
     ]
-    (TV.intent . V.payload <$> x)
+    (H.intent . V.payload <$> x)
 
 
 -- canStopEvent''' :: TestTree
 -- canStopEvent''' = testCase "cannot stop a stopped task" $ do
 --   uuid <- UUID.nextRandom
---   x <- runTasks (uuid, fakeTime) (op uuid >> API.stopTask (UUID.toText uuid))
+--   x <- runTasks (uuid, fakeTime) (op uuid >> H.stopTask (UUID.toText uuid))
 --   assertEqual "can stop"
 --     [ H.Task
 --       { H.taskUuid = Tagged uuid
@@ -102,5 +100,5 @@ canStopEvent'' = testCase "cannot stop a stopped task" $ do
 cannotStopNonExistentEvent :: TestTree
 cannotStopNonExistentEvent = testCase "fails if there is no matching event" $ do
   uuid <- UUID.nextRandom
-  x <- runApi (uuid, fakeTime) (API.stopTask (UUID.toText uuid))
-  assertEqual "expecting failure" API.FailedToFind x
+  x <- runApi (uuid, fakeTime) (H.stopTask (UUID.toText uuid))
+  assertEqual "expecting failure" H.FailedToFind x
