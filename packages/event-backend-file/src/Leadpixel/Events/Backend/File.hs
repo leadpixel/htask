@@ -2,7 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 
-module Event.Backend.File
+module Leadpixel.Events.Backend.File
   ( FileEventBackend ()
   , runFileBackend
   ) where
@@ -19,7 +19,7 @@ import           Control.Monad.IO.Unlift    (MonadUnliftIO, withRunInIO)
 import           Control.Monad.Trans.Class  (MonadTrans)
 import           Control.Monad.Trans.Reader (ReaderT (..), runReaderT)
 import           Data.Maybe                 (mapMaybe)
-import           Events
+import           Leadpixel.Events
 
 
 newtype FileEventBackend m a = Backend { runBackend :: ReaderT FilePath m a }

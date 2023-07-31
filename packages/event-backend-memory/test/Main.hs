@@ -4,8 +4,8 @@
 module Main (main) where
 
 import qualified Data.ByteString.Lazy as Lazy
-import qualified Event.Backend.Memory as Memory
-import qualified Events               as V
+import qualified Leadpixel.Events.Backend.Memory as Memory
+import qualified Leadpixel.Events               as V
 
 import           Data.Sequence        (Seq (..))
 import           Data.Time            (Day (ModifiedJulianDay), UTCTime (..))

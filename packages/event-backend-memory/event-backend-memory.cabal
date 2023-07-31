@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3ff98fcf3987165672aee75c6f3db05faacdf510e5a107b03d2e926b90f393a0
+-- hash: 184c5142ac80682911cf64353e0bac28bba6cdd9356bf546563c78d9249946bf
 
 name:           event-backend-memory
 version:        0.1.0.0
@@ -23,7 +23,7 @@ source-repository head
 
 library
   exposed-modules:
-      Event.Backend.Memory
+      Leadpixel.Events.Backend.Memory
   other-modules:
       Paths_event_backend_memory
   hs-source-dirs:

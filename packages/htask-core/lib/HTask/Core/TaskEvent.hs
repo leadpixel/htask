@@ -9,7 +9,7 @@ module HTask.Core.TaskEvent
   ) where
 
 import qualified Data.Aeson      as Aeson
-import qualified Events          as V
+import qualified Leadpixel.Events          as V
 
 import           Data.Text       (Text)
 import           GHC.Generics

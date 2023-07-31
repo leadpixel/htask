@@ -11,7 +11,7 @@ module Main
 
 import qualified Data.Time                  as Time
 import qualified Data.UUID.V4               as UUID
-import qualified Events                     as V
+import qualified Leadpixel.Events                     as V
 import qualified HTask.CLI.Options          as Opt
 import qualified HTask.CLI.Render           as Render
 import qualified HTask.CLI.Runners          as Runner
@@ -22,7 +22,7 @@ import           Control.Monad.Random.Class (MonadRandom (..))
 import           Control.Monad.Trans.Class  (lift)
 import           Data.Time                  (UTCTime)
 import           Data.UUID                  (UUID)
-import           Event.Backend.File
+import           Leadpixel.Events.Backend.File
 import           Leadpixel.Provider
 
 

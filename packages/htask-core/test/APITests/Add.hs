@@ -6,7 +6,7 @@ module APITests.Add
 
 import qualified Data.Time                 as Time
 import qualified Data.UUID.V4              as UUID
-import qualified Events                    as V
+import qualified Leadpixel.Events                    as V
 import qualified HTask.Core                as H
 
 import           Data.Tagged               (Tagged (..))

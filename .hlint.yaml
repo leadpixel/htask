@@ -23,6 +23,7 @@
   - {name: [System.IO], as: Sys}
   - {name: [Test.QuickCheck], as: QC}
   - {name: [HTask.Core], as: H}
+  - {name: [Leadpixel.Events], as: V}
 #   - {name: Control.Arrow, within: []}#  Certain modules are banned entirely
 
 - functions:

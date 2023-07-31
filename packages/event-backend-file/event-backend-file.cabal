@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 38fa2fa9d29140c7d9191ad1b153ac138f8da40cd6073d29e4997c5046102451
+-- hash: aedf3a846a08a0ed16dba276f058b1b1016101bd3f78dfbba9c2776fdd09e6c4
 
 name:           event-backend-file
 version:        0.1.0.0
@@ -16,7 +16,7 @@ build-type:     Simple
 
 library
   exposed-modules:
-      Event.Backend.File
+      Leadpixel.Events.Backend.File
   other-modules:
       Paths_event_backend_file
   hs-source-dirs:

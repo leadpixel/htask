@@ -3,7 +3,7 @@
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-module Events.Event
+module Leadpixel.Events.Event
   ( Event (..)
   , createEvent
   ) where

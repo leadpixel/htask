@@ -1,10 +1,10 @@
-module Events.Backends
+module Leadpixel.Events.Backends
   ( HasEventSource (..)
   , HasEventSink (..)
   ) where
 
-import qualified Data.Aeson   as Aeson
-import qualified Events.Event as V
+import qualified Data.Aeson             as Aeson
+import qualified Leadpixel.Events.Event as V
 
 
 class (Monad m) => HasEventSource m where

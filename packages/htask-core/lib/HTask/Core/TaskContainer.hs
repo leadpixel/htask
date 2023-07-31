@@ -10,7 +10,7 @@ import qualified Data.Sequence             as Seq
 import           Control.Monad.Trans.State (StateT)
 import           Data.List                 (find)
 import           Data.Maybe                (isNothing)
-import           Data.Sequence             (Seq, (<|), (|>))
+import           Data.Sequence             (Seq, (<|))
 import           HTask.Core.Task
 
 

@@ -9,7 +9,7 @@ module HTask.CLI.Runners.List
 
 import qualified Data.Sequence               as Seq
 import qualified Data.UUID                   as UUID
-import qualified Events                      as V
+import qualified Leadpixel.Events                      as V
 import qualified HTask.Core                  as H
 
 import           Control.Monad.IO.Class      (MonadIO)

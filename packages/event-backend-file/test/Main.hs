@@ -3,8 +3,8 @@
 
 module Main (main) where
 
-import qualified Event.Backend.File      as File
-import qualified Events                  as V
+import qualified Leadpixel.Events.Backend.File      as File
+import qualified Leadpixel.Events                  as V
 
 import           Control.Monad           (replicateM_)
 import           Control.Monad.IO.Unlift (MonadUnliftIO)

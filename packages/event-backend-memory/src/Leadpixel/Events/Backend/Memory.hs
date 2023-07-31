@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveFunctor              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Event.Backend.Memory
+module Leadpixel.Events.Backend.Memory
   ( MemoryBackend ()
   , runMemoryBackend
   ) where
@@ -10,7 +10,7 @@ import qualified Control.Monad.Trans.State as State
 import qualified Data.Aeson                as Aeson
 import qualified Data.ByteString.Lazy      as Lazy
 import qualified Data.Sequence             as Seq
-import qualified Events                    as V
+import qualified Leadpixel.Events                    as V
 
 import           Control.Monad.IO.Class    (MonadIO)
 import           Control.Monad.Trans.Class (MonadTrans)

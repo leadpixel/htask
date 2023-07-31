@@ -7,7 +7,7 @@ module APITests.Start
 
 import qualified Data.UUID                 as UUID
 import qualified Data.UUID.V4              as UUID
-import qualified Events                    as V
+import qualified Leadpixel.Events                    as V
 import qualified HTask.Core                as H
 
 import           Control.Monad.IO.Class    (MonadIO)

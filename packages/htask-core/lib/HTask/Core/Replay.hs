@@ -5,7 +5,7 @@ module HTask.Core.Replay
   ( replayEventLog
   ) where
 
-import qualified Events                   as V
+import qualified Leadpixel.Events                   as V
 
 import           Data.Sequence            (Seq)
 import           HTask.Core.Task

@@ -12,7 +12,7 @@ module HTask.CLI.TaskApplication
   , runTask
   ) where
 
-import qualified Events                    as V
+import qualified Leadpixel.Events                    as V
 import qualified HTask.Core                as H
 
 import           Control.Monad.IO.Class    (MonadIO)

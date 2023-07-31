@@ -12,7 +12,7 @@ dependencies:
 
 library:
   source-dirs: lib
-  exposed-modules: Events
+  exposed-modules: Leadpixel.Events
   dependencies:
     - aeson
     - time

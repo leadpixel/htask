@@ -18,10 +18,10 @@ module HTask.Core.API
 
 import qualified Data.Text                as Text
 import qualified Data.Time                as Time
-import qualified Events                   as V
+import qualified Leadpixel.Events                   as V
 
 import           Control.Monad.IO.Class   (MonadIO, liftIO)
-import           Data.List
+import           Data.Foldable
 import           Data.Sequence            (Seq)
 import           Data.Text                (Text)
 import           Data.Time                (UTCTime)
@@ -71,8 +71,7 @@ addTask tx = do
 
 findTask :: (MonadIO m, HasTasks m) => Text -> m (Maybe Task)
 findTask tx
-  = find (uuidStartsWith tx)
-  <$> listTasks
+  = find (uuidStartsWith tx) <$> listTasks
 
   where
     uuidStartsWith :: Text -> Task -> Bool

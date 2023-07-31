@@ -18,7 +18,7 @@ import qualified Control.Monad.Trans.State  as State
 import qualified Data.Aeson                 as Aeson
 import qualified Data.ByteString.Lazy       as Lazy
 import qualified Data.Foldable              as Foldable
-import qualified Events                     as V
+import qualified Leadpixel.Events                     as V
 import qualified HTask.Core                 as H
 
 import           Control.Monad.IO.Class     (MonadIO)
@@ -28,7 +28,7 @@ import           Control.Monad.Trans.State  (StateT, runStateT)
 import           Data.Sequence              (Seq)
 import           Data.Time                  (UTCTime)
 import           Data.UUID                  (UUID)
-import           Event.Backend.Memory       (MemoryBackend, runMemoryBackend)
+import           Leadpixel.Events.Backend.Memory       (MemoryBackend, runMemoryBackend)
 import           Leadpixel.Provider
 
 import           Data.Maybe
