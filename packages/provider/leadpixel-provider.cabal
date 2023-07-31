@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 93494b7858420aac1696828629ccc3c96fb52ec58aa12eb0fd1b4acc92f04024
+-- hash: 8c8b566ffed4b8a15106df3dcef1c34602f8080162f1b368ff751f20ffad2c60
 
 name:           leadpixel-provider
 version:        1.0.0.0
@@ -31,10 +31,10 @@ test-suite provider
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
-      ProviderTests.Clear
-      ProviderTests.Random
-      ProviderTests.Static
-      ProviderTests.TimedCache
+      Tests.Provider.Clear
+      Tests.Provider.Random
+      Tests.Provider.Static
+      Tests.Provider.TimedCache
       Paths_leadpixel_provider
   hs-source-dirs:
       test

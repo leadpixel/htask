@@ -1,10 +1,10 @@
 module Main (main) where
 
-import           ProviderTests.Clear
-import           ProviderTests.Random
-import           ProviderTests.Static
-import           ProviderTests.TimedCache
 import           Test.Tasty
+import           Tests.Provider.Clear
+import           Tests.Provider.Random
+import           Tests.Provider.Static
+import           Tests.Provider.TimedCache
 
 
 main :: IO ()

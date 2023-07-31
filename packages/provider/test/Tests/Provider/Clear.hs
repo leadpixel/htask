@@ -3,7 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE TypeApplications           #-}
 
-module ProviderTests.Clear (testClear) where
+module Tests.Provider.Clear (testClear) where
 
 import qualified Data.UUID.V4              as UUID
 

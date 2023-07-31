@@ -1,14 +1,14 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module APITests.Stop
+module Tests.Core.Stop
   ( testStop
   ) where
 
 import qualified Data.UUID                 as UUID
 import qualified Data.UUID.V4              as UUID
-import qualified Leadpixel.Events                    as V
 import qualified HTask.Core                as H
+import qualified Leadpixel.Events          as V
 
 import           Control.Monad.IO.Class    (MonadIO)
 import           Data.Tagged               (Tagged (..))
@@ -17,9 +17,9 @@ import           Data.Time                 (Day (ModifiedJulianDay),
 import           Data.UUID                 (UUID)
 import           Test.QuickCheck.Instances ()
 
-import           APITestMonad
 import           Test.Tasty
 import           Test.Tasty.HUnit
+import           Tests.TestApp
 
 
 fakeTime :: UTCTime

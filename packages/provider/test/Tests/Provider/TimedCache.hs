@@ -3,7 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE TypeApplications           #-}
 
-module ProviderTests.TimedCache (testTimedCache) where
+module Tests.Provider.TimedCache (testTimedCache) where
 
 import           Control.Concurrent
 import           Control.Monad.IO.Class

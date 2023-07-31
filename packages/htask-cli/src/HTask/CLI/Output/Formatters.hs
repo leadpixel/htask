@@ -8,9 +8,9 @@ module HTask.CLI.Output.Formatters
   , indent
   ) where
 
-import qualified HTask.Core as H
+import qualified HTask.Core  as H
 
-import           Data.String     (IsString)
+import           Data.String (IsString)
 
 
 data TermColor

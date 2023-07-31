@@ -9,8 +9,8 @@ module HTask.CLI.Runners.List
 
 import qualified Data.Sequence               as Seq
 import qualified Data.UUID                   as UUID
-import qualified Leadpixel.Events                      as V
 import qualified HTask.Core                  as H
+import qualified Leadpixel.Events            as V
 
 import           Control.Monad.IO.Class      (MonadIO)
 import           Data.Foldable

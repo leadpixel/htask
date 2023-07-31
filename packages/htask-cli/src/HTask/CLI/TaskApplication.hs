@@ -12,8 +12,8 @@ module HTask.CLI.TaskApplication
   , runTask
   ) where
 
-import qualified Leadpixel.Events                    as V
 import qualified HTask.Core                as H
+import qualified Leadpixel.Events          as V
 
 import           Control.Monad.IO.Class    (MonadIO)
 import           Control.Monad.Trans.Class (MonadTrans, lift)

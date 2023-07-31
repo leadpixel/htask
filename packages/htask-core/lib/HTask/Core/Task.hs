@@ -1,5 +1,5 @@
 {-# LANGUAGE ConstraintKinds  #-}
-{-# LANGUAGE DataKinds  #-}
+{-# LANGUAGE DataKinds        #-}
 {-# LANGUAGE DeriveGeneric    #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeApplications #-}

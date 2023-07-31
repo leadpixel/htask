@@ -1,21 +1,21 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module APITests.Add
+module Tests.Core.Add
   ( testAdd
   ) where
 
 import qualified Data.Time                 as Time
 import qualified Data.UUID.V4              as UUID
-import qualified Leadpixel.Events                    as V
 import qualified HTask.Core                as H
+import qualified Leadpixel.Events          as V
 
 import           Data.Tagged               (Tagged (..))
 import           Data.Time                 (UTCTime (..))
+
 import           Test.QuickCheck.Instances ()
 import           Test.Tasty
 import           Test.Tasty.HUnit
-
-import           APITestMonad
+import           Tests.TestApp
 
 
 fakeTime :: UTCTime

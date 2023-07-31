@@ -2,12 +2,12 @@ module Main
   ( main
   ) where
 
-import qualified APITests.Add      as APITest
-import qualified APITests.Complete as APITest
-import qualified APITests.List     as APITest
-import qualified APITests.Remove   as APITest
-import qualified APITests.Start    as APITest
-import qualified APITests.Stop     as APITest
+import qualified Tests.Core.Add      as APITest
+import qualified Tests.Core.Complete as APITest
+import qualified Tests.Core.List     as APITest
+import qualified Tests.Core.Remove   as APITest
+import qualified Tests.Core.Start    as APITest
+import qualified Tests.Core.Stop     as APITest
 
 import           Test.Tasty
 

@@ -3,7 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE TypeApplications           #-}
 
-module ProviderTests.Random (testRandom) where
+module Tests.Provider.Random (testRandom) where
 
 import           Control.Monad.Reader
 import           Leadpixel.Provider

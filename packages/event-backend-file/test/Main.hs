@@ -3,12 +3,13 @@
 
 module Main (main) where
 
-import qualified Leadpixel.Events.Backend.File      as File
-import qualified Leadpixel.Events                  as V
+import qualified Leadpixel.Events              as V
+import qualified Leadpixel.Events.Backend.File as File
 
-import           Control.Monad           (replicateM_)
-import           Control.Monad.IO.Unlift (MonadUnliftIO)
-import           Data.Time               (Day (ModifiedJulianDay), UTCTime (..))
+import           Control.Monad                 (replicateM_)
+import           Control.Monad.IO.Unlift       (MonadUnliftIO)
+import           Data.Time                     (Day (ModifiedJulianDay),
+                                                UTCTime (..))
 
 import           System.Directory
 import           System.IO

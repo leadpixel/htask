@@ -3,7 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE TypeApplications           #-}
 
-module ProviderTests.Static (testStatic) where
+module Tests.Provider.Static (testStatic) where
 
 import           Control.Monad.Trans.Reader
 import           Leadpixel.Provider

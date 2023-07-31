@@ -18,7 +18,7 @@ module HTask.Core.API
 
 import qualified Data.Text                as Text
 import qualified Data.Time                as Time
-import qualified Leadpixel.Events                   as V
+import qualified Leadpixel.Events         as V
 
 import           Control.Monad.IO.Class   (MonadIO, liftIO)
 import           Data.Foldable

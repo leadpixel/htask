@@ -4,7 +4,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 
-module APITestMonad
+module Tests.TestApp
   ( TaskAppT (..)
   , DataProviderT (..)
   , runApi
@@ -13,22 +13,23 @@ module APITestMonad
   , runWriteFailure
   ) where
 
-import qualified Control.Monad.Trans.Reader as Reader
-import qualified Control.Monad.Trans.State  as State
-import qualified Data.Aeson                 as Aeson
-import qualified Data.ByteString.Lazy       as Lazy
-import qualified Data.Foldable              as Foldable
-import qualified Leadpixel.Events                     as V
-import qualified HTask.Core                 as H
+import qualified Control.Monad.Trans.Reader      as Reader
+import qualified Control.Monad.Trans.State       as State
+import qualified Data.Aeson                      as Aeson
+import qualified Data.ByteString.Lazy            as Lazy
+import qualified Data.Foldable                   as Foldable
+import qualified HTask.Core                      as H
+import qualified Leadpixel.Events                as V
 
-import           Control.Monad.IO.Class     (MonadIO)
-import           Control.Monad.Trans.Class  (MonadTrans, lift)
-import           Control.Monad.Trans.Reader (ReaderT, runReaderT)
-import           Control.Monad.Trans.State  (StateT, runStateT)
-import           Data.Sequence              (Seq)
-import           Data.Time                  (UTCTime)
-import           Data.UUID                  (UUID)
-import           Leadpixel.Events.Backend.Memory       (MemoryBackend, runMemoryBackend)
+import           Control.Monad.IO.Class          (MonadIO)
+import           Control.Monad.Trans.Class       (MonadTrans, lift)
+import           Control.Monad.Trans.Reader      (ReaderT, runReaderT)
+import           Control.Monad.Trans.State       (StateT, runStateT)
+import           Data.Sequence                   (Seq)
+import           Data.Time                       (UTCTime)
+import           Data.UUID                       (UUID)
+import           Leadpixel.Events.Backend.Memory (MemoryBackend,
+                                                  runMemoryBackend)
 import           Leadpixel.Provider
 
 import           Data.Maybe

@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module APITests.List
+module Tests.Core.List
   ( testList
   ) where
 
@@ -11,9 +11,9 @@ import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
 import           Test.QuickCheck.Instances ()
 
-import           APITestMonad
 import           Test.Tasty
 import           Test.Tasty.HUnit
+import           Tests.TestApp
 
 
 fakeTime :: UTCTime

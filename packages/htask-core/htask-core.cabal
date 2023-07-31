@@ -44,13 +44,13 @@ test-suite htask-core
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
-      APITestMonad
-      APITests.Add
-      APITests.Complete
-      APITests.List
-      APITests.Remove
-      APITests.Start
-      APITests.Stop
+      Tests.Core.Add
+      Tests.Core.Complete
+      Tests.Core.List
+      Tests.Core.Remove
+      Tests.Core.Start
+      Tests.Core.Stop
+      Tests.TestApp
       Paths_htask_core
   hs-source-dirs:
       test
