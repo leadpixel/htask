@@ -26,7 +26,6 @@ executable htask
       HTask.CLI.Actions.Start
       HTask.CLI.Actions.Stop
       HTask.CLI.Actions.Summary
-      HTask.CLI.Config
       HTask.CLI.Options
       HTask.CLI.Output.Document
       HTask.CLI.Output.Formatters

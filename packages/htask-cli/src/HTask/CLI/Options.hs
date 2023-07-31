@@ -6,7 +6,6 @@ module HTask.CLI.Options
 import qualified Options.Applicative        as Opts
 
 import           HTask.CLI.Actions          (Action)
-import           HTask.CLI.Config           (Options (..))
 import           Options.Applicative        ((<|>))
 
 import           HTask.CLI.Actions.Add
@@ -19,6 +18,12 @@ import           HTask.CLI.Actions.Remove
 import           HTask.CLI.Actions.Start
 import           HTask.CLI.Actions.Stop
 import           HTask.CLI.Actions.Summary
+
+
+data Options = Options
+  { action   :: Action
+  , taskfile :: FilePath
+  }
 
 
 actionParser :: Opts.Parser Action
@@ -56,15 +61,15 @@ fileParser = Opts.option Opts.str
   <> Opts.short 'f'
   <> Opts.showDefault
   <> Opts.help "path to tasks file"
-  <> Opts.value ".tasks"
+  <> Opts.value "~/.tasks"
   )
 
 
 optionsParser :: Opts.Parser Options
 optionsParser
-  = flip Options
-  <$> fileParser
-  <*> (actionParser <|> defaultAction)
+  = Options
+  <$> (actionParser <|> defaultAction)
+  <*> fileParser
 
   where
     defaultAction :: Opts.Parser Action
