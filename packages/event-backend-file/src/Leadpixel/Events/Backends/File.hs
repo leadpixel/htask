@@ -28,24 +28,14 @@ newtype FileEventBackend m a
 
 instance (MonadUnliftIO m) => HasEventSource (FileEventBackend m) where
   readEvents = conduitReadEvents
-  readEventsStream = conduitReadStream
 
 instance (MonadUnliftIO m) => HasEventSink (FileEventBackend m) where
   writeEvent = conduitWriteEvent
   writeEvents = conduitWriteMany
-  writeEventsStream = conduitWriteStream
 
 
 runFileBackend :: FilePath -> FileEventBackend m a -> m a
 runFileBackend = flip (runReaderT . runBackend)
-
-
-conduitReadStream :: ConduitT () (Event a) (FileEventBackend m) ()
-conduitReadStream = undefined
-
-
-conduitWriteStream :: ConduitT (Event a) Void (FileEventBackend m) ()
-conduitWriteStream = undefined
 
 
 conduitReadEvents :: (MonadUnliftIO m, Aeson.FromJSON a) => FileEventBackend m [a]
