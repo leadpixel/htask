@@ -12,6 +12,7 @@ module Leadpixel.Events
 
 import qualified Data.Aeson   as Aeson
 
+import           Conduit      (ConduitT, Void)
 import           Data.Time    (UTCTime)
 import           GHC.Generics (Generic)
 
@@ -19,11 +20,16 @@ import           GHC.Generics (Generic)
 class (Monad m) => HasEventSource m where
   readEvents :: (Aeson.FromJSON a) => m [Event a]
 
+  readEventsStream :: (Aeson.FromJSON a) => ConduitT () (Event a) m ()
+
 
 class (Monad m) => HasEventSink m where
   writeEvent :: (Aeson.ToJSON a) => Event a -> m ()
+
   writeEvents :: (Aeson.ToJSON a) => [Event a] -> m ()
   writeEvents = defaultWriteEvents
+
+  writeEventsStream :: (Aeson.FromJSON a) => ConduitT (Event a) Void m ()
 
 
 defaultWriteEvents :: (Monad m, HasEventSink m, Aeson.ToJSON a) => [Event a] -> m ()

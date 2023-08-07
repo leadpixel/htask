@@ -15,4 +15,5 @@ library:
   exposed-modules: Leadpixel.Events
   dependencies:
     - aeson
+    - conduit
     - time

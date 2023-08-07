@@ -20,6 +20,8 @@ executables:
       - -with-rtsopts=-N
     dependencies:
       - MonadRandom
+      - aeson
+      - conduit
       - containers
       - event-backend-file
       - htask-core

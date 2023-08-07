@@ -3,21 +3,11 @@ module HTask.CLI.Options
   , getOptions
   ) where
 
-import qualified Options.Applicative        as Opts
+import qualified Options.Applicative   as Opts
 
-import           HTask.CLI.Actions          (Action)
-import           Options.Applicative        ((<|>))
-
-import           HTask.CLI.Actions.Add
-import           HTask.CLI.Actions.Complete
-import           HTask.CLI.Actions.Done
-import           HTask.CLI.Actions.Drop
-import           HTask.CLI.Actions.List
-import           HTask.CLI.Actions.Pick
-import           HTask.CLI.Actions.Remove
-import           HTask.CLI.Actions.Start
-import           HTask.CLI.Actions.Stop
-import           HTask.CLI.Actions.Summary
+import           HTask.CLI.Actions     (Action)
+import           HTask.CLI.OptionsInfo
+import           Options.Applicative   ((<|>))
 
 
 data Options

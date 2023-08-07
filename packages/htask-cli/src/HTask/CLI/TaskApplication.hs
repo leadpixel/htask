@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstraintKinds            #-}
+{-# LANGUAGE DerivingVia                #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -12,10 +13,13 @@ module HTask.CLI.TaskApplication
   , runTask
   ) where
 
+import qualified Conduit
 import qualified HTask.Core                as H
 import qualified Leadpixel.Events          as V
 
+import           Conduit                   (ConduitT, runConduit)
 import           Control.Monad.IO.Class    (MonadIO)
+import           Control.Monad.IO.Unlift   (MonadUnliftIO)
 import           Control.Monad.Trans.Class (MonadTrans, lift)
 import           Control.Monad.Trans.State (StateT, evalStateT)
 import           Data.Sequence             (Seq)
@@ -32,6 +36,7 @@ newtype TaskApplication m a
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskApplication m) where
   writeEvent = lift . V.writeEvent
+  writeEventsStream = Conduit.transPipe lift V.writeEventsStream
 
 instance (Monad m, Provider k m) => Provider k (TaskApplication m) where
   provide = lift provide

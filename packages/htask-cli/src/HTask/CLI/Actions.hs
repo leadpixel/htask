@@ -1,10 +1,19 @@
-module HTask.CLI.Actions where
+module HTask.CLI.Actions
+  ( Action (..)
+  , ShowAll
+  , ShowUUID
+  ) where
 
-import           Data.Text (Text)
+import           Data.Tagged
+import           Data.Text   (Text)
 
 
-type ShowUUID = Bool
-type ShowAll = Bool
+data ShowUUIDTag
+type ShowUUID = Tagged ShowUUIDTag Bool
+
+
+data ShowAllTag
+type ShowAll = Tagged ShowAllTag Bool
 
 
 data Action

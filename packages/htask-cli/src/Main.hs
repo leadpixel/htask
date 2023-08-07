@@ -1,5 +1,6 @@
 {-# LANGUAGE DerivingVia                #-}
 {-# LANGUAGE FlexibleContexts           #-}
+
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
@@ -7,6 +8,8 @@
 
 module Main (main) where
 
+import qualified Conduit
+import qualified Data.Aeson                     as Aeson
 import qualified Data.Time                      as Time
 import qualified Data.UUID.V4                   as UUID
 import qualified HTask.CLI.Options              as Opt
@@ -14,6 +17,8 @@ import qualified HTask.CLI.Render               as Render
 import qualified HTask.CLI.Runners              as Runner
 import qualified Leadpixel.Events               as V
 
+import           Conduit                        (ConduitT)
+import           Control.Monad                  (liftM)
 import           Control.Monad.IO.Class         (MonadIO)
 import           Control.Monad.IO.Unlift        (MonadUnliftIO)
 import           Control.Monad.Random.Class     (MonadRandom (..))
@@ -37,14 +42,15 @@ instance Provider UUID WrapIO where
 
 newtype App m a
   = App { unApp :: FileEventBackend m a }
-  deriving
-  ( Applicative
-  , Functor
-  , Monad
-  , MonadIO
-  , V.HasEventSink
-  , V.HasEventSource
-  )
+  deriving (Applicative, Functor, Monad, MonadIO)
+
+instance (Monad m, MonadUnliftIO m) => V.HasEventSource (App m) where
+  readEvents = App V.readEvents
+  readEventsStream = Conduit.transPipe App V.readEventsStream
+
+instance (Monad m, MonadUnliftIO m) => V.HasEventSink (App m) where
+  writeEvent = App . V.writeEvent
+  writeEventsStream = Conduit.transPipe App V.writeEventsStream
 
 instance (Monad m, Provider k m) => Provider k (App m) where
   provide = App $ lift provide

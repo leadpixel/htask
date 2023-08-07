@@ -16,7 +16,6 @@ library:
     - HTask.Core
   dependencies:
     - aeson
-    - conduit-combinators
     - containers
     - leadpixel-events
     - leadpixel-provider

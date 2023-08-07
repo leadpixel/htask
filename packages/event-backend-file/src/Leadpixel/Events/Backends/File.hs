@@ -13,7 +13,7 @@ import qualified Data.ByteString            as Strict
 import qualified Data.ByteString.Lazy       as Lazy
 import qualified System.IO                  as Sys
 
-import           Conduit                    (ConduitT, runConduit, (.|))
+import           Conduit                    (ConduitT, Void, runConduit, (.|))
 import           Control.Monad.IO.Class     (MonadIO)
 import           Control.Monad.IO.Unlift    (MonadUnliftIO, withRunInIO)
 import           Control.Monad.Trans.Class  (MonadTrans)
@@ -28,14 +28,24 @@ newtype FileEventBackend m a
 
 instance (MonadUnliftIO m) => HasEventSource (FileEventBackend m) where
   readEvents = conduitReadEvents
+  readEventsStream = conduitReadStream
 
 instance (MonadUnliftIO m) => HasEventSink (FileEventBackend m) where
   writeEvent = conduitWriteEvent
   writeEvents = conduitWriteMany
+  writeEventsStream = conduitWriteStream
 
 
 runFileBackend :: FilePath -> FileEventBackend m a -> m a
 runFileBackend = flip (runReaderT . runBackend)
+
+
+conduitReadStream :: ConduitT () (Event a) (FileEventBackend m) ()
+conduitReadStream = undefined
+
+
+conduitWriteStream :: ConduitT (Event a) Void (FileEventBackend m) ()
+conduitWriteStream = undefined
 
 
 conduitReadEvents :: (MonadUnliftIO m, Aeson.FromJSON a) => FileEventBackend m [a]

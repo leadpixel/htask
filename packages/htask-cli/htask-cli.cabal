@@ -16,31 +16,12 @@ executable htask
   main-is: Main.hs
   other-modules:
       HTask.CLI.Actions
-      HTask.CLI.Actions.Add
-      HTask.CLI.Actions.Complete
-      HTask.CLI.Actions.Done
-      HTask.CLI.Actions.Drop
-      HTask.CLI.Actions.List
-      HTask.CLI.Actions.Pick
-      HTask.CLI.Actions.Remove
-      HTask.CLI.Actions.Start
-      HTask.CLI.Actions.Stop
-      HTask.CLI.Actions.Summary
       HTask.CLI.Options
+      HTask.CLI.OptionsInfo
       HTask.CLI.Output.Document
       HTask.CLI.Output.Formatters
       HTask.CLI.Render
       HTask.CLI.Runners
-      HTask.CLI.Runners.Add
-      HTask.CLI.Runners.Complete
-      HTask.CLI.Runners.Done
-      HTask.CLI.Runners.Drop
-      HTask.CLI.Runners.List
-      HTask.CLI.Runners.Pick
-      HTask.CLI.Runners.Remove
-      HTask.CLI.Runners.Start
-      HTask.CLI.Runners.Stop
-      HTask.CLI.Runners.Summary
       HTask.CLI.TaskApplication
       Paths_htask_cli
   hs-source-dirs:
@@ -48,7 +29,9 @@ executable htask
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       MonadRandom
+    , aeson
     , base >=4.7 && <5
+    , conduit
     , containers
     , event-backend-file
     , htask-core
