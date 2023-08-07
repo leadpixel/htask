@@ -1,9 +1,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module HTask.CLI.Runners.Add
-  ( runAdd
-  ) where
+module HTask.CLI.Runners.Add (runAdd) where
 
 import qualified HTask.Core                as H
 

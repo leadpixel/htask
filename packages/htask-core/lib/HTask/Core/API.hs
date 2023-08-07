@@ -4,16 +4,16 @@
 
 module HTask.Core.API
   ( AddResult (..)
-  , ModifyResult (..)
   , CanAddTask
   , CanModifyTask
+  , ModifyResult (..)
   , addTask
+  , completeTask
   , findTask
+  , listTasks
+  , removeTask
   , startTask
   , stopTask
-  , completeTask
-  , removeTask
-  , listTasks
   ) where
 
 import qualified Data.Text                as Text
@@ -33,14 +33,14 @@ import           HTask.Core.TaskEvent
 data AddResult
   = AddSuccess TaskUuid
   | FailedToAdd
-  deriving (Show, Eq)
+  deriving (Eq, Show)
 
 
 data ModifyResult
   = ModifySuccess Task
   | FailedToModify
   | FailedToFind
-  deriving (Show, Eq)
+  deriving (Eq, Show)
 
 
 type CanAddTask m = (Monad m, V.HasEventSink m, HasTasks m, CanCreateTask m)

@@ -1,5 +1,4 @@
-module HTask.CLI.Actions.List
-  where
+module HTask.CLI.Actions.List where
 
 import           HTask.CLI.Actions
 import           Options.Applicative

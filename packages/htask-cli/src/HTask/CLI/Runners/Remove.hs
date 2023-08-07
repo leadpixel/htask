@@ -1,9 +1,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module HTask.CLI.Runners.Remove
-  ( runRemove
-  ) where
+module HTask.CLI.Runners.Remove (runRemove) where
 
 import qualified HTask.Core                as H
 

@@ -2,9 +2,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module HTask.CLI.Runners.Pick
-  ( runPick
-  ) where
+module HTask.CLI.Runners.Pick (runPick) where
 
 
 import qualified Data.Sequence              as Seq

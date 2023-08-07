@@ -2,10 +2,10 @@
 
 module HTask.CLI.Output.Formatters
   ( TermColor (..)
+  , indent
   , statusSymbol
   , withColor
   , withStatusColor
-  , indent
   ) where
 
 import qualified HTask.Core  as H
@@ -13,16 +13,7 @@ import qualified HTask.Core  as H
 import           Data.String (IsString)
 
 
-data TermColor
-  = Black
-  | Red
-  | Green
-  | Yellow
-  | Blue
-  | Purple
-  | Cyan
-  | LightGrey
-  | Default
+data TermColor = Black | Red | Green | Yellow | Blue | Purple | Cyan | LightGrey | Default
 
 
 resetColor :: (IsString s) => s

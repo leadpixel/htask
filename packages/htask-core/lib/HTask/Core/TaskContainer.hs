@@ -1,8 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module HTask.Core.TaskContainer
-  ( HasTasks (..)
-  ) where
+module HTask.Core.TaskContainer (HasTasks (..)) where
 
 import qualified Control.Monad.Trans.State as State
 import qualified Data.Sequence             as Seq

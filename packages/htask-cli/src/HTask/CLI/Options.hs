@@ -20,10 +20,11 @@ import           HTask.CLI.Actions.Stop
 import           HTask.CLI.Actions.Summary
 
 
-data Options = Options
-  { action   :: Action
-  , taskfile :: FilePath
-  }
+data Options
+  = Options
+    { action   :: Action
+    , taskfile :: FilePath
+    }
 
 
 actionParser :: Opts.Parser Action

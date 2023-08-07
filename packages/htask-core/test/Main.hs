@@ -1,6 +1,4 @@
-module Main
-  ( main
-  ) where
+module Main (main) where
 
 import qualified Tests.Core.Add      as APITest
 import qualified Tests.Core.Complete as APITest

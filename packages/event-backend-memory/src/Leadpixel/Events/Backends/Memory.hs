@@ -19,9 +19,9 @@ import           Data.Foldable             (foldl', toList)
 import           Data.Sequence             (Seq (..), (|>))
 
 
-newtype MemoryBackend m a = Backend
-  { runBackend :: StateT (Seq Lazy.ByteString) m a }
-  deriving (Functor, Applicative, Monad, MonadTrans, MonadIO)
+newtype MemoryBackend m a
+  = Backend { runBackend :: StateT (Seq Lazy.ByteString) m a }
+  deriving (Applicative, Functor, Monad, MonadIO, MonadTrans)
 
 instance (Monad m) => V.HasEventSource (MemoryBackend m) where
   readEvents = toList <$> memoryReadEvents

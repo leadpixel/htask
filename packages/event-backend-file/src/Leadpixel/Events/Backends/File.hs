@@ -22,8 +22,9 @@ import           Data.Maybe                 (mapMaybe)
 import           Leadpixel.Events
 
 
-newtype FileEventBackend m a = Backend { runBackend :: ReaderT FilePath m a }
-  deriving (Functor, Applicative, Monad, MonadTrans, MonadIO)
+newtype FileEventBackend m a
+  = Backend { runBackend :: ReaderT FilePath m a }
+  deriving (Applicative, Functor, Monad, MonadIO, MonadTrans)
 
 instance (MonadUnliftIO m) => HasEventSource (FileEventBackend m) where
   readEvents = conduitReadEvents

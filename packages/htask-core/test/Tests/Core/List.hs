@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Tests.Core.List
-  ( testList
-  ) where
+module Tests.Core.List (testList) where
 
 import qualified Data.UUID.V4              as UUID
 import qualified HTask.Core                as H

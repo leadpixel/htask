@@ -1,9 +1,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Tests.Core.Remove
-  ( testRemove
-  ) where
+module Tests.Core.Remove (testRemove) where
 
 import qualified Data.UUID                 as UUID
 import qualified Data.UUID.V4              as UUID

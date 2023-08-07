@@ -3,9 +3,7 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module HTask.CLI.Runners.List
-  ( runList
-  ) where
+module HTask.CLI.Runners.List (runList) where
 
 import qualified Data.Sequence               as Seq
 import qualified Data.UUID                   as UUID

@@ -3,13 +3,13 @@
 
 module Main (main) where
 
-import qualified Data.ByteString.Lazy            as Lazy
-import qualified Leadpixel.Events                as V
+import qualified Data.ByteString.Lazy             as Lazy
+import qualified Leadpixel.Events                 as V
 import qualified Leadpixel.Events.Backends.Memory as Memory
 
-import           Data.Sequence                   (Seq (..))
-import           Data.Time                       (Day (ModifiedJulianDay),
-                                                  UTCTime (..))
+import           Data.Sequence                    (Seq (..))
+import           Data.Time                        (Day (ModifiedJulianDay),
+                                                   UTCTime (..))
 
 import           Test.Tasty
 import           Test.Tasty.HUnit

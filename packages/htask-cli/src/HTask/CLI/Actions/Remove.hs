@@ -1,5 +1,4 @@
-module HTask.CLI.Actions.Remove
-  where
+module HTask.CLI.Actions.Remove where
 
 import           HTask.CLI.Actions
 import           Options.Applicative

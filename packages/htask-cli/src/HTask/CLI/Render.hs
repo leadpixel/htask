@@ -1,6 +1,4 @@
-module HTask.CLI.Render
-  ( renderResult
-  ) where
+module HTask.CLI.Render (renderResult) where
 
 import qualified Data.Text                   as Text
 import           HTask.CLI.Output.Document   (RunResult (..))

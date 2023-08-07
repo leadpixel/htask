@@ -1,9 +1,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module HTask.CLI.Runners.Complete
-  ( runComplete
-  ) where
+module HTask.CLI.Runners.Complete (runComplete) where
 
 import qualified HTask.Core                as H
 

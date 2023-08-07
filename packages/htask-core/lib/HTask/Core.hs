@@ -1,23 +1,23 @@
 module HTask.Core
-  ( TaskEvent
+  ( AddResult (..)
+  , CanAddTask
+  , CanCreateTask
+  , CanModifyTask
   , HasTasks
-  , addTask
-  , AddResult (..)
   , ModifyResult (..)
+  , Task (..)
+  , TaskEvent
+  , TaskEventDetail (..)
+  , TaskIntent (..)
+  , TaskStatus (..)
+  , addTask
   , completeTask
   , listTasks
-  , CanAddTask
-  , CanModifyTask
-  , CanCreateTask
-  , taskUuidToText
-  , startTask
-  , stopTask
   , removeTask
   , replayEventLog
-  , TaskEventDetail(..)
-  , TaskStatus(..)
-  , Task (..)
-  , TaskIntent (..)
+  , startTask
+  , stopTask
+  , taskUuidToText
   ) where
 
 import           HTask.Core.API

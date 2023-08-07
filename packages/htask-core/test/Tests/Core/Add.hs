@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Tests.Core.Add
-  ( testAdd
-  ) where
+module Tests.Core.Add (testAdd) where
 
 import qualified Data.Time                 as Time
 import qualified Data.UUID.V4              as UUID

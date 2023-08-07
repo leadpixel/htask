@@ -2,9 +2,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 
-module HTask.CLI.Runners
-  ( runAction
-  ) where
+module HTask.CLI.Runners (runAction) where
 
 import qualified HTask.Core                 as H
 

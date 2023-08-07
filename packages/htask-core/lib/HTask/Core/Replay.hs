@@ -1,9 +1,7 @@
 {-# LANGUAGE ConstraintKinds   #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module HTask.Core.Replay
-  ( replayEventLog
-  ) where
+module HTask.Core.Replay (replayEventLog) where
 
 import qualified Leadpixel.Events         as V
 

@@ -6,9 +6,9 @@
 {-# LANGUAGE ScopedTypeVariables        #-}
 
 module HTask.CLI.TaskApplication
-  ( TaskApplication
+  ( CanRunTask
   , HasEventBackend
-  , CanRunTask
+  , TaskApplication
   , runTask
   ) where
 
@@ -26,9 +26,9 @@ type HasEventBackend m = (MonadIO m, V.HasEventSource m, V.HasEventSink m)
 type CanRunTask m = (Monad m, HasEventBackend m)
 
 
-newtype TaskApplication m a = TaskApp
-  { unTaskApp :: StateT (Seq H.Task) m a
-  } deriving (Functor, Applicative, Monad, MonadTrans, MonadIO, H.HasTasks)
+newtype TaskApplication m a
+  = TaskApp { unTaskApp :: StateT (Seq H.Task) m a }
+  deriving (Applicative, Functor, H.HasTasks, Monad, MonadIO, MonadTrans)
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskApplication m) where
   writeEvent = lift . V.writeEvent

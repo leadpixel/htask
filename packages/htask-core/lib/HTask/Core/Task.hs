@@ -5,10 +5,10 @@
 {-# LANGUAGE TypeApplications #-}
 
 module HTask.Core.Task
-  ( Task (..)
-  , TaskUuid
+  ( CanCreateTask
+  , Task (..)
   , TaskStatus (..)
-  , CanCreateTask
+  , TaskUuid
   , createTask
   , setTaskStatus
   , taskUuidToText
@@ -27,20 +27,21 @@ import           Leadpixel.Provider
 type TaskUuid = Tagged "taskId" UUID
 
 
-data TaskStatus
-  = Pending
-  | InProgress
-  | Complete
-  | Abandoned
-  deriving (Show, Eq, Generic)
+data TaskStatus = Pending | InProgress | Complete | Abandoned deriving
+  ( Eq
+  , Generic
+  , Show
+  )
 
 
-data Task = Task
-  { taskUuid    :: TaskUuid
-  , description :: Text
-  , createdAt   :: UTCTime
-  , status      :: TaskStatus
-  } deriving (Show, Eq, Generic)
+data Task
+  = Task
+    { taskUuid    :: TaskUuid
+    , description :: Text
+    , createdAt   :: UTCTime
+    , status      :: TaskStatus
+    }
+  deriving (Eq, Generic, Show)
 
 
 type CanCreateTask m = (Monad m, Provider UTCTime m, Provider UUID m)

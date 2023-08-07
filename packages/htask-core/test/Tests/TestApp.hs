@@ -5,39 +5,39 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 
 module Tests.TestApp
-  ( TaskAppT (..)
-  , DataProviderT (..)
+  ( DataProviderT (..)
+  , TaskAppT (..)
   , runApi
-  , runTasks
   , runEventLog
+  , runTasks
   , runWriteFailure
   ) where
 
-import qualified Control.Monad.Trans.Reader      as Reader
-import qualified Control.Monad.Trans.State       as State
-import qualified Data.Aeson                      as Aeson
-import qualified Data.ByteString.Lazy            as Lazy
-import qualified Data.Foldable                   as Foldable
-import qualified HTask.Core                      as H
-import qualified Leadpixel.Events                as V
+import qualified Control.Monad.Trans.Reader       as Reader
+import qualified Control.Monad.Trans.State        as State
+import qualified Data.Aeson                       as Aeson
+import qualified Data.ByteString.Lazy             as Lazy
+import qualified Data.Foldable                    as Foldable
+import qualified HTask.Core                       as H
+import qualified Leadpixel.Events                 as V
 
-import           Control.Monad.IO.Class          (MonadIO)
-import           Control.Monad.Trans.Class       (MonadTrans, lift)
-import           Control.Monad.Trans.Reader      (ReaderT, runReaderT)
-import           Control.Monad.Trans.State       (StateT, runStateT)
-import           Data.Sequence                   (Seq)
-import           Data.Time                       (UTCTime)
-import           Data.UUID                       (UUID)
+import           Control.Monad.IO.Class           (MonadIO)
+import           Control.Monad.Trans.Class        (MonadTrans, lift)
+import           Control.Monad.Trans.Reader       (ReaderT, runReaderT)
+import           Control.Monad.Trans.State        (StateT, runStateT)
+import           Data.Sequence                    (Seq)
+import           Data.Time                        (UTCTime)
+import           Data.UUID                        (UUID)
 import           Leadpixel.Events.Backends.Memory (MemoryBackend,
-                                                  runMemoryBackend)
+                                                   runMemoryBackend)
 import           Leadpixel.Provider
 
 import           Data.Maybe
 
 
-newtype TaskAppT m a = TaskApp
-  { unTaskApp :: StateT (Seq H.Task) m a
-  } deriving (Functor, Applicative, Monad, MonadTrans, H.HasTasks, MonadIO)
+newtype TaskAppT m a
+  = TaskApp { unTaskApp :: StateT (Seq H.Task) m a }
+  deriving (Applicative, Functor, H.HasTasks, Monad, MonadIO, MonadTrans)
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskAppT m) where
   writeEvent = lift . V.writeEvent
@@ -49,9 +49,9 @@ instance (Monad m, Provider k m) => Provider k (TaskAppT m) where
 type Args = (UUID, UTCTime)
 
 -- TODO: what is the point of this?
-newtype DataProviderT m a = DataProvider
-  { unDataProvider :: ReaderT Args m a
-  } deriving (Functor, Applicative, Monad, MonadTrans, MonadIO)
+newtype DataProviderT m a
+  = DataProvider { unDataProvider :: ReaderT Args m a }
+  deriving (Applicative, Functor, Monad, MonadIO, MonadTrans)
 
 instance (Monad m, V.HasEventSink m) => V.HasEventSink (DataProviderT m) where
   writeEvent = lift . V.writeEvent
@@ -63,9 +63,9 @@ instance (Monad m) => Provider UTCTime (DataProviderT m) where
   provide = snd <$> DataProvider Reader.ask
 
 
-newtype WriteFailureT m a = WriteFailure
-  { unWriteFail :: StateT (Seq H.Task) m a
-  } deriving (Functor, Applicative, Monad, MonadTrans, H.HasTasks)
+newtype WriteFailureT m a
+  = WriteFailure { unWriteFail :: StateT (Seq H.Task) m a }
+  deriving (Applicative, Functor, H.HasTasks, Monad, MonadTrans)
 
 
 runStack :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m ((a, Seq H.Task), Seq Lazy.ByteString)

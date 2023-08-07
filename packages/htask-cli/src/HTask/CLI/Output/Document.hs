@@ -10,10 +10,12 @@ import           Data.Text    (Text)
 import           GHC.Generics
 
 
-data RunResult = RunResult
-  { success :: Bool
-  , text    :: [Text]
-  } deriving (Show, Generic)
+data RunResult
+  = RunResult
+    { success :: Bool
+    , text    :: [Text]
+    }
+  deriving (Generic, Show)
 
 
 resultError :: Text -> RunResult

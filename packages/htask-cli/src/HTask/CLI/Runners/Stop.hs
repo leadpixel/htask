@@ -1,9 +1,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module HTask.CLI.Runners.Stop
-  ( runStop
-  ) where
+module HTask.CLI.Runners.Stop (runStop) where
 
 import qualified HTask.Core                as H
 

@@ -1,9 +1,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module HTask.CLI.Runners.Done
-  ( runDone
-  ) where
+module HTask.CLI.Runners.Done (runDone) where
 
 import qualified Data.Sequence             as Seq
 import qualified HTask.Core                as H

@@ -22,16 +22,18 @@ data TaskIntent
   | StopTask TaskUuid
   | CompleteTask TaskUuid
   | RemoveTask TaskUuid
-  deriving (Show, Eq, Generic)
+  deriving (Eq, Generic, Show)
 
 instance Aeson.ToJSON TaskIntent
 instance Aeson.FromJSON TaskIntent
 
 
-data TaskEventDetail = TaskEventDetail
-  { detailRef :: TaskUuid
-  , intent    :: TaskIntent
-  } deriving (Show, Eq, Generic)
+data TaskEventDetail
+  = TaskEventDetail
+    { detailRef :: TaskUuid
+    , intent    :: TaskIntent
+    }
+  deriving (Eq, Generic, Show)
 
 instance Aeson.ToJSON TaskEventDetail
 instance Aeson.FromJSON TaskEventDetail

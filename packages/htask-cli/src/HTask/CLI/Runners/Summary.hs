@@ -2,9 +2,7 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module HTask.CLI.Runners.Summary
-  ( runSummary
-  ) where
+module HTask.CLI.Runners.Summary (runSummary) where
 
 import qualified Data.Sequence               as Seq
 import qualified Data.Text                   as Text

@@ -1,9 +1,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Tests.Core.Start
-  ( testStart
-  ) where
+module Tests.Core.Start (testStart) where
 
 import qualified Data.UUID                 as UUID
 import qualified Data.UUID.V4              as UUID

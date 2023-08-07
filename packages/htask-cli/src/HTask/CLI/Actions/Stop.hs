@@ -1,5 +1,4 @@
-module HTask.CLI.Actions.Stop
-  where
+module HTask.CLI.Actions.Stop where
 
 import           HTask.CLI.Actions
 import           Options.Applicative

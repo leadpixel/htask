@@ -4,9 +4,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Leadpixel.Events
-  ( HasEventSource (..)
-  , HasEventSink (..)
-
+  ( HasEventSink (..)
+  , HasEventSource (..)
   , Event (..)
   , createEvent
   ) where
@@ -31,10 +30,12 @@ defaultWriteEvents :: (Monad m, HasEventSink m, Aeson.ToJSON a) => [Event a] -> 
 defaultWriteEvents = mapM_ writeEvent
 
 
-data Event a = Event
-  { timestamp :: UTCTime
-  , payload   :: a
-  } deriving (Show, Eq, Generic)
+data Event a
+  = Event
+    { timestamp :: UTCTime
+    , payload   :: a
+    }
+  deriving (Eq, Generic, Show)
 
 
 instance (Aeson.ToJSON a) => Aeson.ToJSON (Event a)
