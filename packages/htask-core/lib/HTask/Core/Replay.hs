@@ -17,13 +17,13 @@ replayEventLog
   :: (Monad m, HasTasks m, Foldable f)
   => f TaskEvent -> m (Seq Task)
 replayEventLog k
-  = mapM_ applyRawEvent k >> getTasks
+  = mapM_ applyEvent k >> getTasks
 
 
-applyRawEvent
+applyEvent
   :: (Monad m, HasTasks m)
   => TaskEvent -> m ()
-applyRawEvent ev = do
+applyEvent ev = do
   let td = V.payload ev
   case intent td of
     (AddTask text) -> do

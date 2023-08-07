@@ -15,7 +15,7 @@ dependencies:
 
 library:
   source-dirs: src
-  exposed-modules: Leadpixel.Events.Backend.Memory
+  exposed-modules: Leadpixel.Events.Backends.Memory
   dependencies:
     - aeson
     - bytestring

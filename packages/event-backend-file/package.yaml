@@ -12,7 +12,7 @@ dependencies:
 
 library:
   source-dirs: src
-  exposed-modules: Leadpixel.Events.Backend.File
+  exposed-modules: Leadpixel.Events.Backends.File
   dependencies:
     - aeson
     - bytestring

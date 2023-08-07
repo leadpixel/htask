@@ -22,7 +22,7 @@ import           Control.Monad.Random.Class    (MonadRandom (..))
 import           Control.Monad.Trans.Class     (lift)
 import           Data.Time                     (UTCTime)
 import           Data.UUID                     (UUID)
-import           Leadpixel.Events.Backend.File
+import           Leadpixel.Events.Backends.File
 import           Leadpixel.Provider
 
 
@@ -50,7 +50,7 @@ instance (MonadRandom m) => MonadRandom (App m) where
 
 
 runApp :: FilePath -> App m a -> m a
-runApp file app = runFileBackend file (unApp app)
+runApp file = runFileBackend file . unApp
 
 
 main :: IO ()

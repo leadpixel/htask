@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 21699cd196ac94781111f62613caf62dba5c50e99eff9ee441ac6e770116e988
+-- hash: 4857523863769a3b2f2e6038b34c0e921a7ab7ce52460ebeed2190c4cdb657bd
 
 name:           leadpixel-events
 version:        0.2.0.0
@@ -18,8 +18,6 @@ library
   exposed-modules:
       Leadpixel.Events
   other-modules:
-      Leadpixel.Events.Backends
-      Leadpixel.Events.Event
       Paths_leadpixel_events
   hs-source-dirs:
       lib

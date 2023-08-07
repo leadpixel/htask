@@ -2,7 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 
-module Leadpixel.Events.Backend.File
+module Leadpixel.Events.Backends.File
   ( FileEventBackend ()
   , runFileBackend
   ) where

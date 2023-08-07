@@ -28,7 +28,7 @@ import           Control.Monad.Trans.State       (StateT, runStateT)
 import           Data.Sequence                   (Seq)
 import           Data.Time                       (UTCTime)
 import           Data.UUID                       (UUID)
-import           Leadpixel.Events.Backend.Memory (MemoryBackend,
+import           Leadpixel.Events.Backends.Memory (MemoryBackend,
                                                   runMemoryBackend)
 import           Leadpixel.Provider
 
