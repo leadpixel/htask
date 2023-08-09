@@ -1,5 +1,6 @@
 {-# LANGUAGE ConstraintKinds  #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module HTask.Core.API
   ( AddResult (..)
@@ -68,12 +69,14 @@ addTask
   => Text -> m AddResult
 addTask tx = do
   tk <- createTask tx
-  p <- addNewTask tk
+  addResult <- addNewTask tk
 
-  if p
+  let intent = AddTask (taskUuid tk) tx
+  (ev :: TaskEvent) <- V.createEvent intent
+
+  if addResult
     then do
-      let intent = AddTask (taskUuid tk) tx
-      V.createEvent intent >>= V.writeEvent
+      V.writeEvent ev
       pure $ AddSuccess (taskUuid tk)
 
     else
@@ -84,9 +87,9 @@ startTask :: (CanModifyTask m) => Text -> m ModifyResult
 startTask tx =
   withMatch tx $ \tsk -> do
     let ref = taskUuid tsk
-    p <- updateExistingTask ref $ setTaskStatus InProgress
+    updateResult <- updateExistingTask ref $ setTaskStatus InProgress
 
-    case p of
+    case updateResult of
       Nothing ->
         pure FailedToModify
 
@@ -104,9 +107,9 @@ stopTask tx =
       else do
         let ref = taskUuid tsk
 
-        p <- updateExistingTask ref $ setTaskStatus Pending
+        updateResult <- updateExistingTask ref $ setTaskStatus Pending
 
-        case p of
+        case updateResult of
           Nothing ->
             pure FailedToModify
 
@@ -119,9 +122,9 @@ completeTask :: (CanModifyTask m) => Text -> m ModifyResult
 completeTask tx =
   withMatch tx $ \tsk -> do
     let ref = taskUuid tsk
-    p <- updateExistingTask ref $ setTaskStatus Complete
+    updateResult <- updateExistingTask ref $ setTaskStatus Complete
 
-    case p of
+    case updateResult of
       Nothing ->
         pure FailedToModify
 
@@ -134,9 +137,9 @@ removeTask :: (CanModifyTask m) => Text -> m ModifyResult
 removeTask tx =
   withMatch tx $ \tsk -> do
     let ref = taskUuid tsk
-    p <- removeTaskUuid ref
+    removeResult <- removeTaskUuid ref
 
-    if p
+    if removeResult
       then do
         V.createEvent (RemoveTask ref) >>= V.writeEvent
         pure $ ModifySuccess tsk

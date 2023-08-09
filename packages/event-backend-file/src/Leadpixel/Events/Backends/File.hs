@@ -14,11 +14,11 @@ import qualified Data.ByteString.Lazy       as Lazy
 import qualified System.IO                  as Sys
 
 import           Conduit                    (ConduitT, Void, runConduit, (.|))
-import           Control.Monad.IO.Class     (MonadIO)
+import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Monad.IO.Unlift    (MonadUnliftIO, withRunInIO)
 import           Control.Monad.Trans.Class  (MonadTrans)
 import           Control.Monad.Trans.Reader (ReaderT (..), runReaderT)
-import           Data.Maybe                 (mapMaybe)
+import           Data.Either
 import           Leadpixel.Events
 
 
@@ -40,7 +40,10 @@ runFileBackend = flip (runReaderT . runBackend)
 
 conduitReadEvents :: (MonadUnliftIO m, Aeson.FromJSON a) => FileEventBackend m [a]
 conduitReadEvents
-  = Backend (ReaderT (fmap decodeEvents . loadFileLines Conduit.sinkList))
+  = Backend (ReaderT (\path -> do
+      ks <- decodeEvents <$> loadFileLines Conduit.sinkList path
+      pure $ Data.Either.rights ks
+                     ))
 
   where
     loadFileLines :: (Monad m, MonadUnliftIO m) => ConduitT Strict.ByteString Conduit.Void m [Strict.ByteString] -> FilePath -> m [Strict.ByteString]
@@ -71,8 +74,8 @@ conduitWriteMany =
         runConduit $ Conduit.yieldMany xs .| dest
 
 
-decodeEvents :: (Aeson.FromJSON a) => [Strict.ByteString] -> [a]
-decodeEvents = mapMaybe Aeson.decodeStrict
+decodeEvents :: (Aeson.FromJSON a) => [Strict.ByteString] -> [Either Strict.ByteString a]
+decodeEvents = fmap (\x -> maybe (Left x) Right (Aeson.decodeStrict x))
 
 
 encodeEvent :: (Aeson.ToJSON a) => Event a -> Strict.ByteString

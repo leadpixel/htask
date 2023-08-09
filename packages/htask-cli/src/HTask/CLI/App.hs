@@ -6,6 +6,8 @@ module HTask.CLI.App
   , runApp
   ) where
 
+import qualified Data.Map.Strict                as Map
+import qualified Data.Sequence                  as Seq
 import qualified Data.Time                      as Time
 import qualified Data.UUID.V4                   as UUID
 import qualified HTask.Core                     as H
@@ -49,4 +51,4 @@ instance (MonadRandom m) => MonadRandom (App m) where
 runApp :: (MonadUnliftIO m) => FilePath -> App m a -> m a
 runApp file app
   = runFileBackend file
-  $ V.readEvents >>= evalStateT (unApp app) . H.foldEventLog
+  $ V.readEvents >>= evalStateT (unApp app) . (Seq.fromList . Map.elems . fst . H.foldEventLog)

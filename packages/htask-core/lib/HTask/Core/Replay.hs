@@ -4,54 +4,75 @@ module HTask.Core.Replay
   ) where
 
 import qualified Data.Map.Strict      as Map
-import qualified Data.Sequence        as Seq
 import qualified Leadpixel.Events     as V
 
 import           Data.Foldable        (foldl')
 import           Data.Map.Strict      (Map)
-import           Data.Sequence        (Seq)
+import           Data.Sequence        (Seq, (|>))
 import           HTask.Core.Task
 import           HTask.Core.TaskEvent
 
 
 foldEventLog
   :: (Foldable f)
-  => f TaskEvent -> Seq Task
-foldEventLog = Seq.fromList . Map.elems . foldl' applyEvent mempty
+  => f TaskEvent -> (Map TaskUuid Task, Seq TaskEvent)
+foldEventLog = foldl' run (mempty, mempty)
+
+  where
+    run (accMap, accSeq) x = do
+      let (xs, mt) = applyEvent accMap x
+
+      let accSeq' = maybe accSeq (accSeq |>) mt
+
+      (xs, accSeq')
 
 
-applyEvent :: Map TaskUuid Task -> TaskEvent -> Map TaskUuid Task
+
+
+applyEvent :: Map TaskUuid Task -> TaskEvent -> (Map TaskUuid Task, Maybe TaskEvent)
 applyEvent xs ev =
   case V.payload ev of
     (AddTask ref text) -> do
       let t = Task ref text (V.timestamp ev) Pending
-      addNewTask t xs
+      let (xs', p) = tryInsertTask t xs
+      if p
+         then (xs', Nothing)
+         else (xs', Just ev)
 
-    (StartTask ref) ->
-      updateExistingTask ref (setTaskStatus InProgress) xs
+    (StartTask ref) -> do
+      let (xs', p) = tryUpdateTask ref (setTaskStatus InProgress) xs
+      if p
+         then (xs', Nothing)
+         else (xs', Just ev)
 
-    (StopTask ref) ->
-      updateExistingTask ref (setTaskStatus Pending) xs
+    (StopTask ref) -> do
+      let (xs', p) = tryUpdateTask ref (setTaskStatus Pending) xs
+      if p
+         then (xs', Nothing)
+         else (xs', Just ev)
 
-    (CompleteTask ref) ->
-      updateExistingTask ref (setTaskStatus Complete) xs
+    (CompleteTask ref) -> do
+      let (xs', p) = tryUpdateTask ref (setTaskStatus Complete) xs
+      if p
+         then (xs', Nothing)
+         else (xs', Just ev)
 
-    (RemoveTask ref) ->
-      updateExistingTask ref (setTaskStatus Abandoned) xs
+    (RemoveTask ref) -> do
+      let (xs', p) = tryUpdateTask ref (setTaskStatus Abandoned) xs
+      if p
+         then (xs', Nothing)
+         else (xs', Just ev)
 
 
-addNewTask :: Task -> Map TaskUuid Task -> Map TaskUuid Task
-addNewTask t xs =
-    if Map.member (taskUuid t) xs
-        then xs
-        else Map.insert (taskUuid t) t xs
+tryInsertTask :: Task -> Map TaskUuid Task -> (Map TaskUuid Task, Bool)
+tryInsertTask t xs =
+  if Map.member (taskUuid t) xs
+    then (xs, False)
+    else (Map.insert (taskUuid t) t xs, True)
 
 
-updateExistingTask :: TaskUuid -> (Task -> Task) -> Map TaskUuid Task -> Map TaskUuid Task
-updateExistingTask ref op xs = do
-  maybe xs
-    (\t -> do
-      let t' = op t
-      Map.insert (taskUuid t) t' xs
-      )
+tryUpdateTask :: TaskUuid -> (Task -> Task) -> Map TaskUuid Task -> (Map TaskUuid Task, Bool)
+tryUpdateTask ref op xs = do
+  maybe (xs, False)
+    (\t -> (Map.insert (taskUuid t) (op t) xs, True))
     (Map.lookup ref xs)
