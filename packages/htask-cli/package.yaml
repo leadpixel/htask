@@ -21,14 +21,11 @@ executables:
     dependencies:
       - MonadRandom
       - aeson
-      - conduit
       - containers
       - event-backend-file
       - htask-core
       - leadpixel-events
       - leadpixel-provider
-      - monads-tf
-      - mtl
       - optparse-applicative
       - tagged
       - text

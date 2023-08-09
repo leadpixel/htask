@@ -3,17 +3,18 @@ module HTask.Core
   , CanCreateTask
   , HasTasks
   , ModifyResult (..)
+    -- TODO: remove constructor export
   , Task (..)
   , TaskEvent
   , TaskEventDetail (..)
   , TaskIntent (..)
   , TaskStatus (..)
+  , TaskUuid
   , addTask
   , completeTask
+  , foldEventLog
   , listTasks
   , removeTask
-  , replayEventLog
-  , foldEventLog
   , startTask
   , stopTask
   , taskUuidToText

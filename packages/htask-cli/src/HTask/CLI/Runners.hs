@@ -1,8 +1,5 @@
-{-# LANGUAGE ConstraintKinds     #-}
-{-# LANGUAGE FlexibleContexts    #-}
-{-# LANGUAGE FlexibleInstances   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module HTask.CLI.Runners (runAction) where
 
@@ -23,9 +20,9 @@ import           Data.Text                   (Text)
 import           Data.Time                   (UTCTime)
 import           Data.UUID                   (UUID)
 import           HTask.CLI.Actions
+import           HTask.CLI.App
 import           HTask.CLI.Output.Document
 import           HTask.CLI.Output.Formatters
-import           HTask.CLI.TaskApplication
 import           Leadpixel.Provider
 
 

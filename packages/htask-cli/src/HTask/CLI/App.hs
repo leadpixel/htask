@@ -1,12 +1,7 @@
-{-# LANGUAGE ConstraintKinds            #-}
-{-# LANGUAGE DerivingVia                #-}
-{-# LANGUAGE FlexibleContexts           #-}
-{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE ScopedTypeVariables        #-}
 
-module HTask.CLI.TaskApplication
+module HTask.CLI.App
   ( App
   , runApp
   ) where
@@ -53,4 +48,5 @@ instance (MonadRandom m) => MonadRandom (App m) where
 
 runApp :: (MonadUnliftIO m) => FilePath -> App m a -> m a
 runApp file app
-  = runFileBackend file (V.readEvents >>= evalStateT (unApp app) . H.foldEventLog )
+  = runFileBackend file
+  $ V.readEvents >>= evalStateT (unApp app) . H.foldEventLog

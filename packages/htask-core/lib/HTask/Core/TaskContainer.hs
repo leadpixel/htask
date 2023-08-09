@@ -3,12 +3,12 @@
 module HTask.Core.TaskContainer (HasTasks (..)) where
 
 import qualified Control.Monad.Trans.State as State
-import qualified Data.Map                  as Map
+import qualified Data.Map.Strict           as Map
 import qualified Data.Sequence             as Seq
 
 import           Control.Monad.Trans.State (StateT)
 import           Data.List                 (find)
-import           Data.Map
+import           Data.Map.Strict
 import           Data.Maybe                (isNothing)
 import           Data.Sequence             (Seq, (<|))
 import           HTask.Core.Task

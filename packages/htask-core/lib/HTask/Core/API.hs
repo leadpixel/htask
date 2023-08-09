@@ -1,6 +1,5 @@
-{-# LANGUAGE ConstraintKinds     #-}
-{-# LANGUAGE FlexibleContexts    #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ConstraintKinds  #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module HTask.Core.API
   ( AddResult (..)
@@ -41,28 +40,12 @@ data ModifyResult
   deriving (Eq, Show)
 
 
-type CanModifyTask m = (Monad m, V.HasEventSink m, HasTasks m)
+type CanAddTask m = (Monad m, V.HasEventSink m, HasTasks m, Provider UUID m, Provider UTCTime m)
+type CanModifyTask m = (Monad m, Provider UTCTime m, V.HasEventSink m, HasTasks m)
 
 
 listTasks :: (HasTasks m) => m (Seq Task)
 listTasks = getTasks
-
-
-addTask
-  :: (Monad m, V.HasEventSink m, HasTasks m, Provider UUID m, Provider UTCTime m)
-  => Text -> m AddResult
-addTask tx = do
-  tk <- createTask tx
-  p <- addNewTask tk
-
-  if p
-    then do
-      let detail = TaskEventDetail (taskUuid tk) (AddTask tx)
-      V.createEvent detail >>= V.writeEvent
-      pure $ AddSuccess (taskUuid tk)
-
-    else
-      pure FailedToAdd
 
 
 findTask :: (HasTasks m, Monad m) => Text -> m (Maybe Task)
@@ -80,9 +63,24 @@ withMatch tx op
   = findTask tx >>= maybe (pure FailedToFind) op
 
 
-startTask
-  :: (CanModifyTask m, Provider UTCTime m)
-  => Text -> m ModifyResult
+addTask
+  :: (CanAddTask m)
+  => Text -> m AddResult
+addTask tx = do
+  tk <- createTask tx
+  p <- addNewTask tk
+
+  if p
+    then do
+      let detail = TaskEventDetail (taskUuid tk) (AddTask tx)
+      V.createEvent detail >>= V.writeEvent
+      pure $ AddSuccess (taskUuid tk)
+
+    else
+      pure FailedToAdd
+
+
+startTask :: (CanModifyTask m) => Text -> m ModifyResult
 startTask tx =
   withMatch tx $ \tsk -> do
     let ref = taskUuid tsk
@@ -97,9 +95,7 @@ startTask tx =
         pure $ ModifySuccess t
 
 
-stopTask
-  :: (CanModifyTask m, Provider UTCTime m)
-  => Text -> m ModifyResult
+stopTask :: (CanModifyTask m) => Text -> m ModifyResult
 stopTask tx =
   withMatch tx $ \tsk -> do
     let ref = taskUuid tsk
@@ -114,9 +110,7 @@ stopTask tx =
         pure $ ModifySuccess t
 
 
-completeTask
-  :: (CanModifyTask m, Provider UTCTime m)
-  => Text -> m ModifyResult
+completeTask :: (CanModifyTask m) => Text -> m ModifyResult
 completeTask tx =
   withMatch tx $ \tsk -> do
     let ref = taskUuid tsk
@@ -131,9 +125,7 @@ completeTask tx =
         pure $ ModifySuccess t
 
 
-removeTask
-  :: (CanModifyTask m, Provider UTCTime m)
-  => Text -> m ModifyResult
+removeTask :: (CanModifyTask m) => Text -> m ModifyResult
 removeTask tx =
   withMatch tx $ \tsk -> do
     let ref = taskUuid tsk

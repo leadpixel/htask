@@ -1,10 +1,10 @@
 module Main (main) where
 
-import qualified HTask.CLI.Options         as Opt
-import qualified HTask.CLI.Render          as Render
-import qualified HTask.CLI.Runners         as Runner
+import qualified HTask.CLI.Options as Opt
+import qualified HTask.CLI.Render  as Render
+import qualified HTask.CLI.Runners as Runner
 
-import           HTask.CLI.TaskApplication
+import           HTask.CLI.App
 
 
 main :: IO ()
