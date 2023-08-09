@@ -5,10 +5,10 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 
 module Tests.TestApp
-  ( runApi
-  , runEventLog
-  , runFish
-  , runTasks
+  ( getEvents
+  , getResult
+  , getTasks
+  , runTestApp
   , runWriteFailure
   ) where
 
@@ -18,8 +18,6 @@ import qualified Data.Aeson                       as Aeson
 import qualified Data.ByteString.Lazy             as Lazy
 import qualified Data.Foldable                    as Foldable
 import qualified Data.Map.Strict                  as Map
-import qualified Data.Maybe                       as Maybe
-import qualified Data.Sequence                    as Seq
 import qualified HTask.Core                       as H
 import qualified Leadpixel.Events                 as V
 
@@ -51,23 +49,11 @@ instance (Monad m) => Provider UTCTime (TestApp m) where
   provide = TestApp $ lift ( snd <$> Reader.ask )
 
 
-
-newtype WriteFailureT m a
-  = WriteFailure { unWriteFail :: StateT (Seq H.Task) m a }
-  deriving (Applicative, Functor, H.HasTasks, Monad, MonadTrans)
-
-
-runStack :: (Monad m) => Args -> TestApp (MemoryBackend m) a -> m ((a, Seq H.Task), Seq Lazy.ByteString)
-runStack args op
-  = runMemoryBackend
-  $ runReaderT
-    ( runStateT (unTestApp op) mempty )
-    args
-
-
-runFish :: (Monad m) => Args -> TestApp (MemoryBackend m) a -> m (a, Map H.TaskUuid H.Task, Seq H.TaskEvent)
-runFish args op = do
-  ((a, b), c) <- runStack args op
+runTestApp :: (Monad m) => Args -> TestApp (MemoryBackend m) a -> m (a, Map H.TaskUuid H.Task, Seq H.TaskEvent)
+runTestApp args op = do
+  ((a, b), c) <- runMemoryBackend
+      $ flip runReaderT args
+      $ runStateT (unTestApp op) mempty
 
   pure (a, convertToMap b, decodeLog c)
 
@@ -79,23 +65,21 @@ runFish args op = do
     decodeLog = Foldable.foldl' (\b -> maybe b (b |>) . Aeson.decode) mempty
 
 
-runApi :: (Monad m) => Args -> TestApp (MemoryBackend m) a -> m a
-runApi args op
-  = fst . fst <$> runStack args op
+getResult :: (a, b, c) -> a
+getResult (a, _, _) = a
 
 
-runTasks :: (Monad m) => Args -> TestApp (MemoryBackend m) a -> m (Seq H.Task)
-runTasks args op
-  = snd . fst <$> runStack args op
+getTasks :: (a, b, c) -> b
+getTasks (_, b, _) = b
 
 
-runEventLog :: (Monad m) => Args -> TestApp (MemoryBackend m) a -> m [H.TaskEvent]
-runEventLog args op
-  = extractLog . snd <$> runStack args op
+getEvents :: (a, b, c) -> c
+getEvents (_, _, c) = c
 
-  where
-    extractLog :: Seq Lazy.ByteString -> [H.TaskEvent]
-    extractLog = Maybe.mapMaybe Aeson.decode . Foldable.toList
+
+newtype WriteFailureT m a
+  = WriteFailure { unWriteFail :: StateT (Seq H.Task) m a }
+  deriving (Applicative, Functor, H.HasTasks, Monad, MonadTrans)
 
 
 runWriteFailure :: (Monad m) => Args -> WriteFailureT m a -> m (a, Seq H.Task)

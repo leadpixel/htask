@@ -72,8 +72,8 @@ addTask tx = do
 
   if p
     then do
-      let detail = TaskEventDetail (taskUuid tk) (AddTask tx)
-      V.createEvent detail >>= V.writeEvent
+      let intent = AddTask (taskUuid tk) tx
+      V.createEvent intent >>= V.writeEvent
       pure $ AddSuccess (taskUuid tk)
 
     else
@@ -91,23 +91,28 @@ startTask tx =
         pure FailedToModify
 
       Just t -> do
-        V.createEvent (TaskEventDetail ref (StartTask ref)) >>= V.writeEvent
+        V.createEvent (StartTask ref) >>= V.writeEvent
         pure $ ModifySuccess t
 
 
 stopTask :: (CanModifyTask m) => Text -> m ModifyResult
 stopTask tx =
   withMatch tx $ \tsk -> do
-    let ref = taskUuid tsk
-    p <- updateExistingTask ref $ setTaskStatus Pending
 
-    case p of
-      Nothing ->
-        pure FailedToModify
+    if status tsk == Pending
+      then pure FailedToModify
+      else do
+        let ref = taskUuid tsk
 
-      Just t -> do
-        V.createEvent (TaskEventDetail ref (StopTask ref)) >>= V.writeEvent
-        pure $ ModifySuccess t
+        p <- updateExistingTask ref $ setTaskStatus Pending
+
+        case p of
+          Nothing ->
+            pure FailedToModify
+
+          Just t -> do
+            V.createEvent (StopTask ref) >>= V.writeEvent
+            pure $ ModifySuccess t
 
 
 completeTask :: (CanModifyTask m) => Text -> m ModifyResult
@@ -121,7 +126,7 @@ completeTask tx =
         pure FailedToModify
 
       Just t -> do
-        V.createEvent (TaskEventDetail ref (CompleteTask ref)) >>= V.writeEvent
+        V.createEvent (CompleteTask ref) >>= V.writeEvent
         pure $ ModifySuccess t
 
 
@@ -133,7 +138,7 @@ removeTask tx =
 
     if p
       then do
-        V.createEvent (TaskEventDetail ref (RemoveTask ref)) >>= V.writeEvent
+        V.createEvent (RemoveTask ref) >>= V.writeEvent
         pure $ ModifySuccess tsk
 
       else

@@ -9,10 +9,10 @@ import qualified HTask.Core                as H
 import           Data.Tagged               (Tagged (..))
 import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
-import           Test.QuickCheck.Instances ()
+
 import           Test.Tasty
 import           Test.Tasty.HUnit
-import           Tests.TestApp             (runApi)
+import           Tests.TestApp
 
 
 fakeTime :: UTCTime
@@ -29,7 +29,7 @@ testComplete = testGroup "complete"
 returnsCreatedUuid :: TestTree
 returnsCreatedUuid = testCase "returns the created uuid on success" $ do
   uuid <- UUID.nextRandom
-  x <- runApi (uuid, fakeTime) (H.addTask "some task" >> H.completeTask (UUID.toText uuid))
+  x <- getResult <$> runTestApp (uuid, fakeTime) (H.addTask "some task" >> H.completeTask (UUID.toText uuid))
   f uuid @=? x
     where
       f uuid = H.ModifySuccess
@@ -45,5 +45,5 @@ returnsCreatedUuid = testCase "returns the created uuid on success" $ do
 failsWhenUnableToFindMatch :: TestTree
 failsWhenUnableToFindMatch = testCase "fails when unable to find a matching task" $ do
   uuid <- UUID.nextRandom
-  x <- runApi (uuid, fakeTime) (H.addTask "some task" >> H.completeTask "unknown")
+  x <- getResult <$> runTestApp (uuid, fakeTime) (H.addTask "some task" >> H.completeTask "unknown")
   assertEqual "expecting failed to find" H.FailedToFind x

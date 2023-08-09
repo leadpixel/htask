@@ -22,10 +22,9 @@ foldEventLog = Seq.fromList . Map.elems . foldl' applyEvent mempty
 
 applyEvent :: Map TaskUuid Task -> TaskEvent -> Map TaskUuid Task
 applyEvent xs ev =
-  let td = V.payload ev
-  in case intent td of
-    (AddTask text) -> do
-      let t = Task (detailRef td) text (V.timestamp ev) Pending
+  case V.payload ev of
+    (AddTask ref text) -> do
+      let t = Task ref text (V.timestamp ev) Pending
       addNewTask t xs
 
     (StartTask ref) ->

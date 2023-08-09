@@ -6,6 +6,7 @@ module Tests.Core.Remove (testRemove) where
 import qualified Data.UUID                 as UUID
 import qualified Data.UUID.V4              as UUID
 import qualified HTask.Core                as H
+import qualified Data.Sequence as Seq
 import qualified Leadpixel.Events          as V
 
 import           Data.Tagged               (Tagged (..))
@@ -13,7 +14,6 @@ import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
 import           Data.UUID                 (UUID)
 import           Leadpixel.Provider
-import           Test.QuickCheck.Instances ()
 
 import           Test.Tasty
 import           Test.Tasty.HUnit
@@ -40,7 +40,7 @@ op uuid = H.addTask "some task" >> H.removeTask (UUID.toText uuid)
 canRemoveEvent :: TestTree
 canRemoveEvent = testCase "reports success when removing a task" $ do
   uuid <- UUID.nextRandom
-  x <- runApi (uuid, fakeTime) (op uuid)
+  x <- getResult <$> runTestApp (uuid, fakeTime) (op uuid)
   assertEqual "can remove" (f uuid) x
 
   where
@@ -57,25 +57,26 @@ canRemoveEvent = testCase "reports success when removing a task" $ do
 canRemoveEvent' :: TestTree
 canRemoveEvent' = testCase "removes the task" $ do
   uuid <- UUID.nextRandom
-  x <- runTasks (uuid, fakeTime) (op uuid)
+  x <- getTasks <$> runTestApp (uuid, fakeTime) (op uuid)
   assertEqual "can remove" mempty x
 
 
 canRemoveEvent'' :: TestTree
 canRemoveEvent'' = testCase "cannot remove a removeped task" $ do
   uuid <- UUID.nextRandom
-  x <- runEventLog (uuid, fakeTime) (op uuid >> H.removeTask (UUID.toText uuid))
-  assertEqual "expecting one 'add-task' intent"
-    [ H.AddTask "some task"
-    , H.RemoveTask (Tagged uuid)
-    ]
-    (H.intent . V.payload <$> x)
+  x <- getEvents <$> runTestApp (uuid, fakeTime) (op uuid >> H.removeTask (UUID.toText uuid))
+
+  let expectedEvents = Seq.fromList
+        [ H.AddTask (Tagged uuid) "some task"
+        , H.RemoveTask (Tagged uuid)
+        ]
+  assertEqual "expecting one 'add-task' intent" expectedEvents (V.payload <$> x)
 
 
 -- canRemoveEvent''' :: TestTree
 -- canRemoveEvent''' = testCase "cannot remove a removeped task" $ do
 --   uuid <- UUID.nextRandom
---   x <- runTasks (uuid, fakeTime) (op uuid >> H.removeTask (Tagged uuid))
+--   x <- getTasks <$> runTestApp (uuid, fakeTime) (op uuid >> H.removeTask (Tagged uuid))
 --   assertEqual "can remove"
 --     [ H.Task
 --       { H.taskUuid = Tagged uuid
@@ -90,5 +91,5 @@ canRemoveEvent'' = testCase "cannot remove a removeped task" $ do
 cannotRemoveNonExistentEvent :: TestTree
 cannotRemoveNonExistentEvent = testCase "fails if there is no matching event" $ do
   uuid <- UUID.nextRandom
-  x <- runApi (uuid, fakeTime) (H.removeTask (UUID.toText uuid))
+  x <- getResult <$> runTestApp (uuid, fakeTime) (H.removeTask (UUID.toText uuid))
   assertEqual "expecting failure" H.FailedToFind x

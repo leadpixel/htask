@@ -6,7 +6,6 @@ module HTask.Core
     -- TODO: remove constructor export
   , Task (..)
   , TaskEvent
-  , TaskEventDetail (..)
   , TaskIntent (..)
   , TaskStatus (..)
   , TaskUuid
