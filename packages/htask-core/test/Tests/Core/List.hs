@@ -19,13 +19,11 @@ fakeTime = UTCTime (ModifiedJulianDay 0) 0
 
 
 testList :: TestTree
-testList = testGroup "add"
-  [ testGroup "success"
-      [ returnsCreatedUuid
-      , storesCreatedTask
-      , rollsBackOnWriteFailure
-      , writesEvent
-      ]
+testList = testGroup "list"
+  [ returnsCreatedUuid
+  , storesCreatedTask
+  , rollsBackOnWriteFailure
+  , writesEvent
   ]
 
 

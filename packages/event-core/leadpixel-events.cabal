@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 05ec73d6b449537f4b5f8a66d31275c5215dc8b84e2e1ea8979f5f0c102d5e90
+-- hash: efefd1b2d09ff2df771b3160110d67f50b5df409093ad86f81321842a7d7f97d
 
 name:           leadpixel-events
 version:        0.2.0.0
@@ -26,5 +26,6 @@ library
       aeson
     , base >=4.7 && <5
     , conduit
+    , leadpixel-provider
     , time
   default-language: Haskell2010

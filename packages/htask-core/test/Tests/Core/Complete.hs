@@ -21,18 +21,9 @@ fakeTime = UTCTime (ModifiedJulianDay 0) 0
 
 testComplete :: TestTree
 testComplete = testGroup "complete"
-  [ testSuccess
-  , testFailure
+  [ returnsCreatedUuid
+  , failsWhenUnableToFindMatch
   ]
-
-  where
-    testSuccess = testGroup "success"
-      [ returnsCreatedUuid
-      ]
-
-    testFailure = testGroup "failure"
-      [ failsWhenUnableToFindMatch
-      ]
 
 
 returnsCreatedUuid :: TestTree

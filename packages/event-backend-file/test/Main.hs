@@ -43,7 +43,6 @@ run op = do
   pure x
 
 
-
 readEvents :: (MonadUnliftIO m, Monad m) => File.FileEventBackend m [V.Event Int]
 readEvents = V.readEvents
 

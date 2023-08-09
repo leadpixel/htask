@@ -1,8 +1,6 @@
 module HTask.Core
   ( AddResult (..)
-  , CanAddTask
   , CanCreateTask
-  , CanModifyTask
   , HasTasks
   , ModifyResult (..)
   , Task (..)
@@ -15,6 +13,7 @@ module HTask.Core
   , listTasks
   , removeTask
   , replayEventLog
+  , foldEventLog
   , startTask
   , stopTask
   , taskUuidToText

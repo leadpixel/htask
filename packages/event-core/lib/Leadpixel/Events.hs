@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TypeApplications      #-}
 
 module Leadpixel.Events
   ( Event (..)
@@ -10,10 +11,11 @@ module Leadpixel.Events
   , createEvent
   ) where
 
-import qualified Data.Aeson   as Aeson
+import qualified Data.Aeson         as Aeson
 
-import           Data.Time    (UTCTime)
-import           GHC.Generics (Generic)
+import           Data.Time          (UTCTime)
+import           GHC.Generics       (Generic)
+import           Leadpixel.Provider
 
 
 class (Monad m) => HasEventSource m where
@@ -43,5 +45,7 @@ instance (Aeson.ToJSON a) => Aeson.ToJSON (Event a)
 instance (Aeson.FromJSON a) => Aeson.FromJSON (Event a)
 
 
-createEvent :: (Functor m) => m UTCTime -> a -> m (Event a)
-createEvent readTime x = (\t -> Event { timestamp = t , payload = x }) <$> readTime
+createEvent :: (Provider UTCTime m) => a -> m (Event a)
+createEvent x = do
+  t <- provide @UTCTime
+  pure $ Event { timestamp = t , payload = x }

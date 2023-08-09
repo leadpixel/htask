@@ -52,7 +52,7 @@ fileParser = Opts.option Opts.str
   <> Opts.short 'f'
   <> Opts.showDefault
   <> Opts.help "path to tasks file"
-  <> Opts.value "~/.tasks"
+  <> Opts.value ".tasks"
   )
 
 

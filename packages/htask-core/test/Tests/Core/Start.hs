@@ -8,11 +8,11 @@ import qualified Data.UUID.V4              as UUID
 import qualified HTask.Core                as H
 import qualified Leadpixel.Events          as V
 
-import           Control.Monad.IO.Class    (MonadIO)
 import           Data.Tagged               (Tagged (..))
 import           Data.Time                 (Day (ModifiedJulianDay),
                                             UTCTime (..))
 import           Data.UUID                 (UUID)
+import           Leadpixel.Provider
 import           Test.QuickCheck.Instances ()
 
 import           Test.Tasty
@@ -33,7 +33,7 @@ testStart = testGroup "start"
   ]
 
 
-op :: (MonadIO m, H.CanAddTask m, H.CanModifyTask m) => UUID -> m H.ModifyResult
+op :: (Provider UTCTime m, Provider UUID m, H.HasTasks m, V.HasEventSink m) => UUID -> m H.ModifyResult
 op uuid = H.addTask "some task" >> H.startTask (UUID.toText uuid)
 
 

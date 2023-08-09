@@ -4,8 +4,6 @@
 
 module HTask.Core.API
   ( AddResult (..)
-  , CanAddTask
-  , CanModifyTask
   , ModifyResult (..)
   , addTask
   , completeTask
@@ -17,17 +15,17 @@ module HTask.Core.API
   ) where
 
 import qualified Data.Text                as Text
-import qualified Data.Time                as Time
 import qualified Leadpixel.Events         as V
 
-import           Control.Monad.IO.Class   (MonadIO, liftIO)
 import           Data.Foldable
 import           Data.Sequence            (Seq)
 import           Data.Text                (Text)
 import           Data.Time                (UTCTime)
+import           Data.UUID                (UUID)
 import           HTask.Core.Task
 import           HTask.Core.TaskContainer
 import           HTask.Core.TaskEvent
+import           Leadpixel.Provider
 
 
 data AddResult
@@ -43,16 +41,15 @@ data ModifyResult
   deriving (Eq, Show)
 
 
-type CanAddTask m = (Monad m, V.HasEventSink m, HasTasks m, CanCreateTask m)
 type CanModifyTask m = (Monad m, V.HasEventSink m, HasTasks m)
 
 
-readTime :: (MonadIO m) => m UTCTime
-readTime = liftIO Time.getCurrentTime
+listTasks :: (HasTasks m) => m (Seq Task)
+listTasks = getTasks
 
 
 addTask
-  :: (CanAddTask m, MonadIO m)
+  :: (Monad m, V.HasEventSink m, HasTasks m, Provider UUID m, Provider UTCTime m)
   => Text -> m AddResult
 addTask tx = do
   tk <- createTask tx
@@ -61,17 +58,16 @@ addTask tx = do
   if p
     then do
       let detail = TaskEventDetail (taskUuid tk) (AddTask tx)
-      x <- V.createEvent readTime detail
-      V.writeEvent x
+      V.createEvent detail >>= V.writeEvent
       pure $ AddSuccess (taskUuid tk)
 
     else
       pure FailedToAdd
 
 
-findTask :: (MonadIO m, HasTasks m) => Text -> m (Maybe Task)
+findTask :: (HasTasks m, Monad m) => Text -> m (Maybe Task)
 findTask tx
-  = find (uuidStartsWith tx) <$> listTasks
+  = find (uuidStartsWith tx) <$> getTasks
 
   where
     uuidStartsWith :: Text -> Task -> Bool
@@ -79,13 +75,13 @@ findTask tx
       = Text.isPrefixOf t . taskUuidToText . taskUuid
 
 
-withMatch :: (MonadIO m, HasTasks m) => Text -> (Task -> m ModifyResult) -> m ModifyResult
+withMatch :: (HasTasks m, Monad m) => Text -> (Task -> m ModifyResult) -> m ModifyResult
 withMatch tx op
   = findTask tx >>= maybe (pure FailedToFind) op
 
 
 startTask
-  :: (CanModifyTask m, MonadIO m)
+  :: (CanModifyTask m, Provider UTCTime m)
   => Text -> m ModifyResult
 startTask tx =
   withMatch tx $ \tsk -> do
@@ -97,13 +93,12 @@ startTask tx =
         pure FailedToModify
 
       Just t -> do
-        x <- V.createEvent readTime (TaskEventDetail ref (StartTask ref))
-        V.writeEvent x
+        V.createEvent (TaskEventDetail ref (StartTask ref)) >>= V.writeEvent
         pure $ ModifySuccess t
 
 
 stopTask
-  :: (CanModifyTask m, MonadIO m)
+  :: (CanModifyTask m, Provider UTCTime m)
   => Text -> m ModifyResult
 stopTask tx =
   withMatch tx $ \tsk -> do
@@ -115,12 +110,12 @@ stopTask tx =
         pure FailedToModify
 
       Just t -> do
-        V.createEvent readTime (TaskEventDetail ref (StopTask ref)) >>= V.writeEvent
+        V.createEvent (TaskEventDetail ref (StopTask ref)) >>= V.writeEvent
         pure $ ModifySuccess t
 
 
 completeTask
-  :: (CanModifyTask m, MonadIO m)
+  :: (CanModifyTask m, Provider UTCTime m)
   => Text -> m ModifyResult
 completeTask tx =
   withMatch tx $ \tsk -> do
@@ -132,12 +127,12 @@ completeTask tx =
         pure FailedToModify
 
       Just t -> do
-        V.createEvent readTime (TaskEventDetail ref (CompleteTask ref)) >>= V.writeEvent
+        V.createEvent (TaskEventDetail ref (CompleteTask ref)) >>= V.writeEvent
         pure $ ModifySuccess t
 
 
 removeTask
-  :: (CanModifyTask m, MonadIO m)
+  :: (CanModifyTask m, Provider UTCTime m)
   => Text -> m ModifyResult
 removeTask tx =
   withMatch tx $ \tsk -> do
@@ -146,12 +141,8 @@ removeTask tx =
 
     if p
       then do
-        V.createEvent readTime (TaskEventDetail ref (RemoveTask ref)) >>= V.writeEvent
+        V.createEvent (TaskEventDetail ref (RemoveTask ref)) >>= V.writeEvent
         pure $ ModifySuccess tsk
 
       else
         pure FailedToModify
-
-
-listTasks :: (HasTasks m) => m (Seq Task)
-listTasks = getTasks

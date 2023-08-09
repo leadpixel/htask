@@ -3,10 +3,12 @@
 module HTask.Core.TaskContainer (HasTasks (..)) where
 
 import qualified Control.Monad.Trans.State as State
+import qualified Data.Map                  as Map
 import qualified Data.Sequence             as Seq
 
 import           Control.Monad.Trans.State (StateT)
 import           Data.List                 (find)
+import           Data.Map
 import           Data.Maybe                (isNothing)
 import           Data.Sequence             (Seq, (<|))
 import           HTask.Core.Task
@@ -22,6 +24,7 @@ findTask ts ref = find matchesRef ts
     matchesRef t = taskUuid t == ref
 
 
+-- TODO: change Seq to Map TaskUuid Task
 class HasTasks m where
   getTasks :: m (Seq Task)
   addNewTask :: Task -> m Bool
@@ -30,19 +33,19 @@ class HasTasks m where
 
 
 instance (Monad m) => HasTasks (StateT (Seq Task) m) where
-  getTasks = stateGetTask
+  getTasks = stateGetTasks
   addNewTask = stateAddNewTask
   updateExistingTask = stateUpdateTask
   removeTaskUuid = stateRemoveTask
 
 
-stateGetTask :: (Monad m) => StateT (Seq Task) m (Seq Task)
-stateGetTask = State.get
+stateGetTasks :: (Monad m) => StateT (Seq Task) m (Seq Task)
+stateGetTasks = State.get
 
 
 stateAddNewTask :: (Monad m) => Task -> StateT (Seq Task) m Bool
 stateAddNewTask t = do
-  ts <- getTasks
+  ts <- State.get
   let p = findTask ts (taskUuid t)
   if isNothing p
       then do
@@ -53,7 +56,7 @@ stateAddNewTask t = do
 
 stateUpdateTask :: (Monad m) => TaskUuid -> (Task -> Task) -> StateT (Seq Task) m (Maybe Task)
 stateUpdateTask ref op = do
-  ts <- getTasks
+  ts <- State.get
   maybe
     (pure Nothing)
     (\t -> do
@@ -65,10 +68,43 @@ stateUpdateTask ref op = do
 
 stateRemoveTask :: (Monad m) => TaskUuid -> StateT (Seq Task) m Bool
 stateRemoveTask ref = do
-  ts <- getTasks
+  ts <- State.get
   maybe
     (pure False)
     (\_t -> do
       State.put (removeTaskByRef ref ts)
       pure True)
     (findTask ts ref)
+
+
+
+instance (Monad m) => HasTasks (StateT (Map TaskUuid Task) m) where
+  getTasks = do
+    Seq.fromList . Map.elems <$> State.get
+
+  addNewTask t = do
+    ts <- State.get
+    if member (taskUuid t) ts
+        then pure False
+        else do
+          State.put $ Map.insert (taskUuid t) t ts
+          pure True
+
+  updateExistingTask ref op = do
+    ts <- State.get
+    maybe
+      (pure Nothing)
+      (\t -> do
+        let t' = op t
+        State.put $ Map.insert (taskUuid t) t' ts
+        pure $ Just t')
+      (Map.lookup ref ts)
+
+  removeTaskUuid ref = do
+    ts <- State.get
+    maybe
+      (pure False)
+      (\_t -> do
+        State.put (Map.delete ref ts)
+        pure True)
+      (Map.lookup ref ts)

@@ -12,7 +12,7 @@ import qualified Data.UUID                   as UUID
 import qualified HTask.Core                  as H
 import qualified Leadpixel.Events            as V
 
-import           Control.Monad.IO.Class      (MonadIO)
+import           Control.Monad.IO.Unlift     (MonadUnliftIO)
 import           Control.Monad.Random.Class  (MonadRandom, getRandomR)
 import           Data.Foldable               (toList)
 import           Data.Function               (on)
@@ -29,21 +29,17 @@ import           HTask.CLI.TaskApplication
 import           Leadpixel.Provider
 
 
-runAction
-  :: (HasEventBackend m, H.CanCreateTask m, MonadRandom m)
-  => Action -> m RunResult
-runAction Summary        = runSummary
-runAction (List d k)     = runList d k
-
+runAction :: (MonadRandom m, MonadUnliftIO m) => Action -> App m RunResult
 runAction (Add tex)      = runAdd tex
+runAction (Complete ref) = runComplete ref
+runAction (List d k)     = runList d k
+runAction (Remove ref)   = runRemove ref
 runAction (Start ref)    = runStart ref
 runAction (Stop ref)     = runStop ref
-runAction (Complete ref) = runComplete ref
-runAction (Remove ref)   = runRemove ref
-
-runAction Pick           = runPick
-runAction Drop           = runDrop
 runAction Done           = runDone
+runAction Drop           = runDrop
+runAction Pick           = runPick
+runAction Summary        = runSummary
 
 
 inProgress :: H.Task -> Bool
@@ -97,27 +93,30 @@ statusDisplayOrder  H.Abandoned   H.InProgress =  GT
 statusDisplayOrder  H.Abandoned   H.Pending    =  GT
 
 
-runAdd :: (Functor m, MonadIO m, V.HasEventSource m, Provider UTCTime m, Provider UUID m, V.HasEventSink m) => Text -> m RunResult
+runAdd ::
+  ( Functor m
+  , Provider UTCTime m
+  , Provider UUID m
+  , V.HasEventSink m
+  , H.HasTasks m
+  ) => Text -> m RunResult
 runAdd t
-  = formatOutcome <$> runTask (H.addTask t)
+  = formatOutcome <$> H.addTask t
 
   where
     formatOutcome (H.AddSuccess ref)
-      = resultSuccessAdd ref
-
-    formatOutcome H.FailedToAdd
-      = resultError "failed to add"
-
-    resultSuccessAdd ref
       = resultSuccess
           [ "added task: " <> t
           , "ref: " <> H.taskUuidToText ref
           ]
 
+    formatOutcome H.FailedToAdd
+      = resultError "failed to add"
 
-runComplete :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
+
+runComplete :: (H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => Text -> m RunResult
 runComplete t
-  = formatOutcome <$> runTask (H.completeTask t)
+  = formatOutcome <$> H.completeTask t
 
   where
     formatOutcome x
@@ -132,9 +131,9 @@ runComplete t
             resultError "unable to modify matching task"
 
 
-runDone :: (HasEventBackend m, H.CanCreateTask m) => m RunResult
+runDone :: (H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => m RunResult
 runDone
-  = formatOutcome <$> runTask doneTask
+  = formatOutcome <$> doneTask
 
   where
     doneTask
@@ -155,9 +154,9 @@ runDone
             "unable to modify matching task"
 
 
-runDrop :: (HasEventBackend m, H.CanCreateTask m) => m RunResult
+runDrop :: (H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => m RunResult
 runDrop
-  = formatOutcome <$> runTask dropTask
+  = formatOutcome <$> dropTask
 
   where
     dropTask
@@ -180,10 +179,10 @@ runDrop
 
 
 
-runList :: (MonadIO m, V.HasEventSource m) => ShowUUID -> ShowAll -> m RunResult
+runList :: (Functor m, H.HasTasks m) => ShowUUID -> ShowAll -> m RunResult
 runList showUUID showAll
   = resultSuccess . toList . fmap formatOutput . selectTasks
-  <$> runTask H.listTasks
+  <$> H.listTasks
 
   where
     formatOutput
@@ -213,9 +212,9 @@ runList showUUID showAll
         printUUID = UUID.toText (untag (H.taskUuid t)) <> " "
 
 
-runPick :: (MonadRandom m, HasEventBackend m, H.CanCreateTask m) => m RunResult
+runPick :: (MonadRandom m, H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => m RunResult
 runPick = do
-  ts <- runTask H.listTasks
+  ts <- H.listTasks
   let ps = Seq.filter (hasStatus H.Pending) ts
   k <- randomSelectOne ps
   maybe
@@ -225,7 +224,7 @@ runPick = do
 
   where
     startTask t = do
-      _ <- runTask (H.startTask $ taskToText t)
+      _ <- H.startTask $ taskToText t
       pure ["picking task: " <> H.description t]
 
 
@@ -235,9 +234,9 @@ randomSelectOne xs =
   (xs !?) <$> getRandomR (0, Seq.length xs)
 
 
-runRemove :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
+runRemove :: (H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => Text -> m RunResult
 runRemove t
-  = formatOutcome <$> runTask (H.removeTask t)
+  = formatOutcome <$> H.removeTask t
 
   where
     formatOutcome x
@@ -252,9 +251,9 @@ runRemove t
             resultError "unable to modify matching task"
 
 
-runStart :: (HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
+runStart :: (H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => Text -> m RunResult
 runStart t
-  = formatOutcome <$> runTask (H.startTask t)
+  = formatOutcome <$> H.startTask t
 
   where
     formatOutcome x
@@ -269,9 +268,9 @@ runStart t
             resultError "unable to modify matching task"
 
 
-runStop :: (MonadIO m, HasEventBackend m, H.CanCreateTask m) => Text -> m RunResult
+runStop :: (V.HasEventSource m, V.HasEventSink m, Provider UTCTime m, H.HasTasks m) => Text -> m RunResult
 runStop t
-  = formatOutcome <$> runTask (H.stopTask t)
+  = formatOutcome <$> H.stopTask t
 
   where
     formatOutcome x
@@ -288,56 +287,56 @@ runStop t
 
 
 
-runSummary :: (MonadIO m, HasEventBackend m) => m RunResult
+runSummary :: (Functor m, H.HasTasks m) => m RunResult
 runSummary
-  = renderSummary <$> runTask H.listTasks
-
-
-renderSummary :: Seq H.Task -> RunResult
-renderSummary ts = resultSuccess
-  $ displayCurrent
-  <> displayTopPending
+  = renderSummary <$> H.listTasks
 
   where
-    displayCurrent :: [Text]
-    displayCurrent = do
-      let ps = Seq.filter (hasStatus H.InProgress) ts
-      if Data.List.null ps
-        then
-          [ "No current task" ]
-        else
-          "Current task:"
-          : concatMap printTaskForSummary ps
-
-
-    displayTopPending :: [Text]
-    displayTopPending
-      = pendingMessage (length xs) (length ps)
-      : concatMap printTaskForSummary xs
+    renderSummary :: Seq H.Task -> RunResult
+    renderSummary ts = resultSuccess
+      $ displayCurrent
+      <> displayTopPending
 
       where
-        ps = Seq.sortBy taskPriority (Seq.filter (hasStatus H.Pending) ts)
+        displayCurrent :: [Text]
+        displayCurrent = do
+          let ps = Seq.filter (hasStatus H.InProgress) ts
+          if Data.List.null ps
+            then
+              [ "No current task" ]
+            else
+              "Current task:"
+              : concatMap printTaskForSummary ps
 
-        xs = Seq.take 5 ps
 
-        pendingMessage x p =
-          "Top " <> tInt x <> " pending (" <> tInt (p - x) <> " hidden):"
+        displayTopPending :: [Text]
+        displayTopPending
+          = pendingMessage (length xs) (length ps)
+          : concatMap printTaskForSummary xs
 
-        tInt = Text.pack . show
+          where
+            ps = Seq.sortBy taskPriority (Seq.filter (hasStatus H.Pending) ts)
+
+            xs = Seq.take 5 ps
+
+            pendingMessage x p =
+              "Top " <> tInt x <> " pending (" <> tInt (p - x) <> " hidden):"
+
+            tInt = Text.pack . show
 
 
-    printTaskForSummary :: H.Task -> [Text]
-    printTaskForSummary t =
-      [ indent printDescription
-      , indent $ indent printRef
-      ]
+        printTaskForSummary :: H.Task -> [Text]
+        printTaskForSummary t =
+          [ indent printDescription
+          , indent $ indent printRef
+          ]
 
-      where
-        printDescription :: Text
-        printDescription
-          =  statusSymbol (H.status t)
-          <> " "
-          <> withStatusColor (H.status t) (H.description t)
+          where
+            printDescription :: Text
+            printDescription
+              =  statusSymbol (H.status t)
+              <> " "
+              <> withStatusColor (H.status t) (H.description t)
 
-        printRef :: Text
-        printRef = (UUID.toText . untag . H.taskUuid) t
+            printRef :: Text
+            printRef = (UUID.toText . untag . H.taskUuid) t

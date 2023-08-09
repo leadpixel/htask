@@ -16,4 +16,5 @@ library:
   dependencies:
     - aeson
     - conduit
+    - leadpixel-provider
     - time

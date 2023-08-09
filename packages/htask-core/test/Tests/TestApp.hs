@@ -5,9 +5,7 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 
 module Tests.TestApp
-  ( DataProviderT (..)
-  , TaskAppT (..)
-  , runApi
+  ( runApi
   , runEventLog
   , runTasks
   , runWriteFailure
@@ -21,10 +19,10 @@ import qualified Data.Foldable                    as Foldable
 import qualified HTask.Core                       as H
 import qualified Leadpixel.Events                 as V
 
-import           Control.Monad.IO.Class           (MonadIO)
 import           Control.Monad.Trans.Class        (MonadTrans, lift)
 import           Control.Monad.Trans.Reader       (ReaderT, runReaderT)
 import           Control.Monad.Trans.State        (StateT, runStateT)
+import           Data.Maybe
 import           Data.Sequence                    (Seq)
 import           Data.Time                        (UTCTime)
 import           Data.UUID                        (UUID)
@@ -32,35 +30,22 @@ import           Leadpixel.Events.Backends.Memory (MemoryBackend,
                                                    runMemoryBackend)
 import           Leadpixel.Provider
 
-import           Data.Maybe
-
-
-newtype TaskAppT m a
-  = TaskApp { unTaskApp :: StateT (Seq H.Task) m a }
-  deriving (Applicative, Functor, H.HasTasks, Monad, MonadIO, MonadTrans)
-
-instance (Monad m, V.HasEventSink m) => V.HasEventSink (TaskAppT m) where
-  writeEvent = lift . V.writeEvent
-
-instance (Monad m, Provider k m) => Provider k (TaskAppT m) where
-  provide = lift provide
-
 
 type Args = (UUID, UTCTime)
 
--- TODO: what is the point of this?
-newtype DataProviderT m a
-  = DataProvider { unDataProvider :: ReaderT Args m a }
-  deriving (Applicative, Functor, Monad, MonadIO, MonadTrans)
+newtype TestApp m a
+  = TestApp { unTestApp :: StateT (Seq H.Task) (ReaderT Args m) a }
+  deriving (Applicative, Functor, H.HasTasks, Monad)
 
-instance (Monad m, V.HasEventSink m) => V.HasEventSink (DataProviderT m) where
-  writeEvent = lift . V.writeEvent
+instance (Monad m, V.HasEventSink m) => V.HasEventSink (TestApp m) where
+  writeEvent = TestApp . lift . lift . V.writeEvent
 
-instance (Monad m) => Provider UUID (DataProviderT m) where
-  provide = fst <$> DataProvider Reader.ask
+instance (Monad m) => Provider UUID (TestApp m) where
+  provide = TestApp $ lift ( fst <$> Reader.ask )
 
-instance (Monad m) => Provider UTCTime (DataProviderT m) where
-  provide = snd <$> DataProvider Reader.ask
+instance (Monad m) => Provider UTCTime (TestApp m) where
+  provide = TestApp $ lift ( snd <$> Reader.ask )
+
 
 
 newtype WriteFailureT m a
@@ -68,29 +53,25 @@ newtype WriteFailureT m a
   deriving (Applicative, Functor, H.HasTasks, Monad, MonadTrans)
 
 
-runStack :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m ((a, Seq H.Task), Seq Lazy.ByteString)
+runStack :: (Monad m) => Args -> TestApp (MemoryBackend m) a -> m ((a, Seq H.Task), Seq Lazy.ByteString)
 runStack args op
   = runMemoryBackend
   $ runReaderT
-    ( unDataProvider
-    $ runStateT
-      (unTaskApp op)
-      mempty
-    )
+    ( runStateT (unTestApp op) mempty )
     args
 
 
-runApi :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m a
+runApi :: (Monad m) => Args -> TestApp (MemoryBackend m) a -> m a
 runApi args op
   = fst . fst <$> runStack args op
 
 
-runTasks :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m (Seq H.Task)
+runTasks :: (Monad m) => Args -> TestApp (MemoryBackend m) a -> m (Seq H.Task)
 runTasks args op
   = snd . fst <$> runStack args op
 
 
-runEventLog :: (Monad m) => Args -> TaskAppT (DataProviderT (MemoryBackend m)) a -> m [H.TaskEvent]
+runEventLog :: (Monad m) => Args -> TestApp (MemoryBackend m) a -> m [H.TaskEvent]
 runEventLog args op
   = extractLog . snd <$> runStack args op
 
