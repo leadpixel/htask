@@ -1,5 +1,5 @@
-{-# LANGUAGE ConstraintKinds  #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ConstraintKinds     #-}
+{-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module HTask.Core.API
@@ -14,10 +14,13 @@ module HTask.Core.API
   , stopTask
   ) where
 
+import qualified Data.Foldable            as Foldable
+import qualified Data.Map                 as Map
+import qualified Data.Sequence            as Seq
 import qualified Data.Text                as Text
 import qualified Leadpixel.Events         as V
 
-import           Data.Foldable
+import           Control.Monad.State      (MonadState)
 import           Data.Sequence            (Seq)
 import           Data.Text                (Text)
 import           Data.Time                (UTCTime)
@@ -41,17 +44,16 @@ data ModifyResult
   deriving (Eq, Show)
 
 
-type CanAddTask m = (Monad m, V.HasEventSink m, HasTasks m, Provider UUID m, Provider UTCTime m)
-type CanModifyTask m = (Monad m, Provider UTCTime m, V.HasEventSink m, HasTasks m)
+type CanModifyTask m = (Monad m, Provider UTCTime m, V.HasEventSink m, MonadState TaskMap m)
 
 
-listTasks :: (HasTasks m) => m (Seq Task)
-listTasks = getTasks
+listTasks :: (MonadState TaskMap m) => m (Seq Task)
+listTasks = Seq.fromList . Map.elems <$> getTasks
 
 
-findTask :: (HasTasks m, Monad m) => Text -> m (Maybe Task)
+findTask :: (MonadState TaskMap m) => Text -> m (Maybe Task)
 findTask tx
-  = find (uuidStartsWith tx) <$> getTasks
+  = Foldable.find (uuidStartsWith tx) <$> getTasks
 
   where
     uuidStartsWith :: Text -> Task -> Bool
@@ -59,13 +61,13 @@ findTask tx
       = Text.isPrefixOf t . taskUuidToText . taskUuid
 
 
-withMatch :: (HasTasks m, Monad m) => Text -> (Task -> m ModifyResult) -> m ModifyResult
+withMatch :: (MonadState TaskMap m) => Text -> (Task -> m ModifyResult) -> m ModifyResult
 withMatch tx op
   = findTask tx >>= maybe (pure FailedToFind) op
 
 
 addTask
-  :: (CanAddTask m)
+  :: (Monad m, MonadState TaskMap m, V.HasEventSink m, Provider UUID m, Provider UTCTime m)
   => Text -> m AddResult
 addTask tx = do
   tk <- createTask tx

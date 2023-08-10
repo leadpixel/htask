@@ -7,7 +7,6 @@ import qualified Data.Sequence               as Seq
 import qualified Data.Text                   as Text
 import qualified Data.UUID                   as UUID
 import qualified HTask.Core                  as H
-import qualified Leadpixel.Events            as V
 
 import           Control.Monad.IO.Unlift     (MonadUnliftIO)
 import           Control.Monad.Random.Class  (MonadRandom, getRandomR)
@@ -17,13 +16,10 @@ import           Data.List                   (null)
 import           Data.Sequence               (Seq, (!?))
 import           Data.Tagged                 (untag)
 import           Data.Text                   (Text)
-import           Data.Time                   (UTCTime)
-import           Data.UUID                   (UUID)
 import           HTask.CLI.Actions
 import           HTask.CLI.App
 import           HTask.CLI.Output.Document
 import           HTask.CLI.Output.Formatters
-import           Leadpixel.Provider
 
 
 runAction :: (MonadRandom m, MonadUnliftIO m) => Action -> App m RunResult
@@ -90,13 +86,7 @@ statusDisplayOrder  H.Abandoned   H.InProgress =  GT
 statusDisplayOrder  H.Abandoned   H.Pending    =  GT
 
 
-runAdd ::
-  ( Functor m
-  , Provider UTCTime m
-  , Provider UUID m
-  , V.HasEventSink m
-  , H.HasTasks m
-  ) => Text -> m RunResult
+runAdd :: (MonadUnliftIO m) => Text -> App m RunResult
 runAdd t
   = formatOutcome <$> H.addTask t
 
@@ -111,7 +101,7 @@ runAdd t
       = resultError "failed to add"
 
 
-runComplete :: (H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => Text -> m RunResult
+runComplete :: (MonadUnliftIO m) => Text -> App m RunResult
 runComplete t
   = formatOutcome <$> H.completeTask t
 
@@ -128,7 +118,7 @@ runComplete t
             resultError "unable to modify matching task"
 
 
-runDone :: (H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => m RunResult
+runDone :: (MonadUnliftIO m) => App m RunResult
 runDone
   = formatOutcome <$> doneTask
 
@@ -151,7 +141,7 @@ runDone
             "unable to modify matching task"
 
 
-runDrop :: (H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => m RunResult
+runDrop :: (MonadUnliftIO m) => App m RunResult
 runDrop
   = formatOutcome <$> dropTask
 
@@ -174,9 +164,7 @@ runDrop
             "unable to modify matching task"
 
 
-
-
-runList :: (Functor m, H.HasTasks m) => ShowUUID -> ShowAll -> m RunResult
+runList :: (Monad m) => ShowUUID -> ShowAll -> App m RunResult
 runList showUUID showAll
   = resultSuccess . toList . fmap formatOutput . selectTasks
   <$> H.listTasks
@@ -209,7 +197,7 @@ runList showUUID showAll
         printUUID = UUID.toText (untag (H.taskUuid t)) <> " "
 
 
-runPick :: (MonadRandom m, H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => m RunResult
+runPick :: (MonadRandom m, MonadUnliftIO m) => App m RunResult
 runPick = do
   ts <- H.listTasks
   let ps = Seq.filter (hasStatus H.Pending) ts
@@ -224,14 +212,13 @@ runPick = do
       _ <- H.startTask $ taskToText t
       pure ["picking task: " <> H.description t]
 
+    randomSelectOne :: (MonadRandom m) => Seq a -> m (Maybe a)
+    randomSelectOne Seq.Empty = pure Nothing
+    randomSelectOne xs =
+      (xs !?) <$> getRandomR (0, Seq.length xs)
 
-randomSelectOne :: (Monad m, MonadRandom m) => Seq a -> m (Maybe a)
-randomSelectOne Seq.Empty = pure Nothing
-randomSelectOne xs =
-  (xs !?) <$> getRandomR (0, Seq.length xs)
 
-
-runRemove :: (H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => Text -> m RunResult
+runRemove :: (MonadUnliftIO m) => Text -> App m RunResult
 runRemove t
   = formatOutcome <$> H.removeTask t
 
@@ -248,7 +235,7 @@ runRemove t
             resultError "unable to modify matching task"
 
 
-runStart :: (H.CanCreateTask m, V.HasEventSource m, V.HasEventSink m, H.HasTasks m) => Text -> m RunResult
+runStart :: (MonadUnliftIO m) => Text -> App m RunResult
 runStart t
   = formatOutcome <$> H.startTask t
 
@@ -265,7 +252,7 @@ runStart t
             resultError "unable to modify matching task"
 
 
-runStop :: (V.HasEventSource m, V.HasEventSink m, Provider UTCTime m, H.HasTasks m) => Text -> m RunResult
+runStop :: (MonadUnliftIO m) => Text -> App m RunResult
 runStop t
   = formatOutcome <$> H.stopTask t
 
@@ -284,7 +271,7 @@ runStop t
 
 
 
-runSummary :: (Functor m, H.HasTasks m) => m RunResult
+runSummary :: (Monad m) => App m RunResult
 runSummary
   = renderSummary <$> H.listTasks
 

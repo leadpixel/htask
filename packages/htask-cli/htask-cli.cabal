@@ -36,6 +36,7 @@ executable htask
     , htask-core
     , leadpixel-events
     , leadpixel-provider
+    , mtl
     , optparse-applicative
     , tagged
     , text

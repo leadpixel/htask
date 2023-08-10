@@ -3,16 +3,16 @@
 
 module Tests.Core.Stop (testStop) where
 
-import qualified Data.Map.Strict    as Map
-import qualified Data.Sequence      as Seq
-import qualified Data.UUID          as UUID
-import qualified Data.UUID.V4       as UUID
-import qualified HTask.Core         as H
-import qualified Leadpixel.Events   as V
+import qualified Data.Map.Strict  as Map
+import qualified Data.Sequence    as Seq
+import qualified Data.UUID        as UUID
+import qualified Data.UUID.V4     as UUID
+import qualified HTask.Core       as H
+import qualified Leadpixel.Events as V
 
-import           Control.Monad      (void)
+import           Control.Monad    (void)
 import           Data.Tagged
-import           Data.Time          (UTCTime)
+import           Data.Time        (UTCTime)
 
 import           Test.Tasty
 import           Test.Tasty.HUnit

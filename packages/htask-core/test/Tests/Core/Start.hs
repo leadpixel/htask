@@ -13,7 +13,6 @@ import qualified Leadpixel.Events   as V
 import           Data.Tagged        (Tagged (..))
 import           Data.Time          (Day (ModifiedJulianDay), UTCTime (..))
 import           Data.UUID          (UUID)
-import           Leadpixel.Provider
 
 import           Test.Tasty
 import           Test.Tasty.HUnit
@@ -33,7 +32,7 @@ testStart = testGroup "start"
   ]
 
 
-op :: (Provider UTCTime m, Provider UUID m, H.HasTasks m, V.HasEventSink m) => UUID -> m H.ModifyResult
+op :: (Monad m) => UUID -> TestApp m H.ModifyResult
 op uuid = H.addTask "some task" >> H.startTask (UUID.toText uuid)
 
 

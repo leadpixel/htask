@@ -1,11 +1,13 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main (main) where
 
-import qualified Tests.Core.Add      as APITest
-import qualified Tests.Core.Complete as APITest
-import qualified Tests.Core.List     as APITest
-import qualified Tests.Core.Remove   as APITest
-import qualified Tests.Core.Start    as APITest
-import qualified Tests.Core.Stop     as APITest
+import           Tests.Core.Add
+import           Tests.Core.Complete
+import           Tests.Core.List
+import           Tests.Core.Remove
+import           Tests.Core.Start
+import           Tests.Core.Stop
 
 import           Test.Tasty
 
@@ -16,10 +18,10 @@ main = defaultMain allTests
 
 allTests :: TestTree
 allTests = testGroup "htask"
-  [ APITest.testAdd
-  , APITest.testComplete
-  , APITest.testList
-  , APITest.testRemove
-  , APITest.testStart
-  , APITest.testStop
+  [ testAdd
+  , after AllSucceed "add" testList
+  , after AllSucceed "add" testStart
+  , after AllSucceed "add" testStop
+  , after AllSucceed "add" testComplete
+  , after AllSucceed "add" testRemove
   ]

@@ -2,13 +2,12 @@
 
 module Tests.Core.Complete (testComplete) where
 
-import qualified Data.UUID                 as UUID
-import qualified Data.UUID.V4              as UUID
-import qualified HTask.Core                as H
+import qualified Data.UUID        as UUID
+import qualified Data.UUID.V4     as UUID
+import qualified HTask.Core       as H
 
-import           Data.Tagged               (Tagged (..))
-import           Data.Time                 (Day (ModifiedJulianDay),
-                                            UTCTime (..))
+import           Data.Tagged      (Tagged (..))
+import           Data.Time        (Day (ModifiedJulianDay), UTCTime (..))
 
 import           Test.Tasty
 import           Test.Tasty.HUnit

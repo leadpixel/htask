@@ -25,7 +25,7 @@ fakeTime = UTCTime (Time.ModifiedJulianDay 0) 0
 
 testAdd :: TestTree
 testAdd = testGroup "add"
-  [  returnsCreatedUuid
+  [ returnsCreatedUuid
   , storesCreatedTask
   -- , rollsBackOnWriteFailure
   , writesEvent
@@ -46,7 +46,7 @@ returnsCreatedUuid = testCase "returns the created uuid on success" $ do
 storesCreatedTask :: TestTree
 storesCreatedTask = testCase "stores the created task" $ do
   uuid <- UUID.nextRandom
-  tasks <- fmap getTasks $ runTestApp (uuid, fakeTime) $ H.addTask "some task"
+  tasks <- getTasks <$> runTestApp (uuid, fakeTime) ( H.addTask "some task" )
 
   assertEqual "expecting one task" 1 (Map.size tasks)
 
@@ -62,7 +62,7 @@ storesCreatedTask = testCase "stores the created task" $ do
 writesEvent :: TestTree
 writesEvent = testCase "stores one event" $ do
   uuid <- UUID.nextRandom
-  events <- fmap getEvents $ runTestApp (uuid, fakeTime) $ H.addTask "some task"
+  events <- getEvents <$> runTestApp (uuid, fakeTime) ( H.addTask "some task" )
 
   let expectedEvents = Seq.fromList [ V.Event { V.timestamp = fakeTime, V.payload = H.AddTask (Tagged uuid) "some task" } ]
   assertEqual "events count" 1 (Seq.length events)

@@ -14,7 +14,7 @@ import qualified Data.ByteString.Lazy       as Lazy
 import qualified System.IO                  as Sys
 
 import           Conduit                    (ConduitT, Void, runConduit, (.|))
-import           Control.Monad.IO.Class     (MonadIO, liftIO)
+import           Control.Monad.IO.Class     (MonadIO)
 import           Control.Monad.IO.Unlift    (MonadUnliftIO, withRunInIO)
 import           Control.Monad.Trans.Class  (MonadTrans)
 import           Control.Monad.Trans.Reader (ReaderT (..), runReaderT)

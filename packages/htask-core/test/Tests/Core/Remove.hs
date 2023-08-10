@@ -3,17 +3,15 @@
 
 module Tests.Core.Remove (testRemove) where
 
-import qualified Data.UUID                 as UUID
-import qualified Data.UUID.V4              as UUID
-import qualified HTask.Core                as H
-import qualified Data.Sequence as Seq
-import qualified Leadpixel.Events          as V
+import qualified Data.Sequence      as Seq
+import qualified Data.UUID          as UUID
+import qualified Data.UUID.V4       as UUID
+import qualified HTask.Core         as H
+import qualified Leadpixel.Events   as V
 
-import           Data.Tagged               (Tagged (..))
-import           Data.Time                 (Day (ModifiedJulianDay),
-                                            UTCTime (..))
-import           Data.UUID                 (UUID)
-import           Leadpixel.Provider
+import           Data.Tagged        (Tagged (..))
+import           Data.Time          (Day (ModifiedJulianDay), UTCTime (..))
+import           Data.UUID          (UUID)
 
 import           Test.Tasty
 import           Test.Tasty.HUnit
@@ -33,7 +31,7 @@ testRemove = testGroup "remove"
   ]
 
 
-op :: (Provider UTCTime m, Provider UUID m, H.HasTasks m, V.HasEventSink m) => UUID -> m H.ModifyResult
+op :: (Monad m) => UUID -> TestApp m H.ModifyResult
 op uuid = H.addTask "some task" >> H.removeTask (UUID.toText uuid)
 
 
@@ -62,7 +60,7 @@ canRemoveEvent' = testCase "removes the task" $ do
 
 
 canRemoveEvent'' :: TestTree
-canRemoveEvent'' = testCase "cannot remove a removeped task" $ do
+canRemoveEvent'' = testCase "cannot remove a removed task" $ do
   uuid <- UUID.nextRandom
   x <- getEvents <$> runTestApp (uuid, fakeTime) (op uuid >> H.removeTask (UUID.toText uuid))
 
@@ -74,7 +72,7 @@ canRemoveEvent'' = testCase "cannot remove a removeped task" $ do
 
 
 -- canRemoveEvent''' :: TestTree
--- canRemoveEvent''' = testCase "cannot remove a removeped task" $ do
+-- canRemoveEvent''' = testCase "cannot remove a removed task" $ do
 --   uuid <- UUID.nextRandom
 --   x <- getTasks <$> runTestApp (uuid, fakeTime) (op uuid >> H.removeTask (Tagged uuid))
 --   assertEqual "can remove"
