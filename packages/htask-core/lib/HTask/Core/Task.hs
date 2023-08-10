@@ -5,8 +5,7 @@
 {-# LANGUAGE TypeApplications #-}
 
 module HTask.Core.Task
-  ( CanCreateTask
-  , Task (..)
+  ( Task (..)
   , TaskStatus (..)
   , TaskUuid
   , createTask
@@ -44,10 +43,7 @@ data Task
   deriving (Eq, Generic, Show)
 
 
-type CanCreateTask m = (Monad m, Provider UTCTime m, Provider UUID m)
-
-
-createTask :: (CanCreateTask m) => Text -> m Task
+createTask :: (Monad m, Provider UTCTime m, Provider UUID m) => Text -> m Task
 createTask tex
   = (\u m -> Task u tex m Pending)
   <$> (Tagged <$> provide @UUID)

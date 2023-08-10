@@ -10,6 +10,7 @@ module HTask.Core.TaskContainer
   ) where
 
 import qualified Control.Monad.State as State
+import qualified Data.List           as List
 import qualified Data.Map.Strict     as Map
 
 import           Control.Monad.State (MonadState)
@@ -37,7 +38,7 @@ addNewTask t = do
   where
     tryInsertTask :: Task -> Map TaskUuid Task -> (Map TaskUuid Task, Bool)
     tryInsertTask t' xs =
-        if Map.member (taskUuid t') xs
+        if Map.member (taskUuid t') xs || (description t `List.elem` (description <$> Map.elems xs))
             then (xs, False)
             else do
               (Map.insert (taskUuid t') t' xs, True)

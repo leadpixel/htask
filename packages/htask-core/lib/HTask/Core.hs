@@ -1,14 +1,9 @@
 module HTask.Core
   ( AddResult (..)
-  , CanCreateTask
   , ModifyResult (..)
-    -- TODO: remove constructor export
-  , Task (..)
-  , TaskEvent
-  , TaskIntent (..)
+  , Task (createdAt, description, status, taskUuid)
   , TaskMap
   , TaskStatus (..)
-  , TaskUuid
   , addTask
   , completeTask
   , foldEventLog
@@ -23,4 +18,3 @@ import           HTask.Core.API
 import           HTask.Core.Replay
 import           HTask.Core.Task
 import           HTask.Core.TaskContainer (TaskMap)
-import           HTask.Core.TaskEvent

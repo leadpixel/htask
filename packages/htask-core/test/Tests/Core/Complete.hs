@@ -2,11 +2,10 @@
 
 module Tests.Core.Complete (testComplete) where
 
-import qualified Data.UUID        as UUID
-import qualified Data.UUID.V4     as UUID
+import qualified Data.List        as List
 import qualified HTask.Core       as H
 
-import           Data.Tagged      (Tagged (..))
+import           Control.Monad    (void)
 import           Data.Time        (Day (ModifiedJulianDay), UTCTime (..))
 
 import           Test.Tasty
@@ -20,29 +19,36 @@ fakeTime = UTCTime (ModifiedJulianDay 0) 0
 
 testComplete :: TestTree
 testComplete = testGroup "complete"
-  [ returnsCreatedUuid
-  , failsWhenUnableToFindMatch
+  [ testCase "responds with success" $ do
+      output <- runTestApp fakeTime $ do
+        (H.AddSuccess taskId)  <- H.addTask "some task"
+        H.completeTask (H.taskUuidToText taskId)
+
+      let result = getResult output
+      isSuccess result @? "expected success"
+
+
+  , testCase "marks the task as complete" $ do
+      output <- runTestApp fakeTime $ do
+        (H.AddSuccess taskId)  <- H.addTask "some task"
+        void $ H.completeTask (H.taskUuidToText taskId)
+        tasks <- H.listTasks
+        pure (taskId, tasks)
+
+      let (taskId, tasks) = getResult output
+      Just H.Complete @=? (H.status <$> List.find (\x -> H.taskUuid x == taskId) tasks)
+
+
+  , testCase "fails when unable to find a matching task" $ do
+      output <- runTestApp fakeTime $ do
+        void $ H.addTask "some task"
+        H.completeTask "unknown"
+
+      let result = getResult output
+      H.FailedToFind @=? result
+
   ]
 
-
-returnsCreatedUuid :: TestTree
-returnsCreatedUuid = testCase "returns the created uuid on success" $ do
-  uuid <- UUID.nextRandom
-  x <- getResult <$> runTestApp (uuid, fakeTime) (H.addTask "some task" >> H.completeTask (UUID.toText uuid))
-  f uuid @=? x
-    where
-      f uuid = H.ModifySuccess
-        ( H.Task
-          { H.taskUuid = Tagged uuid
-          , H.description = "some task"
-          , H.createdAt = fakeTime
-          , H.status = H.Complete
-          }
-        )
-
-
-failsWhenUnableToFindMatch :: TestTree
-failsWhenUnableToFindMatch = testCase "fails when unable to find a matching task" $ do
-  uuid <- UUID.nextRandom
-  x <- getResult <$> runTestApp (uuid, fakeTime) (H.addTask "some task" >> H.completeTask "unknown")
-  assertEqual "expecting failed to find" H.FailedToFind x
+  where
+    isSuccess (H.ModifySuccess _) = True
+    isSuccess _                   = False

@@ -3,7 +3,7 @@
 
 module HTask.CLI.Runners (runAction) where
 
-import qualified Data.Sequence               as Seq
+import qualified Data.List                   as List
 import qualified Data.Text                   as Text
 import qualified Data.UUID                   as UUID
 import qualified HTask.Core                  as H
@@ -12,8 +12,6 @@ import           Control.Monad.IO.Unlift     (MonadUnliftIO)
 import           Control.Monad.Random.Class  (MonadRandom, getRandomR)
 import           Data.Foldable               (toList)
 import           Data.Function               (on)
-import           Data.List                   (null)
-import           Data.Sequence               (Seq, (!?))
 import           Data.Tagged                 (untag)
 import           Data.Text                   (Text)
 import           HTask.CLI.Actions
@@ -108,8 +106,8 @@ runComplete t
   where
     formatOutcome x
       = case x of
-          H.ModifySuccess tsk ->
-            resultSuccess ["completing task: " <> H.description tsk]
+          H.ModifySuccess task ->
+            resultSuccess ["completing task: " <> H.description task]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -124,15 +122,15 @@ runDone
 
   where
     doneTask
-      = H.listTasks >>= mapM (H.completeTask . taskToText) . Seq.filter inProgress
+      = H.listTasks >>= mapM (H.completeTask . taskToText) . List.filter inProgress
 
     formatOutcome
       = resultSuccess . toList . fmap formatRow
 
     formatRow x
       = case x of
-          H.ModifySuccess tsk ->
-            "completing task: " <> H.description tsk
+          H.ModifySuccess task ->
+            "completing task: " <> H.description task
 
           H.FailedToFind ->
             "unable to find matching task"
@@ -147,15 +145,15 @@ runDrop
 
   where
     dropTask
-      = H.listTasks >>= mapM (H.stopTask . taskToText) . Seq.filter inProgress
+      = H.listTasks >>= mapM (H.stopTask . taskToText) . List.filter inProgress
 
     formatOutcome
       = resultSuccess . toList . fmap formatRow
 
     formatRow x
       = case x of
-          H.ModifySuccess tsk ->
-            "stopping task: " <> H.description tsk
+          H.ModifySuccess task ->
+            "stopping task: " <> H.description task
 
           H.FailedToFind ->
             "unable to find matching task"
@@ -173,13 +171,13 @@ runList showUUID showAll
     formatOutput
       = nicePrint showUUID
 
-    selectTasks :: Seq H.Task -> Seq H.Task
+    selectTasks :: [H.Task] -> [H.Task]
     selectTasks
-      = Seq.sortBy taskDisplayOrder
+      = List.sortBy taskDisplayOrder
       . (if untag showAll then id else filterActive)
 
     filterActive
-      = Seq.filter (justActive . H.status)
+      = List.filter (justActive . H.status)
 
     justActive H.Pending    = True
     justActive H.InProgress = True
@@ -199,9 +197,9 @@ runList showUUID showAll
 
 runPick :: (MonadRandom m, MonadUnliftIO m) => App m RunResult
 runPick = do
-  ts <- H.listTasks
-  let ps = Seq.filter (hasStatus H.Pending) ts
-  k <- randomSelectOne ps
+  tasks <- H.listTasks
+  let pendings = List.filter (hasStatus H.Pending) tasks
+  k <- randomSelectOne pendings
   maybe
     (pure $ resultError "no task to pick")
     (fmap resultSuccess . startTask)
@@ -212,10 +210,17 @@ runPick = do
       _ <- H.startTask $ taskToText t
       pure ["picking task: " <> H.description t]
 
-    randomSelectOne :: (MonadRandom m) => Seq a -> m (Maybe a)
-    randomSelectOne Seq.Empty = pure Nothing
+    randomSelectOne :: (MonadRandom m) => [a] -> m (Maybe a)
+    randomSelectOne [] = pure Nothing
     randomSelectOne xs =
-      (xs !?) <$> getRandomR (0, Seq.length xs)
+      (`maybeAt` xs) <$> getRandomR (0, List.length xs)
+
+    maybeAt :: Int -> [a] -> Maybe a
+    maybeAt _ [] = Nothing
+    maybeAt n xs
+      | n < 0 = Nothing
+      | n >= List.length xs = Nothing
+      | otherwise = Just (xs !! n)
 
 
 runRemove :: (MonadUnliftIO m) => Text -> App m RunResult
@@ -225,8 +230,8 @@ runRemove t
   where
     formatOutcome x
       = case x of
-          H.ModifySuccess tsk ->
-            resultSuccess ["removing task: " <> H.description tsk]
+          H.ModifySuccess task ->
+            resultSuccess ["removing task: " <> H.description task]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -242,8 +247,8 @@ runStart t
   where
     formatOutcome x
       = case x of
-          H.ModifySuccess tsk ->
-            resultSuccess ["starting task: " <> H.description tsk]
+          H.ModifySuccess task ->
+            resultSuccess ["starting task: " <> H.description task]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -259,8 +264,8 @@ runStop t
   where
     formatOutcome x
       = case x of
-          H.ModifySuccess tsk ->
-            resultSuccess ["stopping task: " <> H.description tsk]
+          H.ModifySuccess task ->
+            resultSuccess ["stopping task: " <> H.description task]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -276,32 +281,32 @@ runSummary
   = renderSummary <$> H.listTasks
 
   where
-    renderSummary :: Seq H.Task -> RunResult
-    renderSummary ts = resultSuccess
+    renderSummary :: [H.Task] -> RunResult
+    renderSummary tasks = resultSuccess
       $ displayCurrent
       <> displayTopPending
 
       where
         displayCurrent :: [Text]
         displayCurrent = do
-          let ps = Seq.filter (hasStatus H.InProgress) ts
-          if Data.List.null ps
+          let actives = List.filter (hasStatus H.InProgress) tasks
+          if List.null actives
             then
               [ "No current task" ]
             else
               "Current task:"
-              : concatMap printTaskForSummary ps
+              : concatMap printTaskForSummary actives
 
 
         displayTopPending :: [Text]
         displayTopPending
-          = pendingMessage (length xs) (length ps)
+          = pendingMessage (length xs) (length pendings)
           : concatMap printTaskForSummary xs
 
           where
-            ps = Seq.sortBy taskPriority (Seq.filter (hasStatus H.Pending) ts)
+            pendings = List.sortBy taskPriority (List.filter (hasStatus H.Pending) tasks)
 
-            xs = Seq.take 5 ps
+            xs = List.take 5 pendings
 
             pendingMessage x p =
               "Top " <> tInt x <> " pending (" <> tInt (p - x) <> " hidden):"

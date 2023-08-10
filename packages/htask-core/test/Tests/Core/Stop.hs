@@ -4,14 +4,11 @@
 module Tests.Core.Stop (testStop) where
 
 import qualified Data.Map.Strict  as Map
-import qualified Data.Sequence    as Seq
 import qualified Data.UUID        as UUID
 import qualified Data.UUID.V4     as UUID
 import qualified HTask.Core       as H
-import qualified Leadpixel.Events as V
 
 import           Control.Monad    (void)
-import           Data.Tagged
 import           Data.Time        (UTCTime)
 
 import           Test.Tasty
@@ -25,72 +22,58 @@ fakeTime = read "2023-08-09 11:21:00 UTC"
 
 testStop :: TestTree
 testStop = testGroup "stop"
-  [ cannotStopNonExistentEvent
-  , canStopEvent
-  , cannotStopStopped
+  [ testCase "fails if there is no matching event" $ do
+      uuid <- UUID.nextRandom
+      output <- runTestApp fakeTime $ H.stopTask (UUID.toText uuid)
+
+      let result = getResult output
+      assertEqual "expecting failure" H.FailedToFind result
+
+
+  , testCase "does not create a task on failure" $ do
+      uuid <- UUID.nextRandom
+      output <- runTestApp fakeTime $ H.stopTask (UUID.toText uuid)
+
+      let tasks = getTasks output
+      assertEqual "expecting no tasks" mempty tasks
+
+
+  , testCase "reports success when stopping a task" $ do
+      output <- runTestApp fakeTime $ do
+        (H.AddSuccess taskId) <- H.addTask "some task"
+        void $ H.startTask (H.taskUuidToText taskId)
+        H.stopTask (H.taskUuidToText taskId)
+
+      let result = getResult output
+      isSuccess result @? "expected success"
+
+
+  , testCase "marks the task as pending" $ do
+      output <- runTestApp fakeTime $ do
+        (H.AddSuccess taskId) <- H.addTask "some task"
+        void $ H.startTask (H.taskUuidToText taskId)
+        void $ H.stopTask (H.taskUuidToText taskId)
+        pure taskId
+
+      let tasks = getTasks output
+      let taskId = getResult output
+
+      1 @=? Map.size tasks
+      Just H.Pending @=? (H.status <$> Map.lookup taskId tasks)
+
+
+  , testCase "cannot stop a stopped task" $ do
+      output <- runTestApp fakeTime $ do
+        (H.AddSuccess taskId) <- H.addTask "some task"
+        void $ H.startTask (H.taskUuidToText taskId)
+        void $ H.stopTask (H.taskUuidToText taskId)
+        H.stopTask (H.taskUuidToText taskId)
+
+      let result = getResult output
+      H.FailedToModify @=? result
+
   ]
 
-
-cannotStopNonExistentEvent :: TestTree
-cannotStopNonExistentEvent = testCase "fails if there is no matching event" $ do
-  uuid <- UUID.nextRandom
-  let op = H.stopTask (UUID.toText uuid)
-
-  (result, tasks, events) <- runTestApp (uuid, fakeTime) op
-
-  assertEqual "expecting failure" H.FailedToFind result
-  assertEqual "expecting no tasks" mempty tasks
-  assertEqual "expecting no events" mempty events
-
-
-canStopEvent :: TestTree
-canStopEvent = testCase "reports success when stopping a task" $ do
-  uuid <- Tagged <$> UUID.nextRandom
-  let op = do
-        void $ H.addTask "some task"
-        void $ H.startTask (UUID.toText $ untag uuid)
-        H.stopTask (UUID.toText $ untag uuid)
-
-  (result, tasks, events) <- runTestApp (untag uuid, fakeTime) op
-
-  let expectedResult = H.ModifySuccess $ H.Task
-        { H.taskUuid = uuid
-        , H.description = "some task"
-        , H.createdAt = fakeTime
-        , H.status = H.Pending
-        }
-
-  assertEqual "puts a task back into pending" expectedResult result
-
-  assertEqual "tasks count" 1 (Map.size tasks)
-  assertEqual "task status" (Just H.Pending) (H.status <$> Map.lookup uuid tasks)
-
-  assertEqual "events count" 3 (Seq.length events)
-
-  let intent = H.StopTask uuid
-  let ev = V.Event { V.timestamp = fakeTime, V.payload = intent}
-  assertEqual "events" (Just ev) (Seq.lookup 2 events)
-
-
-cannotStopStopped :: TestTree
-cannotStopStopped = testCase "cannot stop a stopped task" $ do
-  uuid <- Tagged <$> UUID.nextRandom
-  let op = do
-        void $ H.addTask "some task"
-        void $ H.startTask (UUID.toText $ untag uuid)
-        void $ H.stopTask (UUID.toText $ untag uuid)
-        H.stopTask (UUID.toText $ untag uuid)
-
-  (result, tasks, events) <- runTestApp (untag uuid, fakeTime) op
-
-  let expectedResult = H.FailedToModify
-  assertEqual "puts a task back into pending" expectedResult result
-
-  assertEqual "tasks count" 1 (Map.size tasks)
-  assertEqual "task status" (Just H.Pending) (H.status <$> Map.lookup uuid tasks)
-
-  assertEqual "events count" 3 (Seq.length events)
-
-  let intent = H.StopTask uuid
-  let ev = V.Event { V.timestamp = fakeTime, V.payload = intent}
-  assertEqual "events" (Just ev) (Seq.lookup 2 events)
+  where
+    isSuccess (H.ModifySuccess _) = True
+    isSuccess _                   = False

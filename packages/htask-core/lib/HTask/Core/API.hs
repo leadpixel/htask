@@ -16,12 +16,10 @@ module HTask.Core.API
 
 import qualified Data.Foldable            as Foldable
 import qualified Data.Map                 as Map
-import qualified Data.Sequence            as Seq
 import qualified Data.Text                as Text
 import qualified Leadpixel.Events         as V
 
 import           Control.Monad.State      (MonadState)
-import           Data.Sequence            (Seq)
 import           Data.Text                (Text)
 import           Data.Time                (UTCTime)
 import           Data.UUID                (UUID)
@@ -47,8 +45,8 @@ data ModifyResult
 type CanModifyTask m = (Monad m, Provider UTCTime m, V.HasEventSink m, MonadState TaskMap m)
 
 
-listTasks :: (MonadState TaskMap m) => m (Seq Task)
-listTasks = Seq.fromList . Map.elems <$> getTasks
+listTasks :: (MonadState TaskMap m) => m [Task]
+listTasks = Map.elems <$> getTasks
 
 
 findTask :: (MonadState TaskMap m) => Text -> m (Maybe Task)
