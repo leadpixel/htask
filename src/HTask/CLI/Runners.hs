@@ -6,7 +6,6 @@ module HTask.CLI.Runners (runAction) where
 import qualified Data.List                  as List
 import qualified Data.Map.Strict            as Map
 import qualified Data.Text                  as Text
-import qualified Data.UUID                  as UUID
 import qualified HTask.Core                 as H
 
 import           Control.Monad.Random.Class (MonadRandom, getRandomR)
@@ -45,6 +44,17 @@ hasStatus s t = s == H.status t
 
 tInt :: Int -> Text
 tInt = Text.pack . show
+
+
+-- | Helper to format descriptions with consistent indentation for newlines
+formatDescription :: Int -> H.Task -> Text
+formatDescription padding t =
+  let lines' = Text.lines (H.description t)
+      symbol = statusSymbol (H.status t)
+      colorized = withStatusColor (H.status t)
+      firstLine = symbol <> " " <> colorized (head lines')
+      otherLines = fmap (\l -> Text.replicate padding " " <> colorized l) (tail lines')
+  in Text.intercalate "\n" (firstLine : otherLines)
 
 
 runAdd :: (CanRunAction m) => Text -> m RunResult
@@ -161,9 +171,8 @@ runList showUUID showAll = do
     nicePrint :: Map.Map H.TaskUuid Text -> [H.Task] -> H.Task -> Text
     nicePrint prefs allTs t
       =  padLeft 3 (maybe "?" tInt (taskIndex t allTs)) <> " "
-      <> statusSymbol (H.status t) <> " "
-      <> withStatusColor (H.status t) (H.description t)
-      <> (if untag showUUID then " " <> withDim (Map.findWithDefault "" (H.taskUuid t) prefs) else "")
+      <> formatDescription 6 t
+      <> (if untag showUUID then "\n    " <> withDim (Map.findWithDefault "" (H.taskUuid t) prefs) else "")
 
     taskIndex t allTs = (+1) <$> List.findIndex (\x -> H.taskUuid x == H.taskUuid t) allTs
 
@@ -286,11 +295,10 @@ runSummary = do
 
         printTaskForSummary :: [H.Task] -> Map.Map H.TaskUuid Text -> H.Task -> [Text]
         printTaskForSummary allTs prefs t =
-          [ maybe "" (\i -> padLeft 3 (tInt i) <> " ") (taskIndex t allTs)
-            <> statusSymbol (H.status t) <> " "
-            <> withStatusColor (H.status t) (H.description t)
-          , indent $ indent $ withDim printRef
-          ]
+          let idxText = maybe "" (\i -> padLeft 3 (tInt i) <> " ") (taskIndex t allTs)
+          in [ idxText <> formatDescription 6 t
+             , indent $ indent $ withDim printRef
+             ]
 
           where
             printRef :: Text
