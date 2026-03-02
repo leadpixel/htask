@@ -53,7 +53,7 @@ formatTaskEntry showFullUuid prefs allTs t =
   ] <> descriptionLines
 
   where
-    idx = maybe "?" (tInt . (+1)) (List.findIndex (\x -> H.taskUuid x == H.taskUuid t) allTs)
+    idx = maybe "??" (padZero 2 . tInt . (+1)) (List.findIndex (\x -> H.taskUuid x == H.taskUuid t) allTs)
     symbol = statusSymbol (H.status t)
 
     -- We always show short UUID, showFullUuid toggles the full text
@@ -61,10 +61,14 @@ formatTaskEntry showFullUuid prefs allTs t =
                then H.taskUuidToText (H.taskUuid t)
                else Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs
 
-    -- Consistent coloring for metadata
-    headerLine = withStatusColor (H.status t) (padLeft 3 idx <> " " <> symbol) <> " " <> withDim uuidText
+    -- Header: " 01 ▶ 9bb2"
+    headerLine = "  " <> withStatusColor (H.status t) (idx <> " " <> symbol) <> " " <> withDim uuidText
 
-    descriptionLines = fmap (\l -> "      " <> withStatusColor (H.status t) l) (Text.lines (H.description t))
+    -- Description: "      ╰─ bash autocompletion"
+    descriptionLines = case Text.lines (H.description t) of
+      [] -> []
+      (f:fs) -> ("       " <> treeLink <> withBold f)
+              : fmap (\l -> "          " <> withBold l) fs
 
 
 runAdd :: (CanRunAction m) => Text -> m RunResult
@@ -171,12 +175,12 @@ runList showUUID showAll = do
     formatGroup allTs ts prefs s =
       case List.filter (hasStatus s) ts of
         [] -> []
-        gs -> ("\n" <> withBold (statusHeader s)) : divider : concatMap (nicePrint prefs allTs) gs
+        gs -> ("\n" <> divider (statusHeader s)) : concatMap (nicePrint prefs allTs) gs
 
-    statusHeader H.InProgress = "In Progress"
-    statusHeader H.Pending    = "Pending"
-    statusHeader H.Complete   = "Completed"
-    statusHeader H.Abandoned  = "Abandoned"
+    statusHeader H.InProgress = "IN PROGRESS"
+    statusHeader H.Pending    = "PENDING"
+    statusHeader H.Complete   = "COMPLETED"
+    statusHeader H.Abandoned  = "ABANDONED"
 
     nicePrint :: Map.Map H.TaskUuid Text -> [H.Task] -> H.Task -> [Text]
     nicePrint = formatTaskEntry (untag showUUID)
@@ -285,16 +289,15 @@ runSummary = do
         displayCurrent =
           if List.null actives
             then [ "No current task" ]
-            else withBold "Current task" : divider : concatMap (formatTaskEntry False prefixes allTasks) actives
+            else divider "CURRENT TASK" : concatMap (formatTaskEntry False prefixes allTasks) actives
 
 
         displayTopPending :: [Text]
         displayTopPending =
           let totalPendings = List.length (List.filter (hasStatus H.Pending) allTasks)
-          in ("\n" <> withBold (pendingMessage (length topPendings) totalPendings))
-             : divider
+          in ("\n" <> divider (pendingMessage (length topPendings) totalPendings))
              : concatMap (formatTaskEntry False prefixes allTasks) topPendings
 
           where
             pendingMessage x p =
-              "Pending tasks (Top " <> tInt x <> " of " <> tInt p <> ")"
+              "PENDING TASKS (" <> tInt x <> " OF " <> tInt p <> ")"
