@@ -6,11 +6,13 @@ module HTask.CLI.Output
   , divider
   , indent
   , padLeft
+  , padZero
   , renderResult
   , resultError
   , resultSuccess
   , statusSymbol
   , text
+  , treeLink
   , withBold
   , withDim
   , withStatusColor
@@ -104,8 +106,14 @@ indent t = "  " <> t
 padLeft :: Int -> Text -> Text
 padLeft n t = Text.replicate (n - Text.length t) " " <> t
 
-divider :: Text
-divider = withDim "────────────────────────────────────────"
+padZero :: Int -> Text -> Text
+padZero n t = Text.replicate (n - Text.length t) "0" <> t
+
+divider :: Text -> Text
+divider label = withBold label <> " " <> withDim (Text.replicate (60 - Text.length label) "─")
+
+treeLink :: Text
+treeLink = "╰─ "
 
 formatError :: [Text] -> [Text]
 formatError t = [ Text.pack (withColor Red "Error" <> ":") ] <> t
