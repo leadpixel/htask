@@ -4,8 +4,10 @@ module HTask.Core
   , Task (createdAt, description, status, taskUuid)
   , TaskMap
   , TaskStatus (..)
+  , TaskUuid
   , addTask
   , completeTask
+  , disambiguatingPrefixes
   , findTask
   , foldEventLog
   , listTasks
@@ -19,6 +21,7 @@ module HTask.Core
 
 import           HTask.Core.API
 import           HTask.Core.Domain (Task (..), TaskMap, TaskStatus (..),
+                                    TaskUuid, disambiguatingPrefixes,
                                     foldEventLog, taskDisplayOrder,
                                     taskPriority, taskUuidToText)
 

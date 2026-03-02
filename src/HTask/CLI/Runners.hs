@@ -4,8 +4,8 @@
 module HTask.CLI.Runners (runAction) where
 
 import qualified Data.List                  as List
+import qualified Data.Map.Strict            as Map
 import qualified Data.Text                  as Text
-import qualified Data.UUID                  as UUID
 import qualified HTask.Core                 as H
 
 import           Control.Monad.Random.Class (MonadRandom, getRandomR)
@@ -124,18 +124,14 @@ runDrop
 
 
 runList :: (CanRunAction m) => ShowUUID -> ShowAll -> m RunResult
-runList showUUID showAll
-  = formatList . selectTasks <$> H.listTasks
+runList showUUID showAll = do
+  tasks <- selectTasks . List.sortBy H.taskDisplayOrder <$> H.listTasks
+  let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> tasks)
+  pure $ resultSuccess $ zipWith (nicePrint showUUID prefixes) [1..] tasks
 
   where
-    formatList :: [H.Task] -> RunResult
-    formatList tasks = resultSuccess $
-      zipWith (nicePrint showUUID) [1..] tasks
-
-    selectTasks :: [H.Task] -> [H.Task]
     selectTasks
-      = List.sortBy H.taskDisplayOrder
-      . (if untag showAll then id else filterActive)
+      = if untag showAll then id else filterActive
 
     filterActive
       = List.filter (justActive . H.status)
@@ -145,8 +141,8 @@ runList showUUID showAll
     justActive H.Complete   = False
     justActive H.Abandoned  = False
 
-    nicePrint :: ShowUUID -> Int -> H.Task -> Text
-    nicePrint d n t
+    nicePrint :: ShowUUID -> Map.Map H.TaskUuid Text -> Int -> H.Task -> Text
+    nicePrint d prefs n t
       =  Text.pack (show n) <> " "
       <> ( if untag d then printUUID else "" )
       <> statusSymbol (H.status t)
@@ -154,7 +150,7 @@ runList showUUID showAll
       <> withStatusColor (H.status t) (H.description t)
 
       where
-        printUUID = UUID.toText (untag (H.taskUuid t)) <> " "
+        printUUID = Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs <> " "
 
 
 runPick :: (CanRunAction m) => m RunResult
@@ -239,46 +235,44 @@ runStop t
 
 
 runSummary :: (CanRunAction m) => m RunResult
-runSummary
-  = renderSummary <$> H.listTasks
+runSummary = do
+  tasks <- H.listTasks
+  let actives = List.filter (hasStatus H.InProgress) tasks
+  let pendings = List.sortBy H.taskPriority (List.filter (hasStatus H.Pending) tasks)
+  let topPendings = List.take 5 pendings
+
+  let displayedTasks = actives <> topPendings
+  let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> tasks) -- Calculate for ALL tasks to ensure unique index matching
+
+  pure $ renderSummary tasks actives topPendings prefixes
 
   where
-    renderSummary :: [H.Task] -> RunResult
-    renderSummary tasks = resultSuccess
+    renderSummary allTasks actives topPendings prefixes = resultSuccess
       $ displayCurrent
       <> displayTopPending
 
       where
         displayCurrent :: [Text]
-        displayCurrent = do
-          let actives = List.filter (hasStatus H.InProgress) tasks
+        displayCurrent =
           if List.null actives
-            then
-              [ "No current task" ]
-            else
-              "Current task:"
-              : concatMap (printTaskForSummary tasks) actives
+            then [ "No current task" ]
+            else "Current task:" : concatMap (printTaskForSummary allTasks prefixes) actives
 
 
         displayTopPending :: [Text]
         displayTopPending
-          = pendingMessage (length xs) (length pendings)
-          : concatMap (printTaskForSummary tasks) xs
+          = pendingMessage (length topPendings) (length pendings)
+          : concatMap (printTaskForSummary allTasks prefixes) topPendings
 
           where
-            pendings = List.sortBy H.taskPriority (List.filter (hasStatus H.Pending) tasks)
-
-            xs = List.take 5 pendings
-
+            pendings = List.filter (hasStatus H.Pending) allTasks
             pendingMessage x p =
               "Top " <> tInt x <> " pending (" <> tInt (p - x) <> " hidden):"
 
-            tInt = Text.pack . show
 
-
-        printTaskForSummary :: [H.Task] -> H.Task -> [Text]
-        printTaskForSummary allTasks t =
-          [ indent $ maybe "" (\i -> tInt i <> " ") (taskIndex t allTasks) <> printDescription
+        printTaskForSummary :: [H.Task] -> Map.Map H.TaskUuid Text -> H.Task -> [Text]
+        printTaskForSummary allTs prefs t =
+          [ indent $ maybe "" (\i -> tInt i <> " ") (taskIndex t allTs) <> printDescription
           , indent $ indent printRef
           ]
 
@@ -290,9 +284,9 @@ runSummary
               <> withStatusColor (H.status t) (H.description t)
 
             printRef :: Text
-            printRef = (UUID.toText . untag . H.taskUuid) t
-
-            tInt = Text.pack . show
+            printRef = Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs
 
             taskIndex :: H.Task -> [H.Task] -> Maybe Int
             taskIndex task ts = (+1) <$> List.findIndex (\x -> H.taskUuid x == H.taskUuid task) (List.sortBy H.taskDisplayOrder ts)
+
+    tInt = Text.pack . show

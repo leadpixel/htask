@@ -15,6 +15,7 @@ module HTask.Core.Domain
   , addNewTask
   , applyEvent
   , createTask
+  , disambiguatingPrefixes
   , foldEventLog
   , getTasks
   , removeTaskUuid
@@ -29,6 +30,7 @@ import qualified Control.Monad.State as State
 import qualified Data.Aeson          as Aeson
 import qualified Data.List           as List
 import qualified Data.Map.Strict     as Map
+import qualified Data.Text           as Text
 import qualified Data.UUID           as UUID
 import qualified HTask.Events        as V
 
@@ -71,6 +73,19 @@ setTaskStatus s t = t { status = s }
 
 taskUuidToText :: TaskUuid -> Text
 taskUuidToText = UUID.toText . untag
+
+disambiguatingPrefixes :: [TaskUuid] -> Map TaskUuid Text
+disambiguatingPrefixes uuids =
+  Map.fromList $ fmap (\u -> (u, findPrefix u)) uuids
+  where
+    texts = fmap taskUuidToText uuids
+    findPrefix u =
+      let t = taskUuidToText u
+      in head [ Text.take n t
+              | n <- [4..36]
+              , let p = Text.take n t
+              , length (filter (Text.isPrefixOf p) texts) == 1
+              ]
 
 taskPriority :: Task -> Task -> Ordering
 taskPriority = compare `on` createdAt
