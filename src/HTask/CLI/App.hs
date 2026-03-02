@@ -21,7 +21,7 @@ import           Control.Monad.Trans.Reader (ReaderT (..), ask, runReaderT)
 import           Data.IORef
 import           Data.Time                  (UTCTime)
 import           Data.UUID                  (UUID)
-import           HTask.Events.Backends.File
+import           HTask.Events
 import           HTask.Provider
 
 

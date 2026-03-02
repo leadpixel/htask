@@ -18,7 +18,7 @@ import           Data.IORef
 import           Data.Time                  (UTCTime)
 import           Data.UUID                  (UUID)
 import qualified Data.UUID                  as UUID
-import           HTask.Events.Backends.File (runFileBackend)
+import           HTask.Events               (runFileBackend)
 import           HTask.Provider
 
 

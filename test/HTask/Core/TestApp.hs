@@ -10,20 +10,20 @@ module HTask.Core.TestApp
   , runTestApp
   ) where
 
-import qualified HTask.Core                   as H
-import qualified HTask.Events                 as V
-import qualified HTask.Events.Backends.Memory as Memory
+import qualified HTask.Core                as H
+import qualified HTask.Events              as Memory
+import qualified HTask.Events              as V
 
-import           Control.Monad.IO.Class       (MonadIO, liftIO)
-import           Control.Monad.State          (MonadState)
-import qualified Control.Monad.State          as State
-import           Control.Monad.Trans.Class    (lift)
-import           Control.Monad.Trans.State    (StateT, runStateT)
-import qualified Data.ByteString.Lazy         as Lazy
-import           Data.Sequence                (Seq)
-import           Data.Time                    (UTCTime)
-import           Data.UUID                    (UUID)
-import qualified Data.UUID.V4                 as UUID
+import           Control.Monad.IO.Class    (MonadIO, liftIO)
+import           Control.Monad.State       (MonadState)
+import qualified Control.Monad.State       as State
+import           Control.Monad.Trans.Class (lift)
+import           Control.Monad.Trans.State (StateT, runStateT)
+import qualified Data.ByteString.Lazy      as Lazy
+import           Data.Sequence             (Seq)
+import           Data.Time                 (UTCTime)
+import           Data.UUID                 (UUID)
+import qualified Data.UUID.V4              as UUID
 import           HTask.Provider
 
 

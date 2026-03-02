@@ -3,20 +3,19 @@
 
 module HTask.CLI.Runners (runAction) where
 
-import qualified Data.List                   as List
-import qualified Data.Text                   as Text
-import qualified Data.UUID                   as UUID
-import qualified HTask.Core                  as H
+import qualified Data.List                  as List
+import qualified Data.Text                  as Text
+import qualified Data.UUID                  as UUID
+import qualified HTask.Core                 as H
 
-import           Control.Monad.Random.Class  (MonadRandom, getRandomR)
-import           Data.Foldable               (toList)
-import           Data.Function               (on)
-import           Data.Tagged                 (untag)
-import           Data.Text                   (Text)
+import           Control.Monad.Random.Class (MonadRandom, getRandomR)
+import           Data.Foldable              (toList)
+import           Data.Function              (on)
+import           Data.Tagged                (untag)
+import           Data.Text                  (Text)
 import           HTask.CLI.Actions
 import           HTask.CLI.App
-import           HTask.CLI.Output.Document
-import           HTask.CLI.Output.Formatters
+import           HTask.CLI.Output
 
 
 runAction :: (CanRunAction m) => Action -> m RunResult

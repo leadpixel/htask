@@ -3,12 +3,11 @@
 
 module HTask.Events.MemorySpec (allTests) where
 
-import qualified HTask.Events                 as V
-import qualified HTask.Events.Backends.Memory as Memory
+import qualified HTask.Events     as Memory
+import qualified HTask.Events     as V
 
-import           Data.Sequence                (Seq (..))
-import           Data.Time                    (Day (ModifiedJulianDay),
-                                               UTCTime (..))
+import           Data.Sequence    (Seq (..))
+import           Data.Time        (Day (ModifiedJulianDay), UTCTime (..))
 import           Test.Tasty
 import           Test.Tasty.HUnit
 

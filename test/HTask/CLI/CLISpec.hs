@@ -2,18 +2,17 @@
 
 module HTask.CLI.CLISpec (tests) where
 
-import qualified HTask.CLI.Actions         as Action
-import qualified HTask.CLI.Output.Document as Doc
-import qualified HTask.CLI.Runners         as Runner
-import           HTask.CLI.TestApp         (runTestApp)
+import qualified HTask.CLI.Actions    as Action
+import qualified HTask.CLI.Output     as Doc
+import qualified HTask.CLI.Runners    as Runner
+import           HTask.CLI.TestApp    (runTestApp)
 
-import qualified Data.ByteString.Lazy      as Lazy
-import qualified Data.Text                 as Text
-import qualified Data.Text.Encoding        as Text
-import           Data.Time                 (Day (ModifiedJulianDay),
-                                            UTCTime (..))
-import           Data.UUID                 (UUID)
-import qualified Data.UUID                 as UUID
+import qualified Data.ByteString.Lazy as Lazy
+import qualified Data.Text            as Text
+import qualified Data.Text.Encoding   as Text
+import           Data.Time            (Day (ModifiedJulianDay), UTCTime (..))
+import           Data.UUID            (UUID)
+import qualified Data.UUID            as UUID
 import           System.Directory
 import           System.IO
 import           Test.Tasty

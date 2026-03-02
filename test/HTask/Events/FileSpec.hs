@@ -3,19 +3,18 @@
 
 module HTask.Events.FileSpec (allTests) where
 
-import qualified HTask.Events               as V
-import qualified HTask.Events.Backends.File as File
+import qualified HTask.Events            as File
+import qualified HTask.Events            as V
 
-import           Control.Exception          (bracket)
-import           Control.Monad              (replicateM_)
-import           Control.Monad.IO.Unlift    (MonadUnliftIO)
-import qualified Data.List                  as List
-import           Data.Time                  (Day (ModifiedJulianDay),
-                                             UTCTime (..))
-import           GHC.IO.Handle              (hDuplicate, hDuplicateTo)
+import           Control.Exception       (bracket)
+import           Control.Monad           (replicateM_)
+import           Control.Monad.IO.Unlift (MonadUnliftIO)
+import qualified Data.List               as List
+import           Data.Time               (Day (ModifiedJulianDay), UTCTime (..))
+import           GHC.IO.Handle           (hDuplicate, hDuplicateTo)
 
 import           System.Directory
-import qualified System.IO                  as Sys
+import qualified System.IO               as Sys
 import           System.IO
 import           Test.Tasty
 import           Test.Tasty.HUnit

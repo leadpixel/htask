@@ -14,18 +14,16 @@ module HTask.Core.API
   , stopTask
   ) where
 
-import qualified Data.Foldable            as Foldable
-import qualified Data.Map                 as Map
-import qualified Data.Text                as Text
-import qualified HTask.Events             as V
+import qualified Data.Foldable       as Foldable
+import qualified Data.Map            as Map
+import qualified Data.Text           as Text
+import qualified HTask.Events        as V
 
-import           Control.Monad.State      (MonadState)
-import           Data.Text                (Text)
-import           Data.Time                (UTCTime)
-import           Data.UUID                (UUID)
-import           HTask.Core.Task
-import           HTask.Core.TaskContainer
-import           HTask.Core.TaskEvent
+import           Control.Monad.State (MonadState)
+import           Data.Text           (Text)
+import           Data.Time           (UTCTime)
+import           Data.UUID           (UUID)
+import           HTask.Core.Domain
 import           HTask.Provider
 
 

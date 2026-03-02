@@ -15,6 +15,5 @@ module HTask.Core
   ) where
 
 import           HTask.Core.API
-import           HTask.Core.Replay
-import           HTask.Core.Task
-import           HTask.Core.TaskContainer (TaskMap)
+import           HTask.Core.Domain (Task (..), TaskMap, TaskStatus (..),
+                                    foldEventLog, taskUuidToText)

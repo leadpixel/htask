@@ -3,6 +3,7 @@
 
 module HTask.Core.Add (testAdd) where
 
+import           Data.Functor       (($>))
 import qualified HTask.Core         as H
 
 import           Data.Time          (Day (ModifiedJulianDay), UTCTime (..))

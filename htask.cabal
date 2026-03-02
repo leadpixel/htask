@@ -12,20 +12,12 @@ library
       HTask.CLI.Actions
       HTask.CLI.App
       HTask.CLI.Options
-      HTask.CLI.OptionsInfo
-      HTask.CLI.Output.Document
-      HTask.CLI.Output.Formatters
-      HTask.CLI.Render
+      HTask.CLI.Output
       HTask.CLI.Runners
       HTask.Core
       HTask.Core.API
-      HTask.Core.Replay
-      HTask.Core.Task
-      HTask.Core.TaskContainer
-      HTask.Core.TaskEvent
+      HTask.Core.Domain
       HTask.Events
-      HTask.Events.Backends.File
-      HTask.Events.Backends.Memory
       HTask.Provider
   other-modules:
       Paths_htask
