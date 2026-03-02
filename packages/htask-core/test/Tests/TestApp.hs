@@ -20,13 +20,11 @@ import qualified HTask.Core                       as H
 import qualified Leadpixel.Events                 as V
 
 import           Control.Monad.IO.Class           (MonadIO, liftIO)
-import           Control.Monad.Reader             (MonadReader)
 import           Control.Monad.State              (MonadState)
-import           Control.Monad.Trans.Class        (MonadTrans, lift)
+import           Control.Monad.Trans.Class        (lift)
 import           Control.Monad.Trans.Reader       (ReaderT, runReaderT)
 import           Control.Monad.Trans.State        (StateT, runStateT)
 import           Control.Monad.Trans.Writer       (WriterT, runWriterT)
-import           Control.Monad.Writer             (MonadWriter)
 import           Data.Sequence                    (Seq)
 import           Data.Time                        (UTCTime)
 import           Data.UUID                        (UUID)

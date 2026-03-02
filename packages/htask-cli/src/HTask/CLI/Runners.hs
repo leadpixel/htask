@@ -7,23 +7,16 @@ import qualified Data.List                   as List
 import qualified Data.Text                   as Text
 import qualified Data.UUID                   as UUID
 import qualified HTask.Core                  as H
-import qualified Leadpixel.Events            as V
 
-import           Control.Monad.IO.Class      (MonadIO)
-import           Control.Monad.IO.Unlift     (MonadUnliftIO)
 import           Control.Monad.Random.Class  (MonadRandom, getRandomR)
-import           Control.Monad.State         (MonadState)
 import           Data.Foldable               (toList)
 import           Data.Function               (on)
 import           Data.Tagged                 (untag)
 import           Data.Text                   (Text)
-import           Data.Time                   (UTCTime)
-import           Data.UUID                   (UUID)
 import           HTask.CLI.Actions
 import           HTask.CLI.App
 import           HTask.CLI.Output.Document
 import           HTask.CLI.Output.Formatters
-import           Leadpixel.Provider
 
 
 runAction :: (CanRunAction m) => Action -> m RunResult
