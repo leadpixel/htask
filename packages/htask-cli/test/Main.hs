@@ -3,13 +3,17 @@
 module Main (main) where
 
 import qualified HTask.CLI.Actions         as Action
-import qualified HTask.CLI.App             as App
 import qualified HTask.CLI.Output.Document as Doc
 import qualified HTask.CLI.Runners         as Runner
+import           TestApp                   (runTestApp)
 
 import qualified Data.ByteString.Lazy      as Lazy
 import qualified Data.Text                 as Text
 import qualified Data.Text.Encoding        as Text
+import           Data.Time                 (Day (ModifiedJulianDay),
+                                            UTCTime (..))
+import           Data.UUID                 (UUID)
+import qualified Data.UUID                 as UUID
 import           System.Directory
 import           System.IO
 import           Test.Tasty
@@ -27,13 +31,19 @@ tests = testGroup "htask-cli"
   , goldenTests
   ]
 
+fakeTime :: UTCTime
+fakeTime = UTCTime (ModifiedJulianDay 0) 0
+
+fakeUUIDs :: [UUID]
+fakeUUIDs = [UUID.fromWords 0 0 0 i | i <- [1..100]]
+
 hunitTests :: TestTree
 hunitTests = testGroup "Unit Tests"
   [ testCase "htask summary shows 'No current task' on empty file" $ do
       (path, h) <- openTempFile "." "cli-test-tasks"
       hClose h
 
-      result <- App.runApp path (Runner.runAction Action.Summary)
+      result <- runTestApp path [] fakeTime (Runner.runAction Action.Summary)
       let output = Doc.text result
 
       removeFile path
@@ -66,7 +76,7 @@ runSummaryWith :: [Action.Action] -> IO Lazy.ByteString
 runSummaryWith actions = do
   (path, h) <- openTempFile "." "cli-test-tasks-golden"
   hClose h
-  result <- App.runApp path $ do
+  result <- runTestApp path fakeUUIDs fakeTime $ do
     mapM_ Runner.runAction actions
     Runner.runAction Action.Summary
   removeFile path

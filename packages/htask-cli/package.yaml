@@ -58,13 +58,22 @@ tests:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
+      - MonadRandom
       - base
       - bytestring
       - directory
+      - event-backend-file
       - htask-cli
       - htask-core
+      - leadpixel-events
+      - leadpixel-provider
+      - mtl
       - process
       - tasty
       - tasty-golden
       - tasty-hunit
       - text
+      - time
+      - transformers
+      - unliftio-core
+      - uuid

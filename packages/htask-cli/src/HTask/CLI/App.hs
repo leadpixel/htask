@@ -3,6 +3,7 @@
 
 module HTask.CLI.App
   ( App
+  , CanRunAction
   , runApp
   ) where
 
@@ -26,6 +27,17 @@ import           Leadpixel.Provider
 newtype App m a
   = App { unApp :: StateT H.TaskMap (FileEventBackend m) a }
   deriving (Applicative, Functor, Monad, MonadIO, MonadState H.TaskMap)
+
+type CanRunAction m =
+  ( Monad m
+  , MonadIO m
+  , MonadUnliftIO m
+  , MonadRandom m
+  , MonadState H.TaskMap m
+  , V.HasEventSink m
+  , Provider UTCTime m
+  , Provider UUID m
+  )
 
 instance (Monad m, MonadUnliftIO m) => V.HasEventSource (App m) where
   readEvents = App $ lift V.readEvents

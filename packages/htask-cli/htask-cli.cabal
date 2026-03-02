@@ -73,19 +73,29 @@ test-suite htask-cli
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
+      TestApp
       Paths_htask_cli
   hs-source-dirs:
       test
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      MonadRandom
+    , base >=4.7 && <5
     , bytestring
     , directory
+    , event-backend-file
     , htask-cli
     , htask-core
+    , leadpixel-events
+    , leadpixel-provider
+    , mtl
     , process
     , tasty
     , tasty-golden
     , tasty-hunit
     , text
+    , time
+    , transformers
+    , unliftio-core
+    , uuid
   default-language: GHC2021

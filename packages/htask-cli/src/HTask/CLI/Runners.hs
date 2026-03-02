@@ -7,20 +7,26 @@ import qualified Data.List                   as List
 import qualified Data.Text                   as Text
 import qualified Data.UUID                   as UUID
 import qualified HTask.Core                  as H
+import qualified Leadpixel.Events            as V
 
+import           Control.Monad.IO.Class      (MonadIO)
 import           Control.Monad.IO.Unlift     (MonadUnliftIO)
 import           Control.Monad.Random.Class  (MonadRandom, getRandomR)
+import           Control.Monad.State         (MonadState)
 import           Data.Foldable               (toList)
 import           Data.Function               (on)
 import           Data.Tagged                 (untag)
 import           Data.Text                   (Text)
+import           Data.Time                   (UTCTime)
+import           Data.UUID                   (UUID)
 import           HTask.CLI.Actions
 import           HTask.CLI.App
 import           HTask.CLI.Output.Document
 import           HTask.CLI.Output.Formatters
+import           Leadpixel.Provider
 
 
-runAction :: (MonadRandom m, MonadUnliftIO m) => Action -> App m RunResult
+runAction :: (CanRunAction m) => Action -> m RunResult
 runAction (Add tex)      = runAdd tex
 runAction (Complete ref) = runComplete ref
 runAction (List d k)     = runList d k
@@ -84,7 +90,7 @@ statusDisplayOrder  H.Abandoned   H.InProgress =  GT
 statusDisplayOrder  H.Abandoned   H.Pending    =  GT
 
 
-runAdd :: (MonadUnliftIO m) => Text -> App m RunResult
+runAdd :: (CanRunAction m) => Text -> m RunResult
 runAdd t
   = formatOutcome <$> H.addTask t
 
@@ -99,7 +105,7 @@ runAdd t
       = resultError "failed to add"
 
 
-runComplete :: (MonadUnliftIO m) => Text -> App m RunResult
+runComplete :: (CanRunAction m) => Text -> m RunResult
 runComplete t
   = formatOutcome <$> H.completeTask t
 
@@ -116,7 +122,7 @@ runComplete t
             resultError "unable to modify matching task"
 
 
-runDone :: (MonadUnliftIO m) => App m RunResult
+runDone :: (CanRunAction m) => m RunResult
 runDone
   = formatOutcome <$> doneTask
 
@@ -139,7 +145,7 @@ runDone
             "unable to modify matching task"
 
 
-runDrop :: (MonadUnliftIO m) => App m RunResult
+runDrop :: (CanRunAction m) => m RunResult
 runDrop
   = formatOutcome <$> dropTask
 
@@ -162,7 +168,7 @@ runDrop
             "unable to modify matching task"
 
 
-runList :: (Monad m) => ShowUUID -> ShowAll -> App m RunResult
+runList :: (CanRunAction m) => ShowUUID -> ShowAll -> m RunResult
 runList showUUID showAll
   = resultSuccess . toList . fmap formatOutput . selectTasks
   <$> H.listTasks
@@ -195,7 +201,7 @@ runList showUUID showAll
         printUUID = UUID.toText (untag (H.taskUuid t)) <> " "
 
 
-runPick :: (MonadRandom m, MonadUnliftIO m) => App m RunResult
+runPick :: (CanRunAction m) => m RunResult
 runPick = do
   tasks <- H.listTasks
   let pendings = List.filter (hasStatus H.Pending) tasks
@@ -213,17 +219,17 @@ runPick = do
     randomSelectOne :: (MonadRandom m) => [a] -> m (Maybe a)
     randomSelectOne [] = pure Nothing
     randomSelectOne xs =
-      (`maybeAt` xs) <$> getRandomR (0, List.length xs)
+      (\i -> xs `maybeAt` i) <$> getRandomR (0, List.length xs - 1)
 
-    maybeAt :: Int -> [a] -> Maybe a
-    maybeAt _ [] = Nothing
-    maybeAt n xs
+    maybeAt :: [a] -> Int -> Maybe a
+    maybeAt [] _ = Nothing
+    maybeAt xs n
       | n < 0 = Nothing
       | n >= List.length xs = Nothing
       | otherwise = Just (xs !! n)
 
 
-runRemove :: (MonadUnliftIO m) => Text -> App m RunResult
+runRemove :: (CanRunAction m) => Text -> m RunResult
 runRemove t
   = formatOutcome <$> H.removeTask t
 
@@ -240,7 +246,7 @@ runRemove t
             resultError "unable to modify matching task"
 
 
-runStart :: (MonadUnliftIO m) => Text -> App m RunResult
+runStart :: (CanRunAction m) => Text -> m RunResult
 runStart t
   = formatOutcome <$> H.startTask t
 
@@ -257,7 +263,7 @@ runStart t
             resultError "unable to modify matching task"
 
 
-runStop :: (MonadUnliftIO m) => Text -> App m RunResult
+runStop :: (CanRunAction m) => Text -> m RunResult
 runStop t
   = formatOutcome <$> H.stopTask t
 
@@ -276,7 +282,7 @@ runStop t
 
 
 
-runSummary :: (Monad m) => App m RunResult
+runSummary :: (CanRunAction m) => m RunResult
 runSummary
   = renderSummary <$> H.listTasks
 
