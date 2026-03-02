@@ -171,7 +171,7 @@ runList showUUID showAll = do
     formatGroup allTs ts prefs s =
       case List.filter (hasStatus s) ts of
         [] -> []
-        gs -> ("\n" <> withBold (withStatusColor s (statusHeader s))) : concatMap (nicePrint prefs allTs) gs
+        gs -> ("\n" <> withBold (statusHeader s)) : divider : concatMap (nicePrint prefs allTs) gs
 
     statusHeader H.InProgress = "In Progress"
     statusHeader H.Pending    = "Pending"
@@ -285,15 +285,16 @@ runSummary = do
         displayCurrent =
           if List.null actives
             then [ "No current task" ]
-            else withBold (withStatusColor H.InProgress "Current task:") : concatMap (formatTaskEntry False prefixes allTasks) actives
+            else withBold "Current task" : divider : concatMap (formatTaskEntry False prefixes allTasks) actives
 
 
         displayTopPending :: [Text]
         displayTopPending =
           let totalPendings = List.length (List.filter (hasStatus H.Pending) allTasks)
-          in ("\n" <> withBold (withStatusColor H.Pending (pendingMessage (length topPendings) totalPendings)))
+          in ("\n" <> withBold (pendingMessage (length topPendings) totalPendings))
+             : divider
              : concatMap (formatTaskEntry False prefixes allTasks) topPendings
 
           where
             pendingMessage x p =
-              "Top " <> tInt x <> " pending (" <> tInt (p - x) <> " hidden):"
+              "Pending tasks (Top " <> tInt x <> " of " <> tInt p <> ")"
