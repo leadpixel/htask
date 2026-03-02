@@ -63,7 +63,7 @@ renderResult res = do
 
 
 -- | Formatting Logic
-data Color = Red | Green | Yellow | Blue | Cyan | White
+data Color = Red | Green | Yellow | Blue | Cyan | Gray
 
 withColor :: Color -> String -> String
 withColor c s
@@ -74,7 +74,7 @@ withColor c s
         Yellow -> "\ESC[33m" <> s <> "\ESC[0m"
         Blue   -> "\ESC[34m" <> s <> "\ESC[0m"
         Cyan   -> "\ESC[36m" <> s <> "\ESC[0m"
-        White  -> "\ESC[37m" <> s <> "\ESC[0m"
+        Gray   -> "\ESC[90m" <> s <> "\ESC[0m"
   | otherwise = s
 
 withBold :: Text -> Text
@@ -83,9 +83,7 @@ withBold t
   | otherwise = t
 
 withDim :: Text -> Text
-withDim t
-  | shouldUseColor = Text.pack $ "\ESC[2m" <> Text.unpack t <> "\ESC[0m"
-  | otherwise = t
+withDim = Text.pack . withColor Gray . Text.unpack
 
 withStatusColor :: H.TaskStatus -> Text -> Text
 withStatusColor H.InProgress = Text.pack . withColor Cyan . Text.unpack

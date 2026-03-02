@@ -48,16 +48,20 @@ tInt = Text.pack . show
 
 -- | Helper to format a task entry with metadata on one line and description indented under it
 formatTaskEntry :: Bool -> Map.Map H.TaskUuid Text -> [H.Task] -> H.Task -> [Text]
-formatTaskEntry showUUID prefs allTs t =
+formatTaskEntry showFullUuid prefs allTs t =
   [ headerLine
   ] <> descriptionLines
 
   where
     idx = maybe "?" (tInt . (+1)) (List.findIndex (\x -> H.taskUuid x == H.taskUuid t) allTs)
     symbol = statusSymbol (H.status t)
-    shortUuid = Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs
 
-    headerLine = padLeft 3 idx <> " " <> symbol <> (if showUUID then " " <> withDim shortUuid else "")
+    -- We always show short UUID, showFullUuid toggles the full text
+    uuidText = if showFullUuid
+               then H.taskUuidToText (H.taskUuid t)
+               else Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs
+
+    headerLine = padLeft 3 idx <> " " <> symbol <> " " <> withDim uuidText
 
     descriptionLines = fmap (\l -> "      " <> withStatusColor (H.status t) l) (Text.lines (H.description t))
 
@@ -280,14 +284,14 @@ runSummary = do
         displayCurrent =
           if List.null actives
             then [ "No current task" ]
-            else withBold "Current task:" : concatMap (formatTaskEntry True prefixes allTasks) actives
+            else withBold "Current task:" : concatMap (formatTaskEntry False prefixes allTasks) actives
 
 
         displayTopPending :: [Text]
         displayTopPending =
           let totalPendings = List.length (List.filter (hasStatus H.Pending) allTasks)
           in ("\n" <> withBold (pendingMessage (length topPendings) totalPendings))
-             : concatMap (formatTaskEntry True prefixes allTasks) topPendings
+             : concatMap (formatTaskEntry False prefixes allTasks) topPendings
 
           where
             pendingMessage x p =
