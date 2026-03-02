@@ -41,3 +41,8 @@ format:
 clean:
     cabal clean
     rm -rf dist-newstyle
+
+# Show instructions for enabling Bash autocompletion
+completion:
+    @echo "To enable Bash autocompletion, add the following to your .bashrc:"
+    @echo 'eval \"\$(htask --bash-completion-script htask)\"'
