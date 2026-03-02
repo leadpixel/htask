@@ -6,6 +6,7 @@ module HTask.CLI.Runners (runAction) where
 import qualified Data.List                  as List
 import qualified Data.Map.Strict            as Map
 import qualified Data.Text                  as Text
+import qualified Data.UUID                  as UUID
 import qualified HTask.Core                 as H
 
 import           Control.Monad.Random.Class (MonadRandom, getRandomR)
@@ -42,6 +43,10 @@ hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
 
 
+tInt :: Int -> Text
+tInt = Text.pack . show
+
+
 runAdd :: (CanRunAction m) => Text -> m RunResult
 runAdd t
   = formatOutcome <$> H.addTask t
@@ -49,8 +54,8 @@ runAdd t
   where
     formatOutcome (H.AddSuccess ref)
       = resultSuccess
-          [ "added task: " <> t
-          , "ref: " <> H.taskUuidToText ref
+          [ "added task: " <> withBold t
+          , "ref: " <> withDim (H.taskUuidToText ref)
           ]
 
     formatOutcome H.FailedToAdd
@@ -68,7 +73,7 @@ runComplete t
     formatOutcome x
       = case x of
           H.ModifySuccess task ->
-            resultSuccess ["completing task: " <> H.description task]
+            resultSuccess ["completing task: " <> withBold (H.description task)]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -91,7 +96,7 @@ runDone
     formatRow x
       = case x of
           H.ModifySuccess task ->
-            "completing task: " <> H.description task
+            "completing task: " <> withBold (H.description task)
 
           H.FailedToFind ->
             "unable to find matching task"
@@ -114,7 +119,7 @@ runDrop
     formatRow x
       = case x of
           H.ModifySuccess task ->
-            "stopping task: " <> H.description task
+            "stopping task: " <> withBold (H.description task)
 
           H.FailedToFind ->
             "unable to find matching task"
@@ -125,32 +130,42 @@ runDrop
 
 runList :: (CanRunAction m) => ShowUUID -> ShowAll -> m RunResult
 runList showUUID showAll = do
-  tasks <- selectTasks . List.sortBy H.taskDisplayOrder <$> H.listTasks
-  let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> tasks)
-  pure $ resultSuccess $ zipWith (nicePrint showUUID prefixes) [1..] tasks
+  allTasks <- List.sortBy H.taskDisplayOrder <$> H.listTasks
+  let tasks = selectTasks allTasks
+  let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> allTasks)
+  pure $ formatList allTasks tasks prefixes
 
   where
     selectTasks
-      = if untag showAll then id else filterActive
-
-    filterActive
-      = List.filter (justActive . H.status)
+      = if untag showAll then id else List.filter (justActive . H.status)
 
     justActive H.Pending    = True
     justActive H.InProgress = True
-    justActive H.Complete   = False
-    justActive H.Abandoned  = False
+    justActive _            = False
 
-    nicePrint :: ShowUUID -> Map.Map H.TaskUuid Text -> Int -> H.Task -> Text
-    nicePrint d prefs n t
-      =  Text.pack (show n) <> " "
-      <> ( if untag d then printUUID else "" )
-      <> statusSymbol (H.status t)
-      <> " "
+    formatList :: [H.Task] -> [H.Task] -> Map.Map H.TaskUuid Text -> RunResult
+    formatList allTs ts prefs = resultSuccess $
+      concatMap (formatGroup allTs ts prefs) [H.InProgress, H.Pending, H.Complete, H.Abandoned]
+
+    formatGroup :: [H.Task] -> [H.Task] -> Map.Map H.TaskUuid Text -> H.TaskStatus -> [Text]
+    formatGroup allTs ts prefs s =
+      case List.filter (hasStatus s) ts of
+        [] -> []
+        gs -> ("\n" <> withBold (statusHeader s)) : fmap (nicePrint prefs allTs) gs
+
+    statusHeader H.InProgress = "In Progress"
+    statusHeader H.Pending    = "Pending"
+    statusHeader H.Complete   = "Completed"
+    statusHeader H.Abandoned  = "Abandoned"
+
+    nicePrint :: Map.Map H.TaskUuid Text -> [H.Task] -> H.Task -> Text
+    nicePrint prefs allTs t
+      =  padLeft 3 (maybe "?" tInt (taskIndex t allTs)) <> " "
+      <> statusSymbol (H.status t) <> " "
       <> withStatusColor (H.status t) (H.description t)
+      <> (if untag showUUID then " " <> withDim (Map.findWithDefault "" (H.taskUuid t) prefs) else "")
 
-      where
-        printUUID = Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs <> " "
+    taskIndex t allTs = (+1) <$> List.findIndex (\x -> H.taskUuid x == H.taskUuid t) allTs
 
 
 runPick :: (CanRunAction m) => m RunResult
@@ -166,7 +181,7 @@ runPick = do
   where
     startTask t = do
       _ <- H.startTask $ taskToText t
-      pure ["picking task: " <> H.description t]
+      pure ["picking task: " <> withBold (H.description t)]
 
     randomSelectOne :: (MonadRandom m) => [a] -> m (Maybe a)
     randomSelectOne [] = pure Nothing
@@ -189,7 +204,7 @@ runRemove t
     formatOutcome x
       = case x of
           H.ModifySuccess task ->
-            resultSuccess ["removing task: " <> H.description task]
+            resultSuccess ["removing task: " <> withBold (H.description task)]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -206,7 +221,7 @@ runStart t
     formatOutcome x
       = case x of
           H.ModifySuccess task ->
-            resultSuccess ["starting task: " <> H.description task]
+            resultSuccess ["starting task: " <> withBold (H.description task)]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -223,7 +238,7 @@ runStop t
     formatOutcome x
       = case x of
           H.ModifySuccess task ->
-            resultSuccess ["stopping task: " <> H.description task]
+            resultSuccess ["stopping task: " <> withBold (H.description task)]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -241,7 +256,7 @@ runSummary = do
   let pendings = List.sortBy H.taskPriority (List.filter (hasStatus H.Pending) tasks)
   let topPendings = List.take 5 pendings
 
-  let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> tasks) -- Calculate for ALL tasks to ensure unique index matching
+  let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> tasks)
 
   pure $ renderSummary tasks actives topPendings prefixes
 
@@ -255,12 +270,12 @@ runSummary = do
         displayCurrent =
           if List.null actives
             then [ "No current task" ]
-            else "Current task:" : concatMap (printTaskForSummary allTasks prefixes) actives
+            else withBold "Current task:" : concatMap (printTaskForSummary allTasks prefixes) actives
 
 
         displayTopPending :: [Text]
         displayTopPending
-          = pendingMessage (length topPendings) (length pendings)
+          = ("\n" <> withBold (pendingMessage (length topPendings) (length pendings)))
           : concatMap (printTaskForSummary allTasks prefixes) topPendings
 
           where
@@ -271,21 +286,15 @@ runSummary = do
 
         printTaskForSummary :: [H.Task] -> Map.Map H.TaskUuid Text -> H.Task -> [Text]
         printTaskForSummary allTs prefs t =
-          [ indent $ maybe "" (\i -> tInt i <> " ") (taskIndex t allTs) <> printDescription
-          , indent $ indent printRef
+          [ maybe "" (\i -> padLeft 3 (tInt i) <> " ") (taskIndex t allTs)
+            <> statusSymbol (H.status t) <> " "
+            <> withStatusColor (H.status t) (H.description t)
+          , indent $ indent $ withDim printRef
           ]
 
           where
-            printDescription :: Text
-            printDescription
-              =  statusSymbol (H.status t)
-              <> " "
-              <> withStatusColor (H.status t) (H.description t)
-
             printRef :: Text
             printRef = Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs
 
             taskIndex :: H.Task -> [H.Task] -> Maybe Int
             taskIndex task ts = (+1) <$> List.findIndex (\x -> H.taskUuid x == H.taskUuid task) (List.sortBy H.taskDisplayOrder ts)
-
-    tInt = Text.pack . show
