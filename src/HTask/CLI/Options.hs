@@ -1,16 +1,22 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module HTask.CLI.Options
   ( Options (..)
   , getOptions
   ) where
 
+import qualified Data.List           as List
+import qualified Data.Map.Strict     as Map
 import           Data.Tagged         (Tagged (..))
+import qualified Data.Text           as Text
 import           Data.Version        (showVersion)
 import           HTask.CLI.Actions   (Action (..))
+import qualified HTask.Core          as H
+import qualified HTask.Events        as V
 import           Options.Applicative
 import           Paths_htask         (version)
-import           System.Directory    (getHomeDirectory)
+import           System.Directory    (doesFileExist, getHomeDirectory)
 import           System.FilePath     ((</>))
 
 
@@ -69,6 +75,30 @@ getOptions = do
   pure $ Options (rawAction raw) file
 
 
+-- | Dynamic Completer for Task IDs and UUIDs
+taskCompleter :: Completer
+taskCompleter = listIOCompleter $ do
+  -- Try local .tasks first, then home
+  localExists <- doesFileExist ".tasks"
+  path <- if localExists
+          then pure ".tasks"
+          else (</> ".tasks") <$> getHomeDirectory
+
+  exists <- doesFileExist path
+  if not exists
+    then pure []
+    else do
+      evs <- V.runFileBackend path V.readEvents :: IO [V.Event H.TaskIntent]
+      let (tasks, _) = H.foldEventLog evs
+      let sorted = List.sortBy H.taskDisplayOrder (Map.elems tasks)
+      let prefixes = H.disambiguatingPrefixes (Map.keys tasks)
+
+      let sortedIndices = fmap (show . fst) (zip ([1..] :: [Int]) sorted)
+      let uuids = fmap Text.unpack (Map.elems prefixes)
+
+      pure (sortedIndices <> uuids)
+
+
 -- | Command Parsers
 addInfo :: ParserInfo Action
 addInfo = info addParser (progDesc "Add a task description")
@@ -78,7 +108,7 @@ addInfo = info addParser (progDesc "Add a task description")
 completeInfo :: ParserInfo Action
 completeInfo = info completeParser (progDesc "Mark a task as completed")
   where
-    completeParser = Complete <$> argument str (metavar "TASKREF")
+    completeParser = Complete <$> argument str (metavar "TASKREF" <> completer taskCompleter)
 
 doneInfo :: ParserInfo Action
 doneInfo = info doneParser (progDesc "Marks the current task as completed")
@@ -114,17 +144,17 @@ pickInfo = info pickParser (progDesc "Picks the next task by priority")
 removeInfo :: ParserInfo Action
 removeInfo = info removeParser (progDesc "Removes a task from the list")
   where
-    removeParser = Remove <$> argument str (metavar "TASKREF")
+    removeParser = Remove <$> argument str (metavar "TASKREF" <> completer taskCompleter)
 
 startInfo :: ParserInfo Action
 startInfo = info startParser (progDesc "Starts a given task")
   where
-    startParser = Start <$> argument str (metavar "TASKREF")
+    startParser = Start <$> argument str (metavar "TASKREF" <> completer taskCompleter)
 
 stopInfo :: ParserInfo Action
 stopInfo = info stopParser (progDesc "Stops a given task")
   where
-    stopParser = Stop <$> argument str (metavar "TASKREF")
+    stopParser = Stop <$> argument str (metavar "TASKREF" <> completer taskCompleter)
 
 summaryInfo :: ParserInfo Action
 summaryInfo = info summaryParser (progDesc "A short summary of current tasks")
