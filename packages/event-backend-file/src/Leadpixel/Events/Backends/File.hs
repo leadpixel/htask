@@ -14,7 +14,7 @@ import qualified Data.ByteString.Lazy       as Lazy
 import qualified System.IO                  as Sys
 
 import           Conduit                    (ConduitT, Void, runConduit, (.|))
-import           Control.Monad.IO.Class     (MonadIO)
+import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Monad.IO.Unlift    (MonadUnliftIO, withRunInIO)
 import           Control.Monad.Trans.Class  (MonadTrans)
 import           Control.Monad.Trans.Reader (ReaderT (..), runReaderT)
@@ -41,11 +41,20 @@ runFileBackend = flip (runReaderT . runBackend)
 conduitReadEvents :: (MonadUnliftIO m, Aeson.FromJSON a) => FileEventBackend m [a]
 conduitReadEvents
   = Backend (ReaderT (\path -> do
-      ks <- decodeEvents <$> loadFileLines Conduit.sinkList path
+      ks <- decodeEvents . zip [1..] <$> loadFileLines Conduit.sinkList path
+      reportErrors ks
       pure $ Data.Either.rights ks
                      ))
 
   where
+    reportErrors :: (MonadIO m) => [Either (Int, Strict.ByteString) a] -> m ()
+    reportErrors = mapM_ reportError . Data.Either.lefts
+
+    reportError :: (MonadIO m) => (Int, Strict.ByteString) -> m ()
+    reportError (n, bs) = liftIO $
+      Sys.hPutStrLn Sys.stderr $
+        "Warning: Failed to decode event on line " <> show n <> ": " <> show bs
+
     loadFileLines :: (Monad m, MonadUnliftIO m) => ConduitT Strict.ByteString Conduit.Void m [Strict.ByteString] -> FilePath -> m [Strict.ByteString]
     loadFileLines c file
       = Conduit.withSourceFile file $ \src ->
@@ -74,8 +83,8 @@ conduitWriteMany =
         runConduit $ Conduit.yieldMany xs .| dest
 
 
-decodeEvents :: (Aeson.FromJSON a) => [Strict.ByteString] -> [Either Strict.ByteString a]
-decodeEvents = fmap (\x -> maybe (Left x) Right (Aeson.decodeStrict x))
+decodeEvents :: (Aeson.FromJSON a) => [(Int, Strict.ByteString)] -> [Either (Int, Strict.ByteString) a]
+decodeEvents = fmap (\(n, x) -> maybe (Left (n, x)) Right (Aeson.decodeStrict x))
 
 
 encodeEvent :: (Aeson.ToJSON a) => Event a -> Strict.ByteString
