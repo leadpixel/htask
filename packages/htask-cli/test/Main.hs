@@ -7,10 +7,13 @@ import qualified HTask.CLI.App             as App
 import qualified HTask.CLI.Output.Document as Doc
 import qualified HTask.CLI.Runners         as Runner
 
+import qualified Data.ByteString.Lazy      as Lazy
 import qualified Data.Text                 as Text
+import qualified Data.Text.Encoding        as Text
 import           System.Directory
 import           System.IO
 import           Test.Tasty
+import           Test.Tasty.Golden
 import           Test.Tasty.HUnit
 
 
@@ -20,6 +23,12 @@ main = defaultMain tests
 
 tests :: TestTree
 tests = testGroup "htask-cli"
+  [ hunitTests
+  , goldenTests
+  ]
+
+hunitTests :: TestTree
+hunitTests = testGroup "Unit Tests"
   [ testCase "htask summary shows 'No current task' on empty file" $ do
       (path, h) <- openTempFile "." "cli-test-tasks"
       hClose h
@@ -33,3 +42,33 @@ tests = testGroup "htask-cli"
       any (needle `Text.isInfixOf`) output
         @? ("Output should contain '" <> Text.unpack needle <> "', got: " <> show output)
   ]
+
+goldenTests :: TestTree
+goldenTests = testGroup "Golden Tests"
+  [ goldenVsString
+      "summary on empty file"
+      "test/golden/summary_empty.golden"
+      (runSummaryWith [])
+  , goldenVsString
+      "summary with tasks"
+      "test/golden/summary_with_tasks.golden"
+      (runSummaryWith
+        [ Action.Add "task 1"
+        , Action.Add "task 2"
+        , Action.Add "task 3"
+        , Action.Start "task 2"
+        , Action.Complete "task 3"
+        ]
+      )
+  ]
+
+runSummaryWith :: [Action.Action] -> IO Lazy.ByteString
+runSummaryWith actions = do
+  (path, h) <- openTempFile "." "cli-test-tasks-golden"
+  hClose h
+  result <- App.runApp path $ do
+    mapM_ Runner.runAction actions
+    Runner.runAction Action.Summary
+  removeFile path
+  let output = Text.unlines (Doc.text result)
+  pure $ Lazy.fromStrict $ Text.encodeUtf8 output

@@ -79,10 +79,13 @@ test-suite htask-cli
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
     , directory
     , htask-cli
+    , htask-core
     , process
     , tasty
+    , tasty-golden
     , tasty-hunit
     , text
   default-language: GHC2021

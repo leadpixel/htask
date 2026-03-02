@@ -59,9 +59,12 @@ tests:
       - -with-rtsopts=-N
     dependencies:
       - base
+      - bytestring
       - directory
       - htask-cli
+      - htask-core
       - process
       - tasty
+      - tasty-golden
       - tasty-hunit
       - text
