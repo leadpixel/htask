@@ -19,6 +19,8 @@ module HTask.Core.Domain
   , getTasks
   , removeTaskUuid
   , setTaskStatus
+  , taskDisplayOrder
+  , taskPriority
   , taskUuidToText
   , updateExistingTask
   ) where
@@ -32,6 +34,7 @@ import qualified HTask.Events        as V
 
 import           Control.Monad.State (MonadState, runState)
 import           Data.Foldable       (foldl')
+import           Data.Function       (on)
 import           Data.Map.Strict     (Map)
 import           Data.Sequence       (Seq, (|>))
 import           Data.Tagged         (Tagged (..), untag)
@@ -68,6 +71,13 @@ setTaskStatus s t = t { status = s }
 
 taskUuidToText :: TaskUuid -> Text
 taskUuidToText = UUID.toText . untag
+
+taskPriority :: Task -> Task -> Ordering
+taskPriority = compare `on` createdAt
+
+taskDisplayOrder :: Task -> Task -> Ordering
+taskDisplayOrder a b
+  = (compare `on` status) a b <> taskPriority a b
 
 
 -- | Task Events

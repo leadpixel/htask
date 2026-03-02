@@ -15,9 +15,12 @@ module HTask.Core.API
   ) where
 
 import qualified Data.Foldable       as Foldable
+import qualified Data.List           as List
 import qualified Data.Map            as Map
+import qualified Data.Maybe          as Maybe
 import qualified Data.Text           as Text
 import qualified HTask.Events        as V
+import qualified Text.Read           as Text
 
 import           Control.Monad.State (MonadState)
 import           Data.Text           (Text)
@@ -49,8 +52,12 @@ listTasks = Map.elems <$> getTasks
 
 
 findTask :: (MonadState TaskMap m) => Text -> m (Maybe Task)
-findTask tx
-  = Foldable.find (uuidStartsWith tx) <$> getTasks
+findTask tx = do
+  tasks <- getTasks
+  let sorted = List.sortBy taskDisplayOrder (Map.elems tasks)
+  pure $ case Text.readMaybe (Text.unpack tx) of
+    Just (n :: Int) -> Maybe.listToMaybe $ drop (n - 1) sorted
+    Nothing         -> Foldable.find (uuidStartsWith tx) sorted
 
   where
     uuidStartsWith :: Text -> Task -> Bool

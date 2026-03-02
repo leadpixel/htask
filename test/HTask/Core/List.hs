@@ -42,4 +42,14 @@ testList = testGroup "list"
 
       let tasks = getResult output
       3 @=? length tasks
+
+  , testCase "finds a task by numeric id" $ do
+      output <- runTestApp fakeTime $ do
+        _ <- H.addTask "task 1"
+        _ <- H.addTask "task 2"
+        _ <- H.addTask "task 3"
+        H.findTask "2"
+
+      let result = getResult output
+      Just "task 2" @=? (H.description <$> result)
   ]

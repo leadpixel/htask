@@ -10,7 +10,6 @@ import qualified HTask.Core                 as H
 
 import           Control.Monad.Random.Class (MonadRandom, getRandomR)
 import           Data.Foldable              (toList)
-import           Data.Function              (on)
 import           Data.Tagged                (untag)
 import           Data.Text                  (Text)
 import           HTask.CLI.Actions
@@ -41,15 +40,6 @@ taskToText = H.taskUuidToText . H.taskUuid
 
 hasStatus :: H.TaskStatus -> H.Task -> Bool
 hasStatus s t = s == H.status t
-
-
-taskPriority :: H.Task -> H.Task -> Ordering
-taskPriority = compare `on` H.createdAt
-
-
-taskDisplayOrder :: H.Task -> H.Task -> Ordering
-taskDisplayOrder a b
-  = (compare `on` H.status) a b <> taskPriority a b
 
 
 runAdd :: (CanRunAction m) => Text -> m RunResult
@@ -135,16 +125,16 @@ runDrop
 
 runList :: (CanRunAction m) => ShowUUID -> ShowAll -> m RunResult
 runList showUUID showAll
-  = resultSuccess . toList . fmap formatOutput . selectTasks
-  <$> H.listTasks
+  = formatList . selectTasks <$> H.listTasks
 
   where
-    formatOutput
-      = nicePrint showUUID
+    formatList :: [H.Task] -> RunResult
+    formatList tasks = resultSuccess $
+      zipWith (nicePrint showUUID) [1..] tasks
 
     selectTasks :: [H.Task] -> [H.Task]
     selectTasks
-      = List.sortBy taskDisplayOrder
+      = List.sortBy H.taskDisplayOrder
       . (if untag showAll then id else filterActive)
 
     filterActive
@@ -155,9 +145,10 @@ runList showUUID showAll
     justActive H.Complete   = False
     justActive H.Abandoned  = False
 
-    nicePrint :: ShowUUID -> H.Task -> Text
-    nicePrint d t
-      =  ( if untag d then printUUID else "" )
+    nicePrint :: ShowUUID -> Int -> H.Task -> Text
+    nicePrint d n t
+      =  Text.pack (show n) <> " "
+      <> ( if untag d then printUUID else "" )
       <> statusSymbol (H.status t)
       <> " "
       <> withStatusColor (H.status t) (H.description t)
@@ -266,16 +257,16 @@ runSummary
               [ "No current task" ]
             else
               "Current task:"
-              : concatMap printTaskForSummary actives
+              : concatMap (printTaskForSummary tasks) actives
 
 
         displayTopPending :: [Text]
         displayTopPending
           = pendingMessage (length xs) (length pendings)
-          : concatMap printTaskForSummary xs
+          : concatMap (printTaskForSummary tasks) xs
 
           where
-            pendings = List.sortBy taskPriority (List.filter (hasStatus H.Pending) tasks)
+            pendings = List.sortBy H.taskPriority (List.filter (hasStatus H.Pending) tasks)
 
             xs = List.take 5 pendings
 
@@ -285,9 +276,9 @@ runSummary
             tInt = Text.pack . show
 
 
-        printTaskForSummary :: H.Task -> [Text]
-        printTaskForSummary t =
-          [ indent printDescription
+        printTaskForSummary :: [H.Task] -> H.Task -> [Text]
+        printTaskForSummary allTasks t =
+          [ indent $ maybe "" (\i -> tInt i <> " ") (taskIndex t allTasks) <> printDescription
           , indent $ indent printRef
           ]
 
@@ -300,3 +291,8 @@ runSummary
 
             printRef :: Text
             printRef = (UUID.toText . untag . H.taskUuid) t
+
+            tInt = Text.pack . show
+
+            taskIndex :: H.Task -> [H.Task] -> Maybe Int
+            taskIndex task ts = (+1) <$> List.findIndex (\x -> H.taskUuid x == H.taskUuid task) (List.sortBy H.taskDisplayOrder ts)
