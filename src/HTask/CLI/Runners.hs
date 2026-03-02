@@ -61,7 +61,8 @@ formatTaskEntry showFullUuid prefs allTs t =
                then H.taskUuidToText (H.taskUuid t)
                else Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs
 
-    headerLine = padLeft 3 idx <> " " <> symbol <> " " <> withDim uuidText
+    -- Consistent coloring for metadata
+    headerLine = withStatusColor (H.status t) (padLeft 3 idx <> " " <> symbol) <> " " <> withDim uuidText
 
     descriptionLines = fmap (\l -> "      " <> withStatusColor (H.status t) l) (Text.lines (H.description t))
 
@@ -73,8 +74,8 @@ runAdd t
   where
     formatOutcome (H.AddSuccess ref)
       = resultSuccess
-          [ "added task: " <> withBold t
-          , "ref: " <> withDim (H.taskUuidToText ref)
+          [ withStatusColor H.Pending "added task: " <> withBold t
+          , withDim ("      ref: " <> H.taskUuidToText ref)
           ]
 
     formatOutcome H.FailedToAdd
@@ -92,7 +93,7 @@ runComplete t
     formatOutcome x
       = case x of
           H.ModifySuccess task ->
-            resultSuccess ["completing task: " <> withBold (H.description task)]
+            resultSuccess [withStatusColor H.Complete "completing task: " <> withBold (H.description task)]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -115,7 +116,7 @@ runDone
     formatRow x
       = case x of
           H.ModifySuccess task ->
-            "completing task: " <> withBold (H.description task)
+            withStatusColor H.Complete "completing task: " <> withBold (H.description task)
 
           H.FailedToFind ->
             "unable to find matching task"
@@ -138,7 +139,7 @@ runDrop
     formatRow x
       = case x of
           H.ModifySuccess task ->
-            "stopping task: " <> withBold (H.description task)
+            withStatusColor H.Pending "stopping task: " <> withBold (H.description task)
 
           H.FailedToFind ->
             "unable to find matching task"
@@ -170,7 +171,7 @@ runList showUUID showAll = do
     formatGroup allTs ts prefs s =
       case List.filter (hasStatus s) ts of
         [] -> []
-        gs -> ("\n" <> withBold (statusHeader s)) : concatMap (nicePrint prefs allTs) gs
+        gs -> ("\n" <> withBold (withStatusColor s (statusHeader s))) : concatMap (nicePrint prefs allTs) gs
 
     statusHeader H.InProgress = "In Progress"
     statusHeader H.Pending    = "Pending"
@@ -194,7 +195,7 @@ runPick = do
   where
     startTask t = do
       _ <- H.startTask $ taskToText t
-      pure ["picking task: " <> withBold (H.description t)]
+      pure [withStatusColor H.InProgress "picking task: " <> withBold (H.description t)]
 
     randomSelectOne :: (MonadRandom m) => [a] -> m (Maybe a)
     randomSelectOne [] = pure Nothing
@@ -217,7 +218,7 @@ runRemove t
     formatOutcome x
       = case x of
           H.ModifySuccess task ->
-            resultSuccess ["removing task: " <> withBold (H.description task)]
+            resultSuccess [withStatusColor H.Abandoned "removing task: " <> withBold (H.description task)]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -234,7 +235,7 @@ runStart t
     formatOutcome x
       = case x of
           H.ModifySuccess task ->
-            resultSuccess ["starting task: " <> withBold (H.description task)]
+            resultSuccess [withStatusColor H.InProgress "starting task: " <> withBold (H.description task)]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -251,7 +252,7 @@ runStop t
     formatOutcome x
       = case x of
           H.ModifySuccess task ->
-            resultSuccess ["stopping task: " <> withBold (H.description task)]
+            resultSuccess [withStatusColor H.Pending "stopping task: " <> withBold (H.description task)]
 
           H.FailedToFind ->
             resultError "unable to find matching task"
@@ -284,13 +285,13 @@ runSummary = do
         displayCurrent =
           if List.null actives
             then [ "No current task" ]
-            else withBold "Current task:" : concatMap (formatTaskEntry False prefixes allTasks) actives
+            else withBold (withStatusColor H.InProgress "Current task:") : concatMap (formatTaskEntry False prefixes allTasks) actives
 
 
         displayTopPending :: [Text]
         displayTopPending =
           let totalPendings = List.length (List.filter (hasStatus H.Pending) allTasks)
-          in ("\n" <> withBold (pendingMessage (length topPendings) totalPendings))
+          in ("\n" <> withBold (withStatusColor H.Pending (pendingMessage (length topPendings) totalPendings)))
              : concatMap (formatTaskEntry False prefixes allTasks) topPendings
 
           where
