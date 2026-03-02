@@ -3,6 +3,7 @@
 
 module HTask.CLI.Output
   ( RunResult
+  , divider
   , indent
   , padLeft
   , renderResult
@@ -102,6 +103,9 @@ indent t = "  " <> t
 
 padLeft :: Int -> Text -> Text
 padLeft n t = Text.replicate (n - Text.length t) " " <> t
+
+divider :: Text
+divider = withDim "────────────────────────────────────────"
 
 formatError :: [Text] -> [Text]
 formatError t = [ Text.pack (withColor Red "Error" <> ":") ] <> t
