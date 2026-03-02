@@ -10,6 +10,8 @@ import           Data.Version        (showVersion)
 import           HTask.CLI.Actions   (Action (..))
 import           Options.Applicative
 import           Paths_htask         (version)
+import           System.Directory    (getHomeDirectory)
+import           System.FilePath     ((</>))
 
 
 data Options
@@ -19,9 +21,15 @@ data Options
     }
   deriving (Show)
 
-optionsParser :: Parser Options
+data RawOptions
+  = RawOptions
+    { rawAction :: Action
+    , rawFile   :: Maybe FilePath
+    }
+
+optionsParser :: Parser RawOptions
 optionsParser
-  = Options
+  = RawOptions
   <$> (hsubparser
       (  command "add"      addInfo
       <> command "complete" completeInfo
@@ -34,16 +42,14 @@ optionsParser
       <> command "stop"     stopInfo
       <> command "summary"  summaryInfo
       ) <|> pure Summary)
-  <*> strOption
+  <*> optional (strOption
       (  long "file"
       <> short 'f'
       <> metavar "ARG"
-      <> help "path to the task list file"
-      <> value ".tasks"
-      <> showDefault
-      )
+      <> help "path to the task list file (default: ~/.tasks)"
+      ))
 
-optionsInfo :: ParserInfo Options
+optionsInfo :: ParserInfo RawOptions
 optionsInfo
   = info (helper <*> versioner <*> optionsParser)
   $ header "HTask.CLI"
@@ -57,7 +63,10 @@ versioner = infoOption (showVersion version)
   )
 
 getOptions :: IO Options
-getOptions = execParser optionsInfo
+getOptions = do
+  raw <- execParser optionsInfo
+  file <- maybe ((</> ".tasks") <$> getHomeDirectory) pure (rawFile raw)
+  pure $ Options (rawAction raw) file
 
 
 -- | Command Parsers

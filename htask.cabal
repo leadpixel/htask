@@ -31,7 +31,10 @@ library
     , bytestring
     , conduit
     , containers
+    , directory
+    , filepath
     , mtl
+
     , optparse-applicative
     , tagged
     , text
