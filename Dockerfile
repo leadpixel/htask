@@ -1,12 +1,14 @@
-FROM haskell:8.6.3 as builder
+FROM haskell:9.6 AS builder
 
-RUN stack setup 8.6.3 && stack update --resolver 13.10
+WORKDIR /opt/build
 
-COPY stack.yaml .
+RUN cabal update
+
+COPY cabal.project cabal.project.freeze ./
 COPY packages packages
-COPY modules modules
 
-RUN stack build && stack test && stack clean
-RUN rm -rf modules packages stack.yaml
+RUN cabal build all && cabal test all
+
+RUN rm -rf packages cabal.project cabal.project.freeze
 
 FROM builder
