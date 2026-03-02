@@ -6,8 +6,10 @@ module HTask.CLI.Options
   ) where
 
 import           Data.Tagged         (Tagged (..))
+import           Data.Version        (showVersion)
 import           HTask.CLI.Actions   (Action (..))
 import           Options.Applicative
+import           Paths_htask         (version)
 
 
 data Options
@@ -43,9 +45,16 @@ optionsParser
 
 optionsInfo :: ParserInfo Options
 optionsInfo
-  = info (helper <*> optionsParser)
+  = info (helper <*> versioner <*> optionsParser)
   $ header "HTask.CLI"
   <> progDesc "track tasks in a local event log"
+
+versioner :: Parser (a -> a)
+versioner = infoOption (showVersion version)
+  (  long "version"
+  <> short 'v'
+  <> help "Show version"
+  )
 
 getOptions :: IO Options
 getOptions = execParser optionsInfo
