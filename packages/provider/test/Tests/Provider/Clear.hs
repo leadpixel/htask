@@ -13,13 +13,12 @@ import           Control.Monad.Trans.State (StateT, evalStateT)
 import           Data.Functor
 import           Data.UUID                 (UUID)
 import           Leadpixel.Provider
-import           System.Random
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
 
 newtype TestApp a
-  = TestApp { unApp :: StateT (Maybe Int) IO a }
+  = TestApp { unApp :: StateT ([Int], Maybe Int) IO a }
   deriving (Applicative, Functor, Monad, MonadIO)
 
 instance Provider Int TestApp where
@@ -29,22 +28,22 @@ instance Provider UUID TestApp where
   provide = liftIO UUID.nextRandom
 
 
-updateValue :: (MonadIO m, MonadState (Maybe Int) m) => m Int
+updateValue :: (MonadIO m, MonadState ([Int], Maybe Int) m) => m Int
 updateValue =
-  get >>= maybe onNothing onJust
+  get >>= \(xs, m) -> maybe (onNothing xs) (onJust xs) m
 
   where
-    onJust v = put Nothing $> v
+    onJust xs v = put (xs, Nothing) $> v
 
-    onNothing = do
-      x <- liftIO $ randomRIO (0, 100 :: Int)
-      put (Just x)
+    onNothing []     = error "out of values"
+    onNothing (x:xs) = do
+      put (xs, Just x)
       pure x
 
 
 runTestApp :: TestApp a -> IO a
 runTestApp app =
-  evalStateT (unApp app) Nothing
+  evalStateT (unApp app) ([1..100], Nothing)
 
 
 testClear :: TestTree

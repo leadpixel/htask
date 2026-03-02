@@ -10,6 +10,34 @@ ghc-options: -Wall
 dependencies:
   - base >= 4.7 && < 5
 
+library:
+  source-dirs: src
+  exposed-modules:
+    - HTask.CLI.Actions
+    - HTask.CLI.App
+    - HTask.CLI.Options
+    - HTask.CLI.OptionsInfo
+    - HTask.CLI.Output.Document
+    - HTask.CLI.Output.Formatters
+    - HTask.CLI.Render
+    - HTask.CLI.Runners
+  dependencies:
+    - MonadRandom
+    - aeson
+    - containers
+    - event-backend-file
+    - htask-core
+    - leadpixel-events
+    - leadpixel-provider
+    - mtl
+    - optparse-applicative
+    - tagged
+    - text
+    - time
+    - transformers
+    - unliftio-core
+    - uuid
+
 executables:
   htask:
     main:                Main.hs
@@ -19,18 +47,21 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
-      - MonadRandom
-      - aeson
-      - containers
-      - event-backend-file
-      - htask-core
-      - leadpixel-events
-      - leadpixel-provider
-      - mtl
-      - optparse-applicative
-      - tagged
+      - htask-cli
+
+tests:
+  htask-cli:
+    main:                Main.hs
+    source-dirs:         test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - base
+      - directory
+      - htask-cli
+      - process
+      - tasty
+      - tasty-hunit
       - text
-      - time
-      - transformers
-      - unliftio-core
-      - uuid

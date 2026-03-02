@@ -1,11 +1,5 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.2.
---
--- see: https://github.com/sol/hpack
---
--- hash: efefd1b2d09ff2df771b3160110d67f50b5df409093ad86f81321842a7d7f97d
-
 name:           leadpixel-events
 version:        0.2.0.0
 author:         Jack Palfrey
@@ -27,5 +21,24 @@ library
     , base >=4.7 && <5
     , conduit
     , leadpixel-provider
+    , time
+  default-language: GHC2021
+
+test-suite leadpixel-events
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      Paths_leadpixel_events
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      QuickCheck
+    , aeson
+    , base >=4.7 && <5
+    , leadpixel-events
+    , quickcheck-instances
+    , tasty
+    , tasty-quickcheck
     , time
   default-language: GHC2021

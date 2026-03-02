@@ -18,3 +18,20 @@ library:
     - conduit
     - leadpixel-provider
     - time
+
+tests:
+  leadpixel-events:
+    main:                Main.hs
+    source-dirs:         test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - QuickCheck
+      - aeson
+      - leadpixel-events
+      - quickcheck-instances
+      - tasty
+      - tasty-quickcheck
+      - time
