@@ -3,7 +3,8 @@
 module HTask.CLI.CLISpec (tests) where
 
 import qualified HTask.CLI.Actions    as Action
-import qualified HTask.CLI.Output     as Doc
+import qualified HTask.CLI.Options    as Opt
+import qualified HTask.CLI.Output     as Output
 import qualified HTask.CLI.Runners    as Runner
 import           HTask.CLI.TestApp    (runTestApp)
 
@@ -32,14 +33,21 @@ fakeTime = UTCTime (ModifiedJulianDay 0) 0
 fakeUUIDs :: [UUID]
 fakeUUIDs = [UUID.fromWords 0 0 0 i | i <- [1..100]]
 
+mockOptions :: Action.Action -> FilePath -> Opt.Options
+mockOptions act path = Opt.Options
+  { Opt.action = act
+  , Opt.taskfile = path
+  , Opt.useJson = False
+  }
+
 hunitTests :: TestTree
 hunitTests = testGroup "Unit Tests"
   [ testCase "htask summary shows 'No current task' on empty file" $ do
       (path, h) <- openTempFile "." "cli-test-tasks"
       hClose h
 
-      result <- runTestApp path [] fakeTime (Runner.runAction Action.Summary)
-      let output = Doc.text result
+      result <- runTestApp path [] fakeTime (Runner.runAction (mockOptions Action.Summary path))
+      let output = Output.text result
 
       removeFile path
 
@@ -72,8 +80,8 @@ runSummaryWith actions = do
   (path, h) <- openTempFile "." "cli-test-tasks-golden"
   hClose h
   result <- runTestApp path fakeUUIDs fakeTime $ do
-    mapM_ Runner.runAction actions
-    Runner.runAction Action.Summary
+    mapM_ (Runner.runAction . flip mockOptions path) actions
+    Runner.runAction (mockOptions Action.Summary path)
   removeFile path
-  let output = Text.unlines (Doc.text result)
+  let output = Text.unlines (Output.text result)
   pure $ Lazy.fromStrict $ Text.encodeUtf8 output

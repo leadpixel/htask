@@ -9,6 +9,7 @@ module HTask.CLI.Output
   , padZero
   , renderResult
   , resultError
+  , resultJson
   , resultSuccess
   , statusSymbol
   , text
@@ -18,23 +19,30 @@ module HTask.CLI.Output
   , withStatusColor
   ) where
 
-import qualified Data.Text        as Text
-import qualified HTask.Core       as H
+import qualified Data.Aeson                 as Aeson
+import qualified Data.Aeson.Encode.Pretty   as Aeson
+import qualified Data.ByteString.Lazy.Char8 as LBS
+import qualified Data.Text                  as Text
+import qualified HTask.Core                 as H
 
 import           Data.IORef
-import           Data.Text        (Text)
-import           System.IO        (hIsTerminalDevice, stdout)
-import           System.IO.Unsafe (unsafePerformIO)
+import           Data.Text                  (Text)
+import           System.IO                  (hIsTerminalDevice, stdout)
+import           System.IO.Unsafe           (unsafePerformIO)
 
 
 -- | Rendering Pipeline Types
 data RunResult
   = Success [Text]
+  | Json Aeson.Value
   | Error [Text]
   deriving (Eq, Show)
 
 resultSuccess :: [Text] -> RunResult
 resultSuccess = Success
+
+resultJson :: (Aeson.ToJSON a) => a -> RunResult
+resultJson = Json . Aeson.toJSON
 
 resultError :: Text -> RunResult
 resultError t = Error [t]
@@ -42,6 +50,7 @@ resultError t = Error [t]
 text :: RunResult -> [Text]
 text (Success ts) = formatSuccess ts
 text (Error ts)   = formatError ts
+text (Json v)     = [Text.pack $ LBS.unpack $ Aeson.encodePretty v]
 
 
 -- | Global coloring state
@@ -77,7 +86,7 @@ withColor c s
         Yellow -> "\ESC[33m" <> s <> "\ESC[0m"
         Blue   -> "\ESC[34m" <> s <> "\ESC[0m"
         Cyan   -> "\ESC[36m" <> s <> "\ESC[0m"
-        Gray   -> "\ESC[38;5;244m" <> s <> "\ESC[0m"
+        Gray   -> "\ESC[90m" <> s <> "\ESC[0m"
   | otherwise = s
 
 withBold :: Text -> Text
