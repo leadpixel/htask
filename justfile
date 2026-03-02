@@ -10,9 +10,12 @@ build:
 test:
     cabal test all
 
-# Run the CLI app with arbitrary arguments
+# Task file to use for 'run' target
+tasks_file := ".tasks"
+
+# Run the CLI app with arbitrary arguments (defaults to local .tasks)
 run *args:
-    @cabal run htask -- {{args}}
+    @cabal run htask -- --file {{tasks_file}} {{args}}
 
 # Pin dependencies
 freeze:
