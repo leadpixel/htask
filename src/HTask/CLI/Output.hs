@@ -12,10 +12,13 @@ module HTask.CLI.Output
   , withStatusColor
   ) where
 
-import qualified Data.Text  as Text
-import qualified HTask.Core as H
+import qualified Data.Text        as Text
+import qualified HTask.Core       as H
 
-import           Data.Text  (Text)
+import           Data.IORef
+import           Data.Text        (Text)
+import           System.IO        (hIsTerminalDevice, stdout)
+import           System.IO.Unsafe (unsafePerformIO)
 
 
 -- | Rendering Pipeline Types
@@ -35,20 +38,39 @@ text (Success ts) = formatSuccess ts
 text (Error ts)   = formatError ts
 
 
+-- | Global coloring state
+{-# NOINLINE useColorRef #-}
+useColorRef :: IORef Bool
+useColorRef = unsafePerformIO $ newIORef True
+
+setUseColor :: Bool -> IO ()
+setUseColor = writeIORef useColorRef
+
+{-# NOINLINE shouldUseColor #-}
+shouldUseColor :: Bool
+shouldUseColor = unsafePerformIO $ readIORef useColorRef
+
+
 -- | IO Rendering
 renderResult :: RunResult -> IO ()
-renderResult = mapM_ (putStrLn . Text.unpack) . text
+renderResult res = do
+  useColor <- hIsTerminalDevice stdout
+  setUseColor useColor
+  mapM_ (putStrLn . Text.unpack) (text res)
 
 
 -- | Formatting Logic
-data Color = Red | Green | Yellow | Blue | Normal
+data Color = Red | Green | Yellow | Blue
 
 withColor :: Color -> String -> String
-withColor Red    s = "\ESC[31m" <> s <> "\ESC[0m"
-withColor Green  s = "\ESC[32m" <> s <> "\ESC[0m"
-withColor Yellow s = "\ESC[33m" <> s <> "\ESC[0m"
-withColor Blue   s = "\ESC[34m" <> s <> "\ESC[0m"
-withColor Normal s = s
+withColor c s
+  | shouldUseColor =
+      case c of
+        Red    -> "\ESC[31m" <> s <> "\ESC[0m"
+        Green  -> "\ESC[32m" <> s <> "\ESC[0m"
+        Yellow -> "\ESC[33m" <> s <> "\ESC[0m"
+        Blue   -> "\ESC[34m" <> s <> "\ESC[0m"
+  | otherwise = s
 
 withStatusColor :: H.TaskStatus -> Text -> Text
 withStatusColor H.InProgress = Text.pack . withColor Blue . Text.unpack
@@ -66,7 +88,7 @@ indent :: Text -> Text
 indent t = "  " <> t
 
 formatError :: [Text] -> [Text]
-formatError t = [ Text.pack $ withColor Red "Error" <> ":" ] <> t
+formatError t = [ Text.pack (withColor Red "Error" <> ":") ] <> t
 
 formatSuccess :: [Text] -> [Text]
-formatSuccess t = [ Text.pack $ withColor Green "Success!" ] <> t
+formatSuccess t = [ Text.pack (withColor Green "Success!") ] <> t
