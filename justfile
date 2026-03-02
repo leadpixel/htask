@@ -2,7 +2,7 @@
 default:
     @just --list
 
-# Build all packages
+# Build everything
 build:
     cabal build all
 
@@ -20,19 +20,19 @@ freeze:
 
 # Install the CLI app to ~/.cabal/bin
 install:
-    cabal install htask-cli --overwrite-policy=always
+    cabal install htask --overwrite-policy=always
 
-# Start a REPL for a specific package (default: htask-core)
-repl package="htask-core":
-    cabal repl {{package}}
+# Start a REPL for the library
+repl:
+    cabal repl htask
 
 # Run hlint on all source files
 lint:
-    hlint packages/
+    hlint src/ app/ test/
 
 # Format all source files using stylish-haskell
 format:
-    find packages/ -name "*.hs" -exec stylish-haskell -i {} +
+    find src/ app/ test/ -name "*.hs" -exec stylish-haskell -i {} +
 
 # Clean build artifacts
 clean:
