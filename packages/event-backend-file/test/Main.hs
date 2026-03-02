@@ -6,12 +6,16 @@ module Main (main) where
 import qualified Leadpixel.Events               as V
 import qualified Leadpixel.Events.Backends.File as File
 
+import           Control.Exception              (bracket)
 import           Control.Monad                  (replicateM_)
 import           Control.Monad.IO.Unlift        (MonadUnliftIO)
+import qualified Data.List                      as List
 import           Data.Time                      (Day (ModifiedJulianDay),
                                                  UTCTime (..))
+import           GHC.IO.Handle                  (hDuplicate, hDuplicateTo)
 
 import           System.Directory
+import qualified System.IO                      as Sys
 import           System.IO
 import           Test.Tasty
 import           Test.Tasty.HUnit
@@ -30,7 +34,44 @@ allTests = testGroup "storage::file"
   , repeatEventsCanBeAdded
   , manyEvents
   , manyEvents2
+  , detectsDecodingErrors
   ]
+
+
+detectsDecodingErrors :: TestTree
+detectsDecodingErrors = testCase "reports decoding errors to stderr" $ do
+  (path, h) <- openTempFile "." "file-test-tmp-error"
+  hPutStrLn h "invalid json"
+  hClose h
+
+  output <- captureStderr $ File.runFileBackend path (V.readEvents :: File.FileEventBackend IO [V.Event Int])
+
+  removeFile path
+
+  ("Warning: Failed to decode event on line 1" `List.isInfixOf` output)
+    @? ("Warning should be printed to stderr, got: " <> output)
+
+
+captureStderr :: IO a -> IO String
+captureStderr action = do
+  tmpDir <- getTemporaryDirectory
+  (path, h) <- openTempFile tmpDir "stderr-capture"
+  hClose h
+  bracket
+    (do
+      stderrDup <- hDuplicate stderr
+      Sys.withFile path Sys.WriteMode $ \h' -> hDuplicateTo h' stderr
+      pure stderrDup
+    )
+    (\stderrDup -> do
+      hDuplicateTo stderrDup stderr
+      hClose stderrDup
+      removeFile path
+    )
+    (\_ -> do
+      _ <- action
+      readFile path
+    )
 
 
 run :: File.FileEventBackend IO a -> IO a
