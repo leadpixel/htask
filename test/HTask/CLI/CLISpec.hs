@@ -33,11 +33,11 @@ fakeTime = UTCTime (ModifiedJulianDay 0) 0
 fakeUUIDs :: [UUID]
 fakeUUIDs = [UUID.fromWords 0 0 0 i | i <- [1..100]]
 
-mockOptions :: Action.Action -> FilePath -> Opt.Options
-mockOptions act path = Opt.Options
+mockOptions :: Action.Action -> FilePath -> Bool -> Opt.Options
+mockOptions act path useJson = Opt.Options
   { Opt.action = act
   , Opt.taskfile = path
-  , Opt.useJson = False
+  , Opt.useJson = useJson
   }
 
 hunitTests :: TestTree
@@ -46,7 +46,7 @@ hunitTests = testGroup "Unit Tests"
       (path, h) <- openTempFile "." "cli-test-tasks"
       hClose h
 
-      result <- runTestApp path [] fakeTime (Runner.runAction (mockOptions Action.Summary path))
+      result <- runTestApp path [] fakeTime (Runner.runAction (mockOptions Action.Summary path False))
       let output = Output.text result
 
       removeFile path
@@ -61,11 +61,22 @@ goldenTests = testGroup "Golden Tests"
   [ goldenVsString
       "summary on empty file"
       "test/HTask/CLI/golden/summary_empty.golden"
-      (runSummaryWith [])
+      (runSummaryWith False [])
   , goldenVsString
       "summary with tasks"
       "test/HTask/CLI/golden/summary_with_tasks.golden"
-      (runSummaryWith
+      (runSummaryWith False
+        [ Action.Add "task 1"
+        , Action.Add "task 2"
+        , Action.Add "task 3"
+        , Action.Start "task 2"
+        , Action.Complete "task 3"
+        ]
+      )
+  , goldenVsString
+      "summary with tasks (json)"
+      "test/HTask/CLI/golden/summary_with_tasks_json.golden"
+      (runSummaryWith True
         [ Action.Add "task 1"
         , Action.Add "task 2"
         , Action.Add "task 3"
@@ -75,13 +86,13 @@ goldenTests = testGroup "Golden Tests"
       )
   ]
 
-runSummaryWith :: [Action.Action] -> IO Lazy.ByteString
-runSummaryWith actions = do
+runSummaryWith :: Bool -> [Action.Action] -> IO Lazy.ByteString
+runSummaryWith useJson actions = do
   (path, h) <- openTempFile "." "cli-test-tasks-golden"
   hClose h
   result <- runTestApp path fakeUUIDs fakeTime $ do
-    mapM_ (Runner.runAction . flip mockOptions path) actions
-    Runner.runAction (mockOptions Action.Summary path)
+    mapM_ (Runner.runAction . \a -> mockOptions a path False) actions
+    Runner.runAction (mockOptions Action.Summary path useJson)
   removeFile path
   let output = Text.unlines (Output.text result)
   pure $ Lazy.fromStrict $ Text.encodeUtf8 output
