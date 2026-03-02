@@ -1,5 +1,5 @@
 cradle:
-  stack:
+  cabal:
     - path: "./packages/event-backend-file/src"
       component: "event-backend-file:lib"
 
