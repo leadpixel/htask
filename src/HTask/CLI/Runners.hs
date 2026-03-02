@@ -66,6 +66,9 @@ runAdd t
     formatOutcome H.FailedToAdd
       = resultError "failed to add"
 
+    formatOutcome H.EmptyDescription
+      = resultError "task description cannot be empty"
+
 
 runComplete :: (CanRunAction m) => Text -> m RunResult
 runComplete t

@@ -30,6 +30,7 @@ import           HTask.Provider
 data AddResult
   = AddSuccess TaskUuid
   | FailedToAdd
+  | EmptyDescription
   deriving (Eq, Show)
 
 
@@ -65,20 +66,22 @@ withMatch tx op
 addTask
   :: (Monad m, MonadState TaskMap m, V.HasEventSink m, Provider UUID m, Provider UTCTime m)
   => Text -> m AddResult
-addTask tx = do
-  tk <- createTask tx
-  addResult <- addNewTask tk
+addTask tx
+  | Text.null (Text.strip tx) = pure EmptyDescription
+  | otherwise = do
+      tk <- createTask tx
+      addResult <- addNewTask tk
 
-  let intent = AddTask (taskUuid tk) tx
-  (ev :: TaskEvent) <- V.createEvent intent
+      let intent = AddTask (taskUuid tk) tx
+      (ev :: TaskEvent) <- V.createEvent intent
 
-  if addResult
-    then do
-      V.writeEvent ev
-      pure $ AddSuccess (taskUuid tk)
+      if addResult
+        then do
+          V.writeEvent ev
+          pure $ AddSuccess (taskUuid tk)
 
-    else
-      pure FailedToAdd
+        else
+          pure FailedToAdd
 
 
 startTask :: (CanModifyTask m) => Text -> m ModifyResult

@@ -57,11 +57,19 @@ testAdd = testGroup "add"
       let (_taskId, tasks) = getResult output
       1 @=? length tasks
 
+
+  , testCase "disallows empty description" $ do
+      output <- runTestApp fakeTime $ H.addTask ""
+      let result = getResult output
+      isEmptyDescription result @? "expected EmptyDescription"
   ]
 
   where
     isSuccess (H.AddSuccess _) = True
     isSuccess _                = False
+
+    isEmptyDescription H.EmptyDescription = True
+    isEmptyDescription _                  = False
 
     void :: (Monad m) => m a -> m ()
     void op = op $> ()
