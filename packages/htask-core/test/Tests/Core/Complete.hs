@@ -22,6 +22,7 @@ testComplete = testGroup "complete"
   [ testCase "responds with success" $ do
       output <- runTestApp fakeTime $ do
         (H.AddSuccess taskId)  <- H.addTask "some task"
+        void $ H.startTask (H.taskUuidToText taskId)
         H.completeTask (H.taskUuidToText taskId)
 
       let result = getResult output
@@ -31,6 +32,7 @@ testComplete = testGroup "complete"
   , testCase "marks the task as complete" $ do
       output <- runTestApp fakeTime $ do
         (H.AddSuccess taskId)  <- H.addTask "some task"
+        void $ H.startTask (H.taskUuidToText taskId)
         void $ H.completeTask (H.taskUuidToText taskId)
         tasks <- H.listTasks
         pure (taskId, tasks)
@@ -47,6 +49,13 @@ testComplete = testGroup "complete"
       let result = getResult output
       H.FailedToFind @=? result
 
+  , testCase "fails when task is pending" $ do
+      output <- runTestApp fakeTime $ do
+        (H.AddSuccess taskId)  <- H.addTask "some task"
+        H.completeTask (H.taskUuidToText taskId)
+
+      let result = getResult output
+      H.FailedToModify @=? result
   ]
 
   where

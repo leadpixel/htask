@@ -27,7 +27,7 @@ testStart = testGroup "start"
         H.startTask (H.taskUuidToText taskId)
 
       let result = getResult output
-      isSuccess result @? "puts a task back into pending"
+      isSuccess result @? "starts a pending task"
 
 
   , testCase "marks the task as in-progress" $ do
@@ -41,12 +41,21 @@ testStart = testGroup "start"
       Just H.InProgress @=? (H.status <$> List.find (\x -> H.taskUuid x == taskId) tasks)
 
 
-  , testCase "fails if there is no matching event" $ do
+  , testCase "fails if there is no matching task" $ do
       uuid <- UUID.nextRandom
       output <- runTestApp fakeTime $ H.startTask (UUID.toText uuid)
       let result = getResult output
       H.FailedToFind @=? result
 
+  , testCase "fails when task is complete" $ do
+      output <- runTestApp fakeTime $ do
+        (H.AddSuccess taskId) <- H.addTask "some task"
+        void $ H.startTask (H.taskUuidToText taskId)
+        void $ H.completeTask (H.taskUuidToText taskId)
+        H.startTask (H.taskUuidToText taskId)
+
+      let result = getResult output
+      H.FailedToModify @=? result
   ]
 
   where

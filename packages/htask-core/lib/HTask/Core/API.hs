@@ -85,28 +85,29 @@ addTask tx = do
 
 startTask :: (CanModifyTask m) => Text -> m ModifyResult
 startTask tx =
-  withMatch tx $ \tsk -> do
-    let ref = taskUuid tsk
-    updateResult <- updateExistingTask ref $ setTaskStatus InProgress
+  withMatch tx $ \tsk ->
+    case status tsk of
+      Pending -> do
+        let ref = taskUuid tsk
+        updateResult <- updateExistingTask ref $ setTaskStatus InProgress
 
-    case updateResult of
-      Nothing ->
-        pure FailedToModify
+        case updateResult of
+          Nothing ->
+            pure FailedToModify
 
-      Just t -> do
-        V.createEvent (StartTask ref) >>= V.writeEvent
-        pure $ ModifySuccess t
+          Just t -> do
+            V.createEvent (StartTask ref) >>= V.writeEvent
+            pure $ ModifySuccess t
+
+      _ -> pure FailedToModify
 
 
 stopTask :: (CanModifyTask m) => Text -> m ModifyResult
 stopTask tx =
-  withMatch tx $ \tsk -> do
-
-    if status tsk == Pending
-      then pure FailedToModify
-      else do
+  withMatch tx $ \tsk ->
+    case status tsk of
+      InProgress -> do
         let ref = taskUuid tsk
-
         updateResult <- updateExistingTask ref $ setTaskStatus Pending
 
         case updateResult of
@@ -117,32 +118,42 @@ stopTask tx =
             V.createEvent (StopTask ref) >>= V.writeEvent
             pure $ ModifySuccess t
 
+      _ -> pure FailedToModify
+
 
 completeTask :: (CanModifyTask m) => Text -> m ModifyResult
 completeTask tx =
-  withMatch tx $ \tsk -> do
-    let ref = taskUuid tsk
-    updateResult <- updateExistingTask ref $ setTaskStatus Complete
+  withMatch tx $ \tsk ->
+    case status tsk of
+      InProgress -> do
+        let ref = taskUuid tsk
+        updateResult <- updateExistingTask ref $ setTaskStatus Complete
 
-    case updateResult of
-      Nothing ->
-        pure FailedToModify
+        case updateResult of
+          Nothing ->
+            pure FailedToModify
 
-      Just t -> do
-        V.createEvent (CompleteTask ref) >>= V.writeEvent
-        pure $ ModifySuccess t
+          Just t -> do
+            V.createEvent (CompleteTask ref) >>= V.writeEvent
+            pure $ ModifySuccess t
+
+      _ -> pure FailedToModify
 
 
 removeTask :: (CanModifyTask m) => Text -> m ModifyResult
 removeTask tx =
-  withMatch tx $ \tsk -> do
-    let ref = taskUuid tsk
-    removeResult <- removeTaskUuid ref
+  withMatch tx $ \tsk ->
+    case status tsk of
+      Complete -> pure FailedToModify
+      Abandoned -> pure FailedToModify
+      _ -> do
+        let ref = taskUuid tsk
+        updateResult <- updateExistingTask ref $ setTaskStatus Abandoned
 
-    if removeResult
-      then do
-        V.createEvent (RemoveTask ref) >>= V.writeEvent
-        pure $ ModifySuccess tsk
+        case updateResult of
+          Nothing ->
+            pure FailedToModify
 
-      else
-        pure FailedToModify
+          Just t -> do
+            V.createEvent (RemoveTask ref) >>= V.writeEvent
+            pure $ ModifySuccess t
