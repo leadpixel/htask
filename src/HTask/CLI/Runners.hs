@@ -46,15 +46,20 @@ tInt :: Int -> Text
 tInt = Text.pack . show
 
 
--- | Helper to format descriptions with consistent indentation for newlines
-formatDescription :: Int -> H.Task -> Text
-formatDescription padding t =
-  let lines' = Text.lines (H.description t)
-      symbol = statusSymbol (H.status t)
-      colorized = withStatusColor (H.status t)
-      firstLine = symbol <> " " <> colorized (head lines')
-      otherLines = fmap (\l -> Text.replicate padding " " <> colorized l) (tail lines')
-  in Text.intercalate "\n" (firstLine : otherLines)
+-- | Helper to format a task entry with metadata on one line and description indented under it
+formatTaskEntry :: Bool -> Map.Map H.TaskUuid Text -> [H.Task] -> H.Task -> [Text]
+formatTaskEntry showUUID prefs allTs t =
+  [ headerLine
+  ] <> descriptionLines
+
+  where
+    idx = maybe "?" (tInt . (+1)) (List.findIndex (\x -> H.taskUuid x == H.taskUuid t) allTs)
+    symbol = statusSymbol (H.status t)
+    shortUuid = Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs
+
+    headerLine = padLeft 3 idx <> " " <> symbol <> (if showUUID then " " <> withDim shortUuid else "")
+
+    descriptionLines = fmap (\l -> "      " <> withStatusColor (H.status t) l) (Text.lines (H.description t))
 
 
 runAdd :: (CanRunAction m) => Text -> m RunResult
@@ -141,9 +146,9 @@ runDrop
 runList :: (CanRunAction m) => ShowUUID -> ShowAll -> m RunResult
 runList showUUID showAll = do
   allTasks <- List.sortBy H.taskDisplayOrder <$> H.listTasks
-  let tasks = selectTasks allTasks
+  let filteredTasks = selectTasks allTasks
   let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> allTasks)
-  pure $ formatList allTasks tasks prefixes
+  pure $ formatList allTasks filteredTasks prefixes
 
   where
     selectTasks
@@ -161,20 +166,15 @@ runList showUUID showAll = do
     formatGroup allTs ts prefs s =
       case List.filter (hasStatus s) ts of
         [] -> []
-        gs -> ("\n" <> withBold (statusHeader s)) : fmap (nicePrint prefs allTs) gs
+        gs -> ("\n" <> withBold (statusHeader s)) : concatMap (nicePrint prefs allTs) gs
 
     statusHeader H.InProgress = "In Progress"
     statusHeader H.Pending    = "Pending"
     statusHeader H.Complete   = "Completed"
     statusHeader H.Abandoned  = "Abandoned"
 
-    nicePrint :: Map.Map H.TaskUuid Text -> [H.Task] -> H.Task -> Text
-    nicePrint prefs allTs t
-      =  padLeft 3 (maybe "?" tInt (taskIndex t allTs)) <> " "
-      <> formatDescription 6 t
-      <> (if untag showUUID then "\n    " <> withDim (Map.findWithDefault "" (H.taskUuid t) prefs) else "")
-
-    taskIndex t allTs = (+1) <$> List.findIndex (\x -> H.taskUuid x == H.taskUuid t) allTs
+    nicePrint :: Map.Map H.TaskUuid Text -> [H.Task] -> H.Task -> [Text]
+    nicePrint = formatTaskEntry (untag showUUID)
 
 
 runPick :: (CanRunAction m) => m RunResult
@@ -261,13 +261,14 @@ runStop t
 runSummary :: (CanRunAction m) => m RunResult
 runSummary = do
   tasks <- H.listTasks
-  let actives = List.filter (hasStatus H.InProgress) tasks
-  let pendings = List.sortBy H.taskPriority (List.filter (hasStatus H.Pending) tasks)
+  let allSorted = List.sortBy H.taskDisplayOrder tasks
+  let actives = List.filter (hasStatus H.InProgress) allSorted
+  let pendings = List.filter (hasStatus H.Pending) allSorted
   let topPendings = List.take 5 pendings
 
-  let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> tasks)
+  let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> allSorted)
 
-  pure $ renderSummary tasks actives topPendings prefixes
+  pure $ renderSummary allSorted actives topPendings prefixes
 
   where
     renderSummary allTasks actives topPendings prefixes = resultSuccess
@@ -279,30 +280,15 @@ runSummary = do
         displayCurrent =
           if List.null actives
             then [ "No current task" ]
-            else withBold "Current task:" : concatMap (printTaskForSummary allTasks prefixes) actives
+            else withBold "Current task:" : concatMap (formatTaskEntry True prefixes allTasks) actives
 
 
         displayTopPending :: [Text]
-        displayTopPending
-          = ("\n" <> withBold (pendingMessage (length topPendings) (length pendings)))
-          : concatMap (printTaskForSummary allTasks prefixes) topPendings
+        displayTopPending =
+          let totalPendings = List.length (List.filter (hasStatus H.Pending) allTasks)
+          in ("\n" <> withBold (pendingMessage (length topPendings) totalPendings))
+             : concatMap (formatTaskEntry True prefixes allTasks) topPendings
 
           where
-            pendings = List.filter (hasStatus H.Pending) allTasks
             pendingMessage x p =
               "Top " <> tInt x <> " pending (" <> tInt (p - x) <> " hidden):"
-
-
-        printTaskForSummary :: [H.Task] -> Map.Map H.TaskUuid Text -> H.Task -> [Text]
-        printTaskForSummary allTs prefs t =
-          let idxText = maybe "" (\i -> padLeft 3 (tInt i) <> " ") (taskIndex t allTs)
-          in [ idxText <> formatDescription 6 t
-             , indent $ indent $ withDim printRef
-             ]
-
-          where
-            printRef :: Text
-            printRef = Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs
-
-            taskIndex :: H.Task -> [H.Task] -> Maybe Int
-            taskIndex task ts = (+1) <$> List.findIndex (\x -> H.taskUuid x == H.taskUuid task) (List.sortBy H.taskDisplayOrder ts)
