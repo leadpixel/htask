@@ -241,7 +241,6 @@ runSummary = do
   let pendings = List.sortBy H.taskPriority (List.filter (hasStatus H.Pending) tasks)
   let topPendings = List.take 5 pendings
 
-  let displayedTasks = actives <> topPendings
   let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> tasks) -- Calculate for ALL tasks to ensure unique index matching
 
   pure $ renderSummary tasks actives topPendings prefixes
