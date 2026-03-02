@@ -70,7 +70,7 @@ conduitWriteMany =
   where
     fileAppend :: (Monad m, MonadUnliftIO m) => [Strict.ByteString] -> FilePath -> m ()
     fileAppend xs file =
-      Conduit.withSinkFile file $ \dest ->
+      withAppendSinkFile file $ \dest ->
         runConduit $ Conduit.yieldMany xs .| dest
 
 
