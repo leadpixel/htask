@@ -1,19 +1,21 @@
-{-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE DerivingVia                #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE StandaloneDeriving         #-}
+{-# LANGUAGE UndecidableInstances       #-}
 
 module Leadpixel.Events.Backends.File
   ( FileEventBackend ()
   , runFileBackend
   ) where
 
-import qualified Conduit
 import qualified Data.Aeson                 as Aeson
 import qualified Data.ByteString            as Strict
 import qualified Data.ByteString.Lazy       as Lazy
 import qualified System.IO                  as Sys
 
 import           Conduit                    (ConduitT, Void, runConduit, (.|))
+import qualified Conduit
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Monad.IO.Unlift    (MonadUnliftIO, withRunInIO)
 import           Control.Monad.Trans.Class  (MonadTrans)
@@ -23,19 +25,24 @@ import           Leadpixel.Events
 
 
 newtype FileEventBackend m a
-  = Backend { runBackend :: ReaderT FilePath m a }
+  = Backend { unBackend :: ReaderT FilePath m a }
   deriving (Applicative, Functor, Monad, MonadIO, MonadTrans)
+
+deriving via (ReaderT FilePath m)
+  instance (MonadUnliftIO m) => MonadUnliftIO (FileEventBackend m)
 
 instance (MonadUnliftIO m) => HasEventSource (FileEventBackend m) where
   readEvents = conduitReadEvents
 
+
 instance (MonadUnliftIO m) => HasEventSink (FileEventBackend m) where
-  writeEvent = conduitWriteEvent
-  writeEvents = conduitWriteMany
+  writeEvent e  = Backend $ ReaderT $ \path -> fileAppend [encodeEvent e] path
+  writeEvents es = Backend $ ReaderT $ \path -> fileAppend (encodeEvent <$> es) path
 
 
 runFileBackend :: FilePath -> FileEventBackend m a -> m a
-runFileBackend = flip (runReaderT . runBackend)
+runFileBackend file op
+  = runReaderT (unBackend op) file
 
 
 conduitReadEvents :: (MonadUnliftIO m, Aeson.FromJSON a) => FileEventBackend m [a]
@@ -61,26 +68,10 @@ conduitReadEvents
           runConduit $ src .| Conduit.linesUnboundedAsciiC .| c
 
 
-conduitWriteEvent :: (MonadUnliftIO m, Aeson.ToJSON a) => Event a -> FileEventBackend m ()
-conduitWriteEvent =
-  Backend . ReaderT . fileAppend . encodeEvent
-
-  where
-    fileAppend :: (Monad m, MonadUnliftIO m) => Strict.ByteString -> FilePath -> m ()
-    fileAppend x file =
-      withAppendSinkFile file $ \dest ->
-        runConduit $ Conduit.yield x .| dest
-
-
-conduitWriteMany :: (MonadUnliftIO m, Aeson.ToJSON a) => [Event a] -> FileEventBackend m ()
-conduitWriteMany =
-  Backend . ReaderT . fileAppend . fmap encodeEvent
-
-  where
-    fileAppend :: (Monad m, MonadUnliftIO m) => [Strict.ByteString] -> FilePath -> m ()
-    fileAppend xs file =
-      withAppendSinkFile file $ \dest ->
-        runConduit $ Conduit.yieldMany xs .| dest
+fileAppend :: (Monad m, MonadUnliftIO m) => [Strict.ByteString] -> FilePath -> m ()
+fileAppend xs file =
+  withAppendSinkFile file $ \dest ->
+    runConduit $ Conduit.yieldMany xs .| dest
 
 
 decodeEvents :: (Aeson.FromJSON a) => [(Int, Strict.ByteString)] -> [Either (Int, Strict.ByteString) a]

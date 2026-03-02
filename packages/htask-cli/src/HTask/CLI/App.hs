@@ -15,9 +15,10 @@ import qualified Leadpixel.Events               as V
 import           Control.Monad.IO.Class         (MonadIO, liftIO)
 import           Control.Monad.IO.Unlift        (MonadUnliftIO)
 import           Control.Monad.Random.Class     (MonadRandom (..))
-import           Control.Monad.State            (MonadState)
+import           Control.Monad.State            (MonadState, get, put)
 import           Control.Monad.Trans.Class      (lift)
-import           Control.Monad.Trans.State      (StateT, evalStateT)
+import           Control.Monad.Trans.Reader     (ReaderT (..), ask, runReaderT)
+import           Data.IORef
 import           Data.Time                      (UTCTime)
 import           Data.UUID                      (UUID)
 import           Leadpixel.Events.Backends.File
@@ -25,8 +26,16 @@ import           Leadpixel.Provider
 
 
 newtype App m a
-  = App { unApp :: StateT H.TaskMap (FileEventBackend m) a }
-  deriving (Applicative, Functor, Monad, MonadIO, MonadState H.TaskMap)
+  = App { unApp :: ReaderT (IORef H.TaskMap) (FileEventBackend m) a }
+  deriving (Applicative, Functor, Monad, MonadIO, MonadUnliftIO)
+
+instance (MonadIO m) => MonadState H.TaskMap (App m) where
+  get = App $ do
+    ref <- ask
+    liftIO $ readIORef ref
+  put m = App $ do
+    ref <- ask
+    liftIO $ writeIORef ref m
 
 type CanRunAction m =
   ( Monad m
@@ -59,6 +68,9 @@ instance (MonadRandom m) => MonadRandom (App m) where
 
 
 runApp :: (MonadUnliftIO m) => FilePath -> App m a -> m a
-runApp file app
-  = runFileBackend file
-  $ V.readEvents >>= evalStateT (unApp app) . (fst . H.foldEventLog)
+runApp file app = do
+  runFileBackend file $ do
+    evs <- V.readEvents
+    let (initialMap, _) = H.foldEventLog evs
+    ref <- liftIO $ newIORef initialMap
+    runReaderT (unApp app) ref
