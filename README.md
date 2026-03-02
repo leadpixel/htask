@@ -16,20 +16,21 @@ And I want to keep a history of task changes to understand how I and collaborato
 
 ## Setup
 
-- install [Stack](https://docs.haskellstack.org/en/stable/README/)
+- install [GHC/Cabal](https://www.haskell.org/ghcup/)
+- install [just](https://github.com/casey/just)
 - checkout the repo and verify:
 ```sh
 $ git clone https://github.com/leadpixel/htask.git
 $ cd htask
-$ stack test --pedantic
+$ just test
 ```
 
 - build and install:
 ```sh
-$ stack install
+$ just install
 ```
 
-You should see output like `Copied executables to /some/local/path`; check this is on your `$PATH`
+Ensure `~/.cabal/bin` (or your OS equivalent) is on your `$PATH`.
 
 - first run:
 ```sh
