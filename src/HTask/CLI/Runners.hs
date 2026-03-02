@@ -49,37 +49,7 @@ taskPriority = compare `on` H.createdAt
 
 taskDisplayOrder :: H.Task -> H.Task -> Ordering
 taskDisplayOrder a b
-  = byStatus a b <> byTimestamp a b
-
-  where
-    byStatus
-      = statusDisplayOrder `on` H.status
-
-    byTimestamp
-      = taskPriority
-
-
--- TODO: replace with common sense / enum instance
-statusDisplayOrder :: H.TaskStatus -> H.TaskStatus -> Ordering
-statusDisplayOrder  H.InProgress  H.Abandoned  =  LT
-statusDisplayOrder  H.InProgress  H.Complete   =  LT
-statusDisplayOrder  H.InProgress  H.Pending    =  LT
-statusDisplayOrder  H.InProgress  H.InProgress =  EQ
-
-statusDisplayOrder  H.Pending     H.Abandoned  =  LT
-statusDisplayOrder  H.Pending     H.Complete   =  LT
-statusDisplayOrder  H.Pending     H.Pending    =  EQ
-statusDisplayOrder  H.Pending     H.InProgress =  GT
-
-statusDisplayOrder  H.Complete    H.Abandoned  =  LT
-statusDisplayOrder  H.Complete    H.Complete   =  EQ
-statusDisplayOrder  H.Complete    H.InProgress =  GT
-statusDisplayOrder  H.Complete    H.Pending    =  GT
-
-statusDisplayOrder  H.Abandoned   H.Abandoned  =  EQ
-statusDisplayOrder  H.Abandoned   H.Complete   =  GT
-statusDisplayOrder  H.Abandoned   H.InProgress =  GT
-statusDisplayOrder  H.Abandoned   H.Pending    =  GT
+  = (compare `on` H.status) a b <> taskPriority a b
 
 
 runAdd :: (CanRunAction m) => Text -> m RunResult

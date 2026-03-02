@@ -45,8 +45,8 @@ import           HTask.Provider
 -- | Task Core Types
 type TaskUuid = Tagged "taskId" UUID
 
-data TaskStatus = Pending | InProgress | Complete | Abandoned
-  deriving (Eq, Generic, Show)
+data TaskStatus = InProgress | Pending | Complete | Abandoned
+  deriving (Eq, Generic, Ord, Show)
 
 data Task
   = Task

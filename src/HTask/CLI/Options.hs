@@ -20,7 +20,7 @@ data Options
 optionsParser :: Parser Options
 optionsParser
   = Options
-  <$> hsubparser
+  <$> (hsubparser
       (  command "add"      addInfo
       <> command "complete" completeInfo
       <> command "done"     doneInfo
@@ -31,7 +31,7 @@ optionsParser
       <> command "start"    startInfo
       <> command "stop"     stopInfo
       <> command "summary"  summaryInfo
-      )
+      ) <|> pure Summary)
   <*> strOption
       (  long "file"
       <> short 'f'
