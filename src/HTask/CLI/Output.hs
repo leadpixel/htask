@@ -74,7 +74,7 @@ withColor c s
         Yellow -> "\ESC[33m" <> s <> "\ESC[0m"
         Blue   -> "\ESC[34m" <> s <> "\ESC[0m"
         Cyan   -> "\ESC[36m" <> s <> "\ESC[0m"
-        Gray   -> "\ESC[37m" <> s <> "\ESC[0m"
+        Gray   -> "\ESC[38;5;244m" <> s <> "\ESC[0m"
   | otherwise = s
 
 withBold :: Text -> Text
