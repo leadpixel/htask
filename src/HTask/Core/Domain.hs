@@ -53,6 +53,9 @@ type TaskUuid = Tagged "taskId" UUID
 data TaskStatus = InProgress | Pending | Complete | Abandoned
   deriving (Eq, Generic, Ord, Show)
 
+instance Aeson.ToJSON TaskStatus
+instance Aeson.FromJSON TaskStatus
+
 data Task
   = Task
     { taskUuid    :: TaskUuid
@@ -61,6 +64,9 @@ data Task
     , status      :: TaskStatus
     }
   deriving (Eq, Generic, Show)
+
+instance Aeson.ToJSON Task
+instance Aeson.FromJSON Task
 
 createTask :: (Monad m, Provider UTCTime m, Provider UUID m) => Text -> m Task
 createTask tex

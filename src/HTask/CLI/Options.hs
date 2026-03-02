@@ -7,6 +7,7 @@ module HTask.CLI.Options
   ) where
 
 import qualified Data.List           as List
+import           Data.Map.Strict     (Map)
 import qualified Data.Map.Strict     as Map
 import           Data.Tagged         (Tagged (..))
 import qualified Data.Text           as Text
@@ -24,6 +25,7 @@ data Options
   = Options
     { action   :: Action
     , taskfile :: FilePath
+    , useJson  :: Bool
     }
   deriving (Show)
 
@@ -31,6 +33,7 @@ data RawOptions
   = RawOptions
     { rawAction :: Action
     , rawFile   :: Maybe FilePath
+    , rawJson   :: Bool
     }
 
 optionsParser :: Parser RawOptions
@@ -54,6 +57,11 @@ optionsParser
       <> metavar "ARG"
       <> help "path to the task list file (default: ~/.tasks)"
       ))
+  <*> switch
+      (  long "json"
+      <> short 'j'
+      <> help "output in JSON format"
+      )
 
 optionsInfo :: ParserInfo RawOptions
 optionsInfo
@@ -72,7 +80,7 @@ getOptions :: IO Options
 getOptions = do
   raw <- execParser optionsInfo
   file <- maybe ((</> ".tasks") <$> getHomeDirectory) pure (rawFile raw)
-  pure $ Options (rawAction raw) file
+  pure $ Options (rawAction raw) file (rawJson raw)
 
 
 -- | Dynamic Completer for Task IDs and UUIDs

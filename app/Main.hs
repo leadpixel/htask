@@ -10,7 +10,6 @@ import           HTask.CLI.App
 main :: IO ()
 main = do
   options <- Opt.getOptions
-  let action = Opt.action options
   let file = Opt.taskfile options
 
-  runApp file (Runner.runAction action) >>= Render.renderResult
+  runApp file (Runner.runAction options) >>= Render.renderResult
