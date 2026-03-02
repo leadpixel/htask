@@ -50,12 +50,12 @@ listInfo = info listParser (progDesc "List tasks; optionally show removed tasks"
   where
     listParser :: Parser Action
     listParser
-      = List
-      <$> (Tagged <$> switch
+      = List . Tagged
+      <$> switch
           (  long "show-uuid"
           <> short 'u'
           <> help "Show UUID for tasks"
-          ) )
+          )
       <*> (Tagged <$> switch
           (  long "show-all"
           <> short 'a'

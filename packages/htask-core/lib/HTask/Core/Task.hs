@@ -26,11 +26,8 @@ import           Leadpixel.Provider
 type TaskUuid = Tagged "taskId" UUID
 
 
-data TaskStatus = Pending | InProgress | Complete | Abandoned deriving
-  ( Eq
-  , Generic
-  , Show
-  )
+data TaskStatus = Pending | InProgress | Complete | Abandoned
+  deriving (Eq, Generic, Show)
 
 
 data Task

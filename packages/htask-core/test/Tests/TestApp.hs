@@ -39,7 +39,14 @@ type Args = UTCTime
 
 newtype TestApp m a
   = TestApp { unTestApp :: StateT H.TaskMap (WriterT (Seq UUID) (ReaderT Args (MemoryBackend m))) a }
-  deriving (Applicative, Functor, Monad, MonadIO, MonadState H.TaskMap, MonadFail)
+  deriving
+  ( Applicative
+  , Functor
+  , Monad
+  , MonadFail
+  , MonadIO
+  , MonadState H.TaskMap
+  )
 
 instance (Monad m) => V.HasEventSink (TestApp m) where
   writeEvent = TestApp . lift . lift . lift . V.writeEvent
