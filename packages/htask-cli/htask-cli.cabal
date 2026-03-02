@@ -44,4 +44,4 @@ executable htask
     , transformers
     , unliftio-core
     , uuid
-  default-language: Haskell2010
+  default-language: GHC2021

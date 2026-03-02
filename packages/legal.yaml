@@ -3,4 +3,4 @@
   maintainer: "jack.palf@gmail.com"
   copyright:  2020 LeadPixel
   license:     BSD3
-
+  language:    GHC2021

@@ -37,7 +37,7 @@ library
     , time
     , transformers
     , uuid
-  default-language: Haskell2010
+  default-language: GHC2021
 
 test-suite htask-core
   type: exitcode-stdio-1.0
@@ -73,4 +73,4 @@ test-suite htask-core
     , time
     , transformers
     , uuid
-  default-language: Haskell2010
+  default-language: GHC2021
