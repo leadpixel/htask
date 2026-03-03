@@ -9,6 +9,17 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	ErrTaskNotFound      = errors.New("unable to find matching task")
+	ErrModifyFailed      = errors.New("unable to modify matching task")
+	ErrEmptyDescription  = errors.New("task description cannot be empty")
+	ErrFailedToAdd       = errors.New("failed to add")
+)
+
+type EventSource interface {
+	ReadEvents() ([]Event, error)
+}
+
 type EventSink interface {
 	WriteEvent(event Event) error
 }
@@ -20,6 +31,15 @@ type TaskService struct {
 
 func NewTaskService(sink EventSink, tasks map[uuid.UUID]*Task) *TaskService {
 	return &TaskService{sink: sink, Tasks: tasks}
+}
+
+func NewTaskServiceFromSource(source EventSource, sink EventSink) (*TaskService, error) {
+	evs, err := source.ReadEvents()
+	if err != nil {
+		return nil, err
+	}
+	tasks, _ := FoldEventLog(evs)
+	return NewTaskService(sink, tasks), nil
 }
 
 func (s *TaskService) ListTasks() []*Task {
@@ -48,7 +68,7 @@ func (s *TaskService) FindTask(ref string) *Task {
 
 func (s *TaskService) AddTask(description string) (*Task, error) {
 	if strings.TrimSpace(description) == "" {
-		return nil, errors.New("task description cannot be empty")
+		return nil, ErrEmptyDescription
 	}
 
 	u := uuid.New()
@@ -63,7 +83,7 @@ func (s *TaskService) AddTask(description string) (*Task, error) {
 
 	success := applyEvent(s.Tasks, ev)
 	if !success {
-		return nil, errors.New("failed to add")
+		return nil, ErrFailedToAdd
 	}
 
 	if s.sink != nil {
@@ -89,10 +109,10 @@ func (s *TaskService) CompleteTask(ref string) (*Task, error) {
 func (s *TaskService) RemoveTask(ref string) (*Task, error) {
 	t := s.FindTask(ref)
 	if t == nil {
-		return nil, errors.New("unable to find matching task")
+		return nil, ErrTaskNotFound
 	}
 	if t.Status == Complete || t.Status == Abandoned {
-		return nil, errors.New("unable to modify matching task")
+		return nil, ErrModifyFailed
 	}
 
 	ev := Event{
@@ -103,7 +123,7 @@ func (s *TaskService) RemoveTask(ref string) (*Task, error) {
 		},
 	}
 	if !applyEvent(s.Tasks, ev) {
-		return nil, errors.New("unable to modify matching task")
+		return nil, ErrModifyFailed
 	}
 	if s.sink != nil {
 		if err := s.sink.WriteEvent(ev); err != nil {
@@ -116,10 +136,10 @@ func (s *TaskService) RemoveTask(ref string) (*Task, error) {
 func (s *TaskService) modifyTask(ref string, requiredStatus TaskStatus, intent TaskIntentType) (*Task, error) {
 	t := s.FindTask(ref)
 	if t == nil {
-		return nil, errors.New("unable to find matching task")
+		return nil, ErrTaskNotFound
 	}
 	if t.Status != requiredStatus {
-		return nil, errors.New("unable to modify matching task")
+		return nil, ErrModifyFailed
 	}
 
 	ev := Event{
@@ -131,7 +151,7 @@ func (s *TaskService) modifyTask(ref string, requiredStatus TaskStatus, intent T
 	}
 
 	if !applyEvent(s.Tasks, ev) {
-		return nil, errors.New("unable to modify matching task")
+		return nil, ErrModifyFailed
 	}
 
 	if s.sink != nil {

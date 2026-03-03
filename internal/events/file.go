@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/leadpixel/htask/internal/core"
 )
@@ -23,6 +25,25 @@ type FileBackend struct {
 
 func NewFileBackend(path string) *FileBackend {
 	return &FileBackend{path: path}
+}
+
+func ResolveDefaultPath() string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		home, _ := os.UserHomeDir()
+		return filepath.Join(home, ".tasks")
+	}
+
+	dirs := strings.Split(cwd, string(filepath.Separator))
+	for i := len(dirs); i > 0; i-- {
+		path := filepath.Join("/", filepath.Join(dirs[:i]...), ".tasks")
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+
+	home, _ := os.UserHomeDir()
+	return filepath.Join(home, ".tasks")
 }
 
 func (b *FileBackend) ReadEvents() ([]core.Event, error) {

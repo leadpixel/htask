@@ -2,7 +2,7 @@ package core
 
 import (
 	"encoding/json"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -190,17 +190,16 @@ func DisambiguatingPrefixes(uuids []uuid.UUID) map[uuid.UUID]string {
 }
 
 func SortTasks(tasks []*Task) {
-	sort.SliceStable(tasks, func(i, j int) bool {
-		sI, sJ := tasks[i].Status, tasks[j].Status
-		if sI != sJ {
-			order := map[TaskStatus]int{
-				InProgress: 0,
-				Pending:    1,
-				Complete:   2,
-				Abandoned:  3,
-			}
-			return order[sI] < order[sJ]
+	order := map[TaskStatus]int{
+		InProgress: 0,
+		Pending:    1,
+		Complete:   2,
+		Abandoned:  3,
+	}
+	slices.SortStableFunc(tasks, func(a, b *Task) int {
+		if a.Status != b.Status {
+			return order[a.Status] - order[b.Status]
 		}
-		return tasks[i].CreatedAt.Before(tasks[j].CreatedAt)
+		return a.CreatedAt.Compare(b.CreatedAt)
 	})
 }

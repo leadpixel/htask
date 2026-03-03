@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/google/uuid"
@@ -15,46 +14,29 @@ import (
 )
 
 var (
-	jsonFlag   bool
-	fileFlag   string
-	showUUID   bool
-	showAll    bool
+	jsonFlag bool
+	fileFlag string
+	showUUID bool
+	showAll  bool
 )
-
-func resolveDefaultPath() string {
-	cwd, err := os.Getwd()
-	if err != nil {
-		home, _ := os.UserHomeDir()
-		return filepath.Join(home, ".tasks")
-	}
-
-	dirs := strings.Split(cwd, string(filepath.Separator))
-	for i := len(dirs); i > 0; i-- {
-		path := filepath.Join("/", filepath.Join(dirs[:i]...), ".tasks")
-		if _, err := os.Stat(path); err == nil {
-			return path
-		}
-	}
-
-	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".tasks")
-}
 
 func initService() *core.TaskService {
 	path := fileFlag
 	if path == "" {
-		path = resolveDefaultPath()
+		path = events.ResolveDefaultPath()
 	}
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		// Just create empty file
 		os.WriteFile(path, []byte{}, 0644)
 	}
 
 	backend := events.NewFileBackend(path)
-	evs, _ := backend.ReadEvents()
-	tasks, _ := core.FoldEventLog(evs)
-	return core.NewTaskService(backend, tasks)
+	svc, err := core.NewTaskServiceFromSource(backend, backend)
+	if err != nil {
+		cli.ErrorResult{err.Error()}.Render()
+		os.Exit(1)
+	}
+	return svc
 }
 
 func formatTaskEntry(t *core.Task, allTasks []*core.Task, prefixes map[uuid.UUID]string) []string {
