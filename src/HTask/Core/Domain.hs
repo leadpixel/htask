@@ -3,7 +3,6 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE TypeApplications  #-}
 
 module HTask.Core.Domain
   ( Task (..)
@@ -44,7 +43,7 @@ import           Data.Text           (Text)
 import           Data.Time           (UTCTime)
 import           Data.UUID           (UUID)
 import           GHC.Generics        (Generic)
-import           HTask.Provider
+import           HTask.Effects
 
 
 -- | Task Core Types
@@ -68,11 +67,10 @@ data Task
 instance Aeson.ToJSON Task
 instance Aeson.FromJSON Task
 
-createTask :: (Monad m, Provider UTCTime m, Provider UUID m) => Text -> m Task
+createTask :: (MonadTime m, MonadUUID m) => Text -> m Task
 createTask tex
-  = (\u m -> Task u tex m Pending)
-  <$> (Tagged <$> provide @UUID)
-  <*> provide @UTCTime
+  = ((\u m -> Task u tex m Pending) . Tagged <$> nextUUID)
+  <*> currentTime
 
 setTaskStatus :: TaskStatus -> Task -> Task
 setTaskStatus s t = t { status = s }

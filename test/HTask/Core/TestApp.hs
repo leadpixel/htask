@@ -24,7 +24,7 @@ import           Data.Sequence              (Seq)
 import           Data.Time                  (UTCTime, addUTCTime)
 import           Data.UUID                  (UUID)
 import qualified Data.UUID.V4               as UUID
-import           HTask.Provider
+import           HTask.Effects
 
 
 -- We use IORef for mock values to keep everything in ReaderT IO
@@ -53,16 +53,16 @@ instance (MonadIO m) => V.HasEventSource (TestApp m) where
 instance (MonadIO m) => V.HasEventSink (TestApp m) where
   writeEvent = TestApp . lift . V.writeEvent
 
-instance (MonadIO m) => Provider UTCTime (TestApp m) where
-  provide = TestApp $ do
+instance (MonadIO m) => MonadTime (TestApp m) where
+  currentTime = TestApp $ do
     env <- ask
     t <- liftIO $ readIORef (mockTime env)
     -- Auto-increment time slightly on each provide to ensure ordering
     liftIO $ modifyIORef' (mockTime env) (addUTCTime 1)
     pure t
 
-instance (MonadIO m) => Provider UUID (TestApp m) where
-  provide = liftIO UUID.nextRandom
+instance (MonadIO m) => MonadUUID (TestApp m) where
+  nextUUID = liftIO UUID.nextRandom
 
 
 runTestApp :: (MonadIO m) => UTCTime -> TestApp m a -> m (a, Seq Lazy.ByteString)

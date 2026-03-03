@@ -7,7 +7,6 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE StandaloneDeriving         #-}
-{-# LANGUAGE TypeApplications           #-}
 {-# LANGUAGE UndecidableInstances       #-}
 
 module HTask.Events
@@ -44,7 +43,7 @@ import           Data.Foldable              (foldl', toList)
 import           Data.Sequence              (Seq (..), (|>))
 import           Data.Time                  (UTCTime)
 import           GHC.Generics               (Generic)
-import           HTask.Provider
+import           HTask.Effects
 
 
 -- | Core Event Types
@@ -66,9 +65,9 @@ data Event a
 instance (Aeson.ToJSON a) => Aeson.ToJSON (Event a)
 instance (Aeson.FromJSON a) => Aeson.FromJSON (Event a)
 
-createEvent :: (Provider UTCTime m) => a -> m (Event a)
+createEvent :: (MonadTime m) => a -> m (Event a)
 createEvent x = do
-  t <- provide @UTCTime
+  t <- currentTime
   pure $ Event { timestamp = t , payload = x }
 
 

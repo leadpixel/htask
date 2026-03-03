@@ -17,8 +17,8 @@ library
       HTask.Core
       HTask.Core.API
       HTask.Core.Domain
+      HTask.Effects
       HTask.Events
-      HTask.Provider
   other-modules:
       Paths_htask
   hs-source-dirs:
@@ -70,13 +70,10 @@ test-suite htask-test
       HTask.Core.Start
       HTask.Core.Stop
       HTask.Core.TestApp
+      HTask.EffectsSpec
       HTask.Events.CoreSpec
       HTask.Events.FileSpec
       HTask.Events.MemorySpec
-      HTask.Provider.Clear
-      HTask.Provider.Random
-      HTask.Provider.Static
-      HTask.Provider.TimedCache
       Paths_htask
   hs-source-dirs:
       test

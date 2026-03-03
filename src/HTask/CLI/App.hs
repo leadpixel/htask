@@ -10,6 +10,7 @@ module HTask.CLI.App
 import qualified Data.Time                  as Time
 import qualified Data.UUID.V4               as UUID
 import qualified HTask.Core                 as H
+import           HTask.Effects
 import qualified HTask.Events               as V
 
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
@@ -19,10 +20,6 @@ import           Control.Monad.State        (MonadState, get, put)
 import           Control.Monad.Trans.Class  (lift)
 import           Control.Monad.Trans.Reader (ReaderT (..), ask, runReaderT)
 import           Data.IORef
-import           Data.Time                  (UTCTime)
-import           Data.UUID                  (UUID)
-import           HTask.Events
-import           HTask.Provider
 import           System.Directory           (doesFileExist)
 import           System.Exit                (exitFailure)
 import           System.IO                  (hFlush, hIsTerminalDevice,
@@ -30,7 +27,7 @@ import           System.IO                  (hFlush, hIsTerminalDevice,
 
 
 newtype App m a
-  = App { unApp :: ReaderT (IORef H.TaskMap) (FileEventBackend m) a }
+  = App { unApp :: ReaderT (IORef H.TaskMap) (V.FileEventBackend m) a }
   deriving (Applicative, Functor, Monad, MonadIO, MonadUnliftIO)
 
 instance (MonadIO m) => MonadState H.TaskMap (App m) where
@@ -48,8 +45,8 @@ type CanRunAction m =
   , MonadRandom m
   , MonadState H.TaskMap m
   , V.HasEventSink m
-  , Provider UTCTime m
-  , Provider UUID m
+  , MonadTime m
+  , MonadUUID m
   )
 
 instance (Monad m, MonadUnliftIO m) => V.HasEventSource (App m) where
@@ -58,11 +55,11 @@ instance (Monad m, MonadUnliftIO m) => V.HasEventSource (App m) where
 instance (Monad m, MonadUnliftIO m) => V.HasEventSink (App m) where
   writeEvent = App . lift . V.writeEvent
 
-instance (MonadIO m) => Provider UTCTime (App m) where
-  provide = App $ liftIO Time.getCurrentTime
+instance (MonadIO m) => MonadTime (App m) where
+  currentTime = App $ liftIO Time.getCurrentTime
 
-instance (MonadIO m) => Provider UUID (App m) where
-  provide = App $ liftIO UUID.nextRandom
+instance (MonadIO m) => MonadUUID (App m) where
+  nextUUID = App $ liftIO UUID.nextRandom
 
 instance (MonadRandom m) => MonadRandom (App m) where
   getRandom = App $ lift $ lift getRandom
@@ -74,7 +71,7 @@ instance (MonadRandom m) => MonadRandom (App m) where
 runApp :: (MonadUnliftIO m) => FilePath -> App m a -> m a
 runApp file app = do
   liftIO $ ensureFileExists file
-  runFileBackend file $ do
+  V.runFileBackend file $ do
     evs <- V.readEvents
     let (initialMap, _) = H.foldEventLog evs
     ref <- liftIO $ newIORef initialMap
