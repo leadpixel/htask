@@ -23,7 +23,7 @@ freeze:
 
 # Install the CLI app to ~/.cabal/bin
 install:
-    cabal install htask --overwrite-policy=always
+    cabal install exe:htask --overwrite-policy=always
 
 # Start a REPL for the library
 repl:
