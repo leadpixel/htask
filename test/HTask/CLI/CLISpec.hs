@@ -2,15 +2,15 @@
 
 module HTask.CLI.CLISpec (tests) where
 
-import qualified HTask.CLI.Actions    as Action
-import qualified HTask.CLI.Options    as Opt
+import qualified HTask.CLI.Actions    as Actions
+import qualified HTask.CLI.Options    as Options
 import qualified HTask.CLI.Output     as Output
-import qualified HTask.CLI.Runners    as Runner
+import qualified HTask.CLI.Runners    as Runners
 import           HTask.CLI.TestApp    (runTestApp)
 
 import qualified Data.ByteString.Lazy as Lazy
 import qualified Data.Text            as Text
-import qualified Data.Text.Encoding   as Text
+import qualified Data.Text.Encoding   as Encoding
 import           Data.Time            (Day (ModifiedJulianDay), UTCTime (..))
 import           Data.UUID            (UUID)
 import qualified Data.UUID            as UUID
@@ -33,11 +33,11 @@ fakeTime = UTCTime (ModifiedJulianDay 0) 0
 fakeUUIDs :: [UUID]
 fakeUUIDs = [UUID.fromWords 0 0 0 i | i <- [1..100]]
 
-mockOptions :: Action.Action -> FilePath -> Bool -> Opt.Options
-mockOptions act path useJson = Opt.Options
-  { Opt.action = act
-  , Opt.taskfile = path
-  , Opt.useJson = useJson
+mockOptions :: Actions.Action -> FilePath -> Bool -> Options.Options
+mockOptions act path useJson = Options.Options
+  { Options.action = act
+  , Options.taskfile = path
+  , Options.useJson = useJson
   }
 
 hunitTests :: TestTree
@@ -46,7 +46,7 @@ hunitTests = testGroup "Unit Tests"
       (path, h) <- openTempFile "." "cli-test-tasks"
       hClose h
 
-      result <- runTestApp path [] fakeTime (Runner.runAction (mockOptions Action.Summary path False))
+      result <- runTestApp path [] fakeTime (Runners.runAction (mockOptions Actions.Summary path False))
       let output = Output.text result
 
       removeFile path
@@ -66,33 +66,33 @@ goldenTests = testGroup "Golden Tests"
       "summary with tasks"
       "test/HTask/CLI/golden/summary_with_tasks.golden"
       (runSummaryWith False
-        [ Action.Add "task 1"
-        , Action.Add "task 2"
-        , Action.Add "task 3"
-        , Action.Start "task 2"
-        , Action.Complete "task 3"
+        [ Actions.Add "task 1"
+        , Actions.Add "task 2"
+        , Actions.Add "task 3"
+        , Actions.Start "task 2"
+        , Actions.Complete "task 3"
         ]
       )
   , goldenVsString
       "summary with tasks (json)"
       "test/HTask/CLI/golden/summary_with_tasks_json.golden"
       (runSummaryWith True
-        [ Action.Add "task 1"
-        , Action.Add "task 2"
-        , Action.Add "task 3"
-        , Action.Start "task 2"
-        , Action.Complete "task 3"
+        [ Actions.Add "task 1"
+        , Actions.Add "task 2"
+        , Actions.Add "task 3"
+        , Actions.Start "task 2"
+        , Actions.Complete "task 3"
         ]
       )
   ]
 
-runSummaryWith :: Bool -> [Action.Action] -> IO Lazy.ByteString
+runSummaryWith :: Bool -> [Actions.Action] -> IO Lazy.ByteString
 runSummaryWith useJson actions = do
   (path, h) <- openTempFile "." "cli-test-tasks-golden"
   hClose h
   result <- runTestApp path fakeUUIDs fakeTime $ do
-    mapM_ (Runner.runAction . \a -> mockOptions a path False) actions
-    Runner.runAction (mockOptions Action.Summary path useJson)
+    mapM_ (Runners.runAction . \a -> mockOptions a path False) actions
+    Runners.runAction (mockOptions Actions.Summary path useJson)
   removeFile path
   let output = Text.unlines (Output.text result)
-  pure $ Lazy.fromStrict $ Text.encodeUtf8 output
+  pure $ Lazy.fromStrict $ Encoding.encodeUtf8 output

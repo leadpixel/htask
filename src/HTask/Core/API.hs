@@ -19,8 +19,8 @@ import qualified Data.List           as List
 import qualified Data.Map            as Map
 import qualified Data.Maybe          as Maybe
 import qualified Data.Text           as Text
-import qualified HTask.Events        as V
-import qualified Text.Read           as Text
+import qualified HTask.Events        as Events
+import qualified Text.Read           as Read
 
 import           Control.Monad.State (MonadState)
 import           Data.Text           (Text)
@@ -42,7 +42,7 @@ data ModifyResult
   deriving (Eq, Show)
 
 
-type CanModifyTask m = (MonadTime m, V.HasEventSink m, MonadState TaskMap m)
+type CanModifyTask m = (MonadTime m, Events.HasEventSink m, MonadState TaskMap m)
 
 
 listTasks :: (MonadState TaskMap m) => m [Task]
@@ -53,7 +53,7 @@ findTask :: (MonadState TaskMap m) => Text -> m (Maybe Task)
 findTask tx = do
   tasks <- getTasks
   let sorted = List.sortBy taskDisplayOrder (Map.elems tasks)
-  pure $ case Text.readMaybe (Text.unpack tx) of
+  pure $ case Read.readMaybe (Text.unpack tx) of
     Just (n :: Int) | n > 0 -> Maybe.listToMaybe $ drop (n - 1) sorted
     _                       -> Foldable.find (uuidStartsWith tx) sorted
 
@@ -69,7 +69,7 @@ withMatch tx op
 
 
 addTask
-  :: (MonadTime m, MonadUUID m, MonadState TaskMap m, V.HasEventSink m)
+  :: (MonadTime m, MonadUUID m, MonadState TaskMap m, Events.HasEventSink m)
   => Text -> m AddResult
 addTask tx
   | Text.null (Text.strip tx) = pure EmptyDescription
@@ -78,11 +78,11 @@ addTask tx
       addResult <- addNewTask tk
 
       let intent = AddTask (taskUuid tk) tx
-      (ev :: TaskEvent) <- V.createEvent intent
+      (ev :: TaskEvent) <- Events.createEvent intent
 
       if addResult
         then do
-          V.writeEvent ev
+          Events.writeEvent ev
           pure $ AddSuccess (taskUuid tk)
 
         else
@@ -102,7 +102,7 @@ startTask tx =
             pure FailedToModify
 
           Just t -> do
-            V.createEvent (StartTask ref) >>= V.writeEvent
+            Events.createEvent (StartTask ref) >>= Events.writeEvent
             pure $ ModifySuccess t
 
       _ -> pure FailedToModify
@@ -121,7 +121,7 @@ stopTask tx =
             pure FailedToModify
 
           Just t -> do
-            V.createEvent (StopTask ref) >>= V.writeEvent
+            Events.createEvent (StopTask ref) >>= Events.writeEvent
             pure $ ModifySuccess t
 
       _ -> pure FailedToModify
@@ -140,7 +140,7 @@ completeTask tx =
             pure FailedToModify
 
           Just t -> do
-            V.createEvent (CompleteTask ref) >>= V.writeEvent
+            Events.createEvent (CompleteTask ref) >>= Events.writeEvent
             pure $ ModifySuccess t
 
       _ -> pure FailedToModify
@@ -161,5 +161,5 @@ removeTask tx =
             pure FailedToModify
 
           Just t -> do
-            V.createEvent (RemoveTask ref) >>= V.writeEvent
+            Events.createEvent (RemoveTask ref) >>= Events.writeEvent
             pure $ ModifySuccess t

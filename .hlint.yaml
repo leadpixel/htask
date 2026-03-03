@@ -22,8 +22,8 @@
   - {name: [Network.Wreq], as: Wreq}
   - {name: [System.IO], as: Sys}
   - {name: [Test.QuickCheck], as: QC}
-  - {name: [HTask.Core], as: H}
-  - {name: [Leadpixel.Events], as: V}
+  - {name: [HTask.Core], as: Core}
+  - {name: [HTask.Events], as: Events}
 #   - {name: Control.Arrow, within: []}#  Certain modules are banned entirely
 
 - functions:

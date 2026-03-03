@@ -3,7 +3,7 @@
 module HTask.Core.Complete (testComplete) where
 
 import qualified Data.List          as List
-import qualified HTask.Core         as H
+import qualified HTask.Core         as Core
 
 import           Control.Monad      (void)
 import           Data.Time          (Day (ModifiedJulianDay), UTCTime (..))
@@ -21,9 +21,9 @@ testComplete :: TestTree
 testComplete = testGroup "complete"
   [ testCase "responds with success" $ do
       output <- runTestApp fakeTime $ do
-        (H.AddSuccess taskId)  <- H.addTask "some task"
-        void $ H.startTask (H.taskUuidToText taskId)
-        H.completeTask (H.taskUuidToText taskId)
+        (Core.AddSuccess taskId)  <- Core.addTask "some task"
+        void $ Core.startTask (Core.taskUuidToText taskId)
+        Core.completeTask (Core.taskUuidToText taskId)
 
       let result = getResult output
       isSuccess result @? "expected success"
@@ -31,33 +31,33 @@ testComplete = testGroup "complete"
 
   , testCase "marks the task as complete" $ do
       output <- runTestApp fakeTime $ do
-        (H.AddSuccess taskId)  <- H.addTask "some task"
-        void $ H.startTask (H.taskUuidToText taskId)
-        void $ H.completeTask (H.taskUuidToText taskId)
-        tasks <- H.listTasks
+        (Core.AddSuccess taskId)  <- Core.addTask "some task"
+        void $ Core.startTask (Core.taskUuidToText taskId)
+        void $ Core.completeTask (Core.taskUuidToText taskId)
+        tasks <- Core.listTasks
         pure (taskId, tasks)
 
       let (taskId, tasks) = getResult output
-      Just H.Complete @=? (H.status <$> List.find (\x -> H.taskUuid x == taskId) tasks)
+      Just Core.Complete @=? (Core.status <$> List.find (\x -> Core.taskUuid x == taskId) tasks)
 
 
   , testCase "fails when unable to find a matching task" $ do
       output <- runTestApp fakeTime $ do
-        void $ H.addTask "some task"
-        H.completeTask "unknown"
+        void $ Core.addTask "some task"
+        Core.completeTask "unknown"
 
       let result = getResult output
-      H.FailedToFind @=? result
+      Core.FailedToFind @=? result
 
   , testCase "fails when task is pending" $ do
       output <- runTestApp fakeTime $ do
-        (H.AddSuccess taskId)  <- H.addTask "some task"
-        H.completeTask (H.taskUuidToText taskId)
+        (Core.AddSuccess taskId)  <- Core.addTask "some task"
+        Core.completeTask (Core.taskUuidToText taskId)
 
       let result = getResult output
-      H.FailedToModify @=? result
+      Core.FailedToModify @=? result
   ]
 
   where
-    isSuccess (H.ModifySuccess _) = True
-    isSuccess _                   = False
+    isSuccess (Core.ModifySuccess _) = True
+    isSuccess _                      = False

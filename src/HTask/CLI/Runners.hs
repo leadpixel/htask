@@ -6,7 +6,7 @@ module HTask.CLI.Runners (runAction) where
 import qualified Data.List                  as List
 import qualified Data.Map.Strict            as Map
 import qualified Data.Text                  as Text
-import qualified HTask.Core                 as H
+import qualified HTask.Core                 as Core
 
 import           Control.Monad.Random.Class (MonadRandom, getRandomR)
 import           Data.Foldable              (toList)
@@ -34,16 +34,16 @@ runAction opts =
     Summary        -> runSummary j
 
 
-inProgress :: H.Task -> Bool
-inProgress t = H.status t == H.InProgress
+inProgress :: Core.Task -> Bool
+inProgress t = Core.status t == Core.InProgress
 
 
-taskToText :: H.Task -> Text
-taskToText = H.taskUuidToText . H.taskUuid
+taskToText :: Core.Task -> Text
+taskToText = Core.taskUuidToText . Core.taskUuid
 
 
-hasStatus :: H.TaskStatus -> H.Task -> Bool
-hasStatus s t = s == H.status t
+hasStatus :: Core.TaskStatus -> Core.Task -> Bool
+hasStatus s t = s == Core.status t
 
 
 tInt :: Int -> Text
@@ -51,22 +51,22 @@ tInt = Text.pack . show
 
 
 -- | Helper to format a task entry with metadata on one line and description indented under it
-formatTaskEntry :: Bool -> Map.Map H.TaskUuid Text -> [H.Task] -> H.Task -> [Text]
+formatTaskEntry :: Bool -> Map.Map Core.TaskUuid Text -> [Core.Task] -> Core.Task -> [Text]
 formatTaskEntry _ _ allTs t =
   [ headerLine
   ] <> descriptionLines
 
   where
-    idx = maybe "??" (padZero 2 . tInt . (+1)) (List.findIndex (\x -> H.taskUuid x == H.taskUuid t) allTs)
-    symbol = statusSymbol (H.status t)
+    idx = maybe "??" (padZero 2 . tInt . (+1)) (List.findIndex (\x -> Core.taskUuid x == Core.taskUuid t) allTs)
+    symbol = statusSymbol (Core.status t)
 
-    uuidText = H.taskUuidToText (H.taskUuid t)
+    uuidText = Core.taskUuidToText (Core.taskUuid t)
 
     -- Header: " 01 ▶ 9bb2"
-    headerLine = "  " <> withStatusColor (H.status t) (idx <> " " <> symbol) <> " " <> withDim uuidText
+    headerLine = "  " <> withStatusColor (Core.status t) (idx <> " " <> symbol) <> " " <> withDim uuidText
 
     -- Description: "      ╰─ bash autocompletion"
-    descriptionLines = case Text.lines (H.description t) of
+    descriptionLines = case Text.lines (Core.description t) of
       [] -> []
       (f:fs) -> ("       " <> treeLink <> withBold f)
               : fmap (\l -> "          " <> withBold l) fs
@@ -74,38 +74,38 @@ formatTaskEntry _ _ allTs t =
 
 runAdd :: (CanRunAction m) => Bool -> Text -> m RunResult
 runAdd j t
-  = formatOutcome <$> H.addTask t
+  = formatOutcome <$> Core.addTask t
 
   where
-    formatOutcome (H.AddSuccess ref)
+    formatOutcome (Core.AddSuccess ref)
       | j = resultJson ref
       | otherwise = resultSuccess
-          [ withStatusColor H.Pending "added task: " <> withBold t
-          , withDim ("      ref: " <> H.taskUuidToText ref)
+          [ withStatusColor Core.Pending "added task: " <> withBold t
+          , withDim ("      ref: " <> Core.taskUuidToText ref)
           ]
 
-    formatOutcome H.FailedToAdd
+    formatOutcome Core.FailedToAdd
       = resultError "failed to add"
 
-    formatOutcome H.EmptyDescription
+    formatOutcome Core.EmptyDescription
       = resultError "task description cannot be empty"
 
 
 runComplete :: (CanRunAction m) => Bool -> Text -> m RunResult
 runComplete j t
-  = formatOutcome <$> H.completeTask t
+  = formatOutcome <$> Core.completeTask t
 
   where
     formatOutcome x
       = case x of
-          H.ModifySuccess task
+          Core.ModifySuccess task
             | j -> resultJson task
-            | otherwise -> resultSuccess [withStatusColor H.Complete "completing task: " <> withBold (H.description task)]
+            | otherwise -> resultSuccess [withStatusColor Core.Complete "completing task: " <> withBold (Core.description task)]
 
-          H.FailedToFind ->
+          Core.FailedToFind ->
             resultError "unable to find matching task"
 
-          H.FailedToModify ->
+          Core.FailedToModify ->
             resultError "unable to modify matching task"
 
 
@@ -115,24 +115,24 @@ runDone j
 
   where
     doneTask
-      = H.listTasks >>= mapM (H.completeTask . taskToText) . List.filter inProgress
+      = Core.listTasks >>= mapM (Core.completeTask . taskToText) . List.filter inProgress
 
     formatOutcome xs
       | j = resultJson (toList (fmap getTask xs))
       | otherwise = resultSuccess . toList . fmap formatRow $ xs
 
-    getTask (H.ModifySuccess t) = Just t
-    getTask _                   = Nothing
+    getTask (Core.ModifySuccess t) = Just t
+    getTask _                      = Nothing
 
     formatRow x
       = case x of
-          H.ModifySuccess task ->
-            withStatusColor H.Complete "completing task: " <> withBold (H.description task)
+          Core.ModifySuccess task ->
+            withStatusColor Core.Complete "completing task: " <> withBold (Core.description task)
 
-          H.FailedToFind ->
+          Core.FailedToFind ->
             "unable to find matching task"
 
-          H.FailedToModify ->
+          Core.FailedToModify ->
             "unable to modify matching task"
 
 
@@ -142,32 +142,32 @@ runDrop j
 
   where
     dropTask
-      = H.listTasks >>= mapM (H.stopTask . taskToText) . List.filter inProgress
+      = Core.listTasks >>= mapM (Core.stopTask . taskToText) . List.filter inProgress
 
     formatOutcome xs
       | j = resultJson (toList (fmap getTask xs))
       | otherwise = resultSuccess . toList . fmap formatRow $ xs
 
-    getTask (H.ModifySuccess t) = Just t
-    getTask _                   = Nothing
+    getTask (Core.ModifySuccess t) = Just t
+    getTask _                      = Nothing
 
     formatRow x
       = case x of
-          H.ModifySuccess task ->
-            withStatusColor H.Pending "stopping task: " <> withBold (H.description task)
+          Core.ModifySuccess task ->
+            withStatusColor Core.Pending "stopping task: " <> withBold (Core.description task)
 
-          H.FailedToFind ->
+          Core.FailedToFind ->
             "unable to find matching task"
 
-          H.FailedToModify ->
+          Core.FailedToModify ->
             "unable to modify matching task"
 
 
 runList :: (CanRunAction m) => Bool -> ShowUUID -> ShowAll -> m RunResult
 runList j showUUID showAll = do
-  allTasks <- List.sortBy H.taskDisplayOrder <$> H.listTasks
+  allTasks <- List.sortBy Core.taskDisplayOrder <$> Core.listTasks
   let filteredTasks = selectTasks allTasks
-  let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> allTasks)
+  let prefixes = Core.disambiguatingPrefixes (Core.taskUuid <$> allTasks)
 
   if j
     then pure $ resultJson filteredTasks
@@ -175,35 +175,35 @@ runList j showUUID showAll = do
 
   where
     selectTasks
-      = if untag showAll then id else List.filter (justActive . H.status)
+      = if untag showAll then id else List.filter (justActive . Core.status)
 
-    justActive H.Pending    = True
-    justActive H.InProgress = True
-    justActive _            = False
+    justActive Core.Pending    = True
+    justActive Core.InProgress = True
+    justActive _               = False
 
-    formatList :: [H.Task] -> [H.Task] -> Map.Map H.TaskUuid Text -> RunResult
+    formatList :: [Core.Task] -> [Core.Task] -> Map.Map Core.TaskUuid Text -> RunResult
     formatList allTs ts prefs = resultSuccess $
-      concatMap (formatGroup allTs ts prefs) [H.InProgress, H.Pending, H.Complete, H.Abandoned]
+      concatMap (formatGroup allTs ts prefs) [Core.InProgress, Core.Pending, Core.Complete, Core.Abandoned]
 
-    formatGroup :: [H.Task] -> [H.Task] -> Map.Map H.TaskUuid Text -> H.TaskStatus -> [Text]
+    formatGroup :: [Core.Task] -> [Core.Task] -> Map.Map Core.TaskUuid Text -> Core.TaskStatus -> [Text]
     formatGroup allTs ts prefs s =
       case List.filter (hasStatus s) ts of
         [] -> []
         gs -> ("\n" <> divider (statusHeader s)) : concatMap (nicePrint prefs allTs) gs
 
-    statusHeader H.InProgress = "IN PROGRESS"
-    statusHeader H.Pending    = "PENDING"
-    statusHeader H.Complete   = "COMPLETED"
-    statusHeader H.Abandoned  = "ABANDONED"
+    statusHeader Core.InProgress = "IN PROGRESS"
+    statusHeader Core.Pending    = "PENDING"
+    statusHeader Core.Complete   = "COMPLETED"
+    statusHeader Core.Abandoned  = "ABANDONED"
 
-    nicePrint :: Map.Map H.TaskUuid Text -> [H.Task] -> H.Task -> [Text]
+    nicePrint :: Map.Map Core.TaskUuid Text -> [Core.Task] -> Core.Task -> [Text]
     nicePrint = formatTaskEntry (untag showUUID)
 
 
 runPick :: (CanRunAction m) => Bool -> m RunResult
 runPick j = do
-  tasks <- H.listTasks
-  let pendings = List.filter (hasStatus H.Pending) tasks
+  tasks <- Core.listTasks
+  let pendings = List.filter (hasStatus Core.Pending) tasks
   k <- randomSelectOne pendings
   maybe
     (pure $ resultError "no task to pick")
@@ -213,10 +213,10 @@ runPick j = do
   where
     formatOutcome t
       | j = resultJson t
-      | otherwise = resultSuccess [withStatusColor H.InProgress "picking task: " <> withBold (H.description t)]
+      | otherwise = resultSuccess [withStatusColor Core.InProgress "picking task: " <> withBold (Core.description t)]
 
     startTask t = do
-      _ <- H.startTask $ taskToText t
+      _ <- Core.startTask $ taskToText t
       pure t
 
     randomSelectOne :: (MonadRandom m) => [a] -> m (Maybe a)
@@ -234,55 +234,55 @@ runPick j = do
 
 runRemove :: (CanRunAction m) => Bool -> Text -> m RunResult
 runRemove j t
-  = formatOutcome <$> H.removeTask t
+  = formatOutcome <$> Core.removeTask t
 
   where
     formatOutcome x
       = case x of
-          H.ModifySuccess task
+          Core.ModifySuccess task
             | j -> resultJson task
-            | otherwise -> resultSuccess [withStatusColor H.Abandoned "removing task: " <> withBold (H.description task)]
+            | otherwise -> resultSuccess [withStatusColor Core.Abandoned "removing task: " <> withBold (Core.description task)]
 
-          H.FailedToFind ->
+          Core.FailedToFind ->
             resultError "unable to find matching task"
 
-          H.FailedToModify ->
+          Core.FailedToModify ->
             resultError "unable to modify matching task"
 
 
 runStart :: (CanRunAction m) => Bool -> Text -> m RunResult
 runStart j t
-  = formatOutcome <$> H.startTask t
+  = formatOutcome <$> Core.startTask t
 
   where
     formatOutcome x
       = case x of
-          H.ModifySuccess task
+          Core.ModifySuccess task
             | j -> resultJson task
-            | otherwise -> resultSuccess [withStatusColor H.InProgress "starting task: " <> withBold (H.description task)]
+            | otherwise -> resultSuccess [withStatusColor Core.InProgress "starting task: " <> withBold (Core.description task)]
 
-          H.FailedToFind ->
+          Core.FailedToFind ->
             resultError "unable to find matching task"
 
-          H.FailedToModify ->
+          Core.FailedToModify ->
             resultError "unable to modify matching task"
 
 
 runStop :: (CanRunAction m) => Bool -> Text -> m RunResult
 runStop j t
-  = formatOutcome <$> H.stopTask t
+  = formatOutcome <$> Core.stopTask t
 
   where
     formatOutcome x
       = case x of
-          H.ModifySuccess task
+          Core.ModifySuccess task
             | j -> resultJson task
-            | otherwise -> resultSuccess [withStatusColor H.Pending "stopping task: " <> withBold (H.description task)]
+            | otherwise -> resultSuccess [withStatusColor Core.Pending "stopping task: " <> withBold (Core.description task)]
 
-          H.FailedToFind ->
+          Core.FailedToFind ->
             resultError "unable to find matching task"
 
-          H.FailedToModify ->
+          Core.FailedToModify ->
             resultError "unable to modify matching task"
 
 
@@ -290,13 +290,13 @@ runStop j t
 
 runSummary :: (CanRunAction m) => Bool -> m RunResult
 runSummary j = do
-  tasks <- H.listTasks
-  let allSorted = List.sortBy H.taskDisplayOrder tasks
-  let actives = List.filter (hasStatus H.InProgress) allSorted
-  let pendings = List.filter (hasStatus H.Pending) allSorted
+  tasks <- Core.listTasks
+  let allSorted = List.sortBy Core.taskDisplayOrder tasks
+  let actives = List.filter (hasStatus Core.InProgress) allSorted
+  let pendings = List.filter (hasStatus Core.Pending) allSorted
   let topPendings = List.take 5 pendings
 
-  let prefixes = H.disambiguatingPrefixes (H.taskUuid <$> allSorted)
+  let prefixes = Core.disambiguatingPrefixes (Core.taskUuid <$> allSorted)
 
   if j
     then pure $ resultJson (actives <> topPendings)
@@ -317,7 +317,7 @@ runSummary j = do
 
         displayTopPending :: [Text]
         displayTopPending =
-          let totalPendings = List.length (List.filter (hasStatus H.Pending) allTasks)
+          let totalPendings = List.length (List.filter (hasStatus Core.Pending) allTasks)
           in ("\n" <> divider (pendingMessage (length topPendings) totalPendings))
              : concatMap (formatTaskEntry False prefixes allTasks) topPendings
 

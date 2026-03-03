@@ -3,7 +3,7 @@
 
 module HTask.Core.List (testList) where
 
-import qualified HTask.Core         as H
+import qualified HTask.Core         as Core
 
 import           Data.Time          (Day (ModifiedJulianDay), UTCTime (..))
 
@@ -19,15 +19,15 @@ fakeTime = UTCTime (ModifiedJulianDay 0) 0
 testList :: TestTree
 testList = testGroup "list"
   [ testCase "returns empty when there are no tasks" $ do
-      output <- runTestApp fakeTime H.listTasks
+      output <- runTestApp fakeTime Core.listTasks
       let tasks = getResult output
       0 @=? length tasks
 
 
   , testCase "returns one task when created" $ do
       output <- runTestApp fakeTime $ do
-        _ <- H.addTask "some task"
-        H.listTasks
+        _ <- Core.addTask "some task"
+        Core.listTasks
 
       let tasks = getResult output
       1 @=? length tasks
@@ -35,21 +35,21 @@ testList = testGroup "list"
 
   , testCase "returns many tasks" $ do
       output <- runTestApp fakeTime $ do
-        _ <- H.addTask "task 1"
-        _ <- H.addTask "task 2"
-        _ <- H.addTask "task 3"
-        H.listTasks
+        _ <- Core.addTask "task 1"
+        _ <- Core.addTask "task 2"
+        _ <- Core.addTask "task 3"
+        Core.listTasks
 
       let tasks = getResult output
       3 @=? length tasks
 
   , testCase "finds a task by numeric id" $ do
       output <- runTestApp fakeTime $ do
-        _ <- H.addTask "task 1"
-        _ <- H.addTask "task 2"
-        _ <- H.addTask "task 3"
-        H.findTask "2"
+        _ <- Core.addTask "task 1"
+        _ <- Core.addTask "task 2"
+        _ <- Core.addTask "task 3"
+        Core.findTask "2"
 
       let result = getResult output
-      Just "task 2" @=? (H.description <$> result)
+      Just "task 2" @=? (Core.description <$> result)
   ]
