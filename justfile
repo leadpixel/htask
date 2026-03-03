@@ -1,40 +1,14 @@
-[private]
 default:
     @just --list
 
-# Build all packages
-build:
-    cabal build all
-
-# Run all tests
+# run tests
 test:
-    cabal test all
+    go test ./...
 
-# Run the CLI app with arbitrary arguments
-run *args:
-    @cabal run htask -- {{args}}
+# build htask
+build:
+    go build -o htask ./cmd/htask
 
-# Pin dependencies
-freeze:
-    cabal freeze
-
-# Install the CLI app to ~/.cabal/bin
+# install htask
 install:
-    cabal install htask-cli --overwrite-policy=always
-
-# Start a REPL for a specific package (default: htask-core)
-repl package="htask-core":
-    cabal repl {{package}}
-
-# Run hlint on all source files
-lint:
-    hlint packages/
-
-# Format all source files using stylish-haskell
-format:
-    find packages/ -name "*.hs" -exec stylish-haskell -i {} +
-
-# Clean build artifacts
-clean:
-    cabal clean
-    rm -rf dist-newstyle
+    go install ./cmd/htask
