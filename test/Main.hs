@@ -6,6 +6,7 @@ import qualified HTask.Core.Complete     as CoreComplete
 import qualified HTask.Core.List         as CoreList
 import qualified HTask.Core.Remove       as CoreRemove
 import qualified HTask.Core.Start        as CoreStart
+import qualified HTask.Core.StateSpec    as CoreState
 import qualified HTask.Core.Stop         as CoreStop
 import qualified HTask.EffectsSpec       as Effects
 import qualified HTask.Events.CoreSpec   as EventsCore
@@ -31,6 +32,7 @@ tests = testGroup "HTask"
       , CoreList.testList
       , CoreRemove.testRemove
       , CoreStart.testStart
+      , CoreState.tests
       , CoreStop.testStop
       ]
   , CLI.tests

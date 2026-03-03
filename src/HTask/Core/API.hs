@@ -47,7 +47,7 @@ listTasks = Map.elems <$> getTasks
 findTask :: (MonadState TaskMap m) => Text -> m (Maybe Task)
 findTask tx = do
   tasks <- getTasks
-  let sorted = List.sortBy taskDisplayOrder (Map.elems tasks)
+  let sorted = List.sortBy taskPriority (Map.elems tasks)
   pure $ case Read.readMaybe (Text.unpack tx) of
     Just (n :: Int) | n > 0 -> Maybe.listToMaybe $ drop (n - 1) sorted
     _                       -> Foldable.find (uuidStartsWith tx) sorted
