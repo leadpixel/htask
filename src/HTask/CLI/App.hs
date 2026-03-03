@@ -23,6 +23,9 @@ import           Data.Time                  (UTCTime)
 import           Data.UUID                  (UUID)
 import           HTask.Events
 import           HTask.Provider
+import           System.Directory           (doesFileExist)
+import           System.Exit                (exitFailure)
+import           System.IO                  (hFlush, hPutStrLn, stderr, stdout)
 
 
 newtype App m a
@@ -69,8 +72,25 @@ instance (MonadRandom m) => MonadRandom (App m) where
 
 runApp :: (MonadUnliftIO m) => FilePath -> App m a -> m a
 runApp file app = do
+  liftIO $ ensureFileExists file
   runFileBackend file $ do
     evs <- V.readEvents
     let (initialMap, _) = H.foldEventLog evs
     ref <- liftIO $ newIORef initialMap
     runReaderT (unApp app) ref
+
+  where
+    ensureFileExists :: FilePath -> IO ()
+    ensureFileExists path = do
+      exists <- doesFileExist path
+      if exists
+        then pure ()
+        else do
+          putStr $ "Task file '" <> path <> "' not found. Create it? [y/N] "
+          hFlush stdout
+          response <- getLine
+          if response `elem` ["y", "Y", "yes", "YES"]
+            then writeFile path ""
+            else do
+              hPutStrLn stderr "Aborted."
+              exitFailure
