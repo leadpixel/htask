@@ -52,7 +52,7 @@ tInt = Text.pack . show
 
 -- | Helper to format a task entry with metadata on one line and description indented under it
 formatTaskEntry :: Bool -> Map.Map H.TaskUuid Text -> [H.Task] -> H.Task -> [Text]
-formatTaskEntry showFullUuid prefs allTs t =
+formatTaskEntry _ _ allTs t =
   [ headerLine
   ] <> descriptionLines
 
@@ -60,10 +60,7 @@ formatTaskEntry showFullUuid prefs allTs t =
     idx = maybe "??" (padZero 2 . tInt . (+1)) (List.findIndex (\x -> H.taskUuid x == H.taskUuid t) allTs)
     symbol = statusSymbol (H.status t)
 
-    -- We always show short UUID, showFullUuid toggles the full text
-    uuidText = if showFullUuid
-               then H.taskUuidToText (H.taskUuid t)
-               else Map.findWithDefault (H.taskUuidToText (H.taskUuid t)) (H.taskUuid t) prefs
+    uuidText = H.taskUuidToText (H.taskUuid t)
 
     -- Header: " 01 ▶ 9bb2"
     headerLine = "  " <> withStatusColor (H.status t) (idx <> " " <> symbol) <> " " <> withDim uuidText

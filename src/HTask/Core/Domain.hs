@@ -87,11 +87,14 @@ disambiguatingPrefixes uuids =
     texts = fmap taskUuidToText uuids
     findPrefix u =
       let t = taskUuidToText u
-      in head [ Text.take n t
-              | n <- [4..36]
-              , let p = Text.take n t
-              , length (filter (Text.isPrefixOf p) texts) == 1
-              ]
+          prefixes = [ Text.take n t
+                     | n <- [4..36]
+                     , let p = Text.take n t
+                     , length (filter (Text.isPrefixOf p) texts) == 1
+                     ]
+      in case prefixes of
+           (p:_) -> p
+           []    -> t
 
 taskPriority :: Task -> Task -> Ordering
 taskPriority = compare `on` createdAt

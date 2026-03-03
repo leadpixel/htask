@@ -25,7 +25,8 @@ import           HTask.Events
 import           HTask.Provider
 import           System.Directory           (doesFileExist)
 import           System.Exit                (exitFailure)
-import           System.IO                  (hFlush, hPutStrLn, stderr, stdout)
+import           System.IO                  (hFlush, hIsTerminalDevice,
+                                             hPutStrLn, stderr, stdout)
 
 
 newtype App m a
@@ -86,11 +87,17 @@ runApp file app = do
       if exists
         then pure ()
         else do
-          putStr $ "Task file '" <> path <> "' not found. Create it? [y/N] "
-          hFlush stdout
-          response <- getLine
-          if response `elem` ["y", "Y", "yes", "YES"]
-            then writeFile path ""
+          isTerm <- hIsTerminalDevice stdout
+          if isTerm
+            then do
+              putStr $ "Task file '" <> path <> "' not found. Create it? [y/N] "
+              hFlush stdout
+              response <- getLine
+              if response `elem` ["y", "Y", "yes", "YES"]
+                then writeFile path ""
+                else do
+                  hPutStrLn stderr "Aborted."
+                  exitFailure
             else do
-              hPutStrLn stderr "Aborted."
+              hPutStrLn stderr $ "Task file '" <> path <> "' not found."
               exitFailure

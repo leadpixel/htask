@@ -56,8 +56,8 @@ findTask tx = do
   tasks <- getTasks
   let sorted = List.sortBy taskDisplayOrder (Map.elems tasks)
   pure $ case Text.readMaybe (Text.unpack tx) of
-    Just (n :: Int) -> Maybe.listToMaybe $ drop (n - 1) sorted
-    Nothing         -> Foldable.find (uuidStartsWith tx) sorted
+    Just (n :: Int) | n > 0 -> Maybe.listToMaybe $ drop (n - 1) sorted
+    _                       -> Foldable.find (uuidStartsWith tx) sorted
 
   where
     uuidStartsWith :: Text -> Task -> Bool
