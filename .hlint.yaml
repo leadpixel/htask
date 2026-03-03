@@ -22,8 +22,15 @@
   - {name: [Network.Wreq], as: Wreq}
   - {name: [System.IO], as: Sys}
   - {name: [Test.QuickCheck], as: QC}
-  - {name: [HTask.Core], as: H}
-  - {name: [Leadpixel.Events], as: V}
+  - {name: [HTask.Core], as: Core}
+  - {name: [HTask.Events], as: Events}
+  - {name: [HTask.CLI.Actions], as: Actions}
+  - {name: [HTask.CLI.Options], as: Options}
+  - {name: [HTask.CLI.Output], as: Output}
+  - {name: [HTask.CLI.Runners], as: Runners}
+  - {name: [Data.Aeson.Encode.Pretty], as: AesonPretty}
+  - {name: [Data.Text.Encoding], as: Encoding}
+  - {name: [Text.Read], as: Read}
 #   - {name: Control.Arrow, within: []}#  Certain modules are banned entirely
 
 - functions:
@@ -45,6 +52,7 @@
 - warn: {name: "move pure", lhs: "case a of ; Nothing -> pure y ; Just v -> pure x", rhs: "pure $ case a of ; Just v -> x ; Nothing -> y"}
 - warn: {name: "move pure", lhs: "case a of ; Left e -> pure x ; Right v -> pure y", rhs: "pure $ case a of ; Left e -> x ; Right v -> y"}
 - warn: {name: "move pure", lhs: "maybe (pure f) (pure . g) x", rhs: "pure $ maybe f g x"}
+- warn: {name: "move pure", lhs: "if a then pure b else pure c", rhs: "pure $ if a then b else c"}
 - warn: {name: "assert blank", lhs: "assertEqual \"\" x y", rhs: "x @=? y"}
 - warn: {name: "assert bool", lhs: "assertBool s x", rhs: "x @? s"}
 - warn: {name: "remove brackets", lhs: "(f . g) . h", rhs: "f . g . h"}
