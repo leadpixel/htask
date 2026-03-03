@@ -160,9 +160,9 @@ runList j showUUID showAll = do
   let displayTasks = List.sortBy Core.taskDisplayOrder (selectTasks allTasks)
   let prefixes = Core.disambiguatingPrefixes (Core.taskUuid <$> allTasks)
 
-  if j
-    then pure $ resultJson displayTasks
-    else pure $ formatList idReference displayTasks prefixes
+  pure $ if j
+    then resultJson displayTasks
+    else formatList idReference displayTasks prefixes
 
   where
     selectTasks
@@ -283,9 +283,9 @@ runSummary j = do
 
   let prefixes = Core.disambiguatingPrefixes (Core.taskUuid <$> allSorted)
 
-  if j
-    then pure $ resultJson (actives <> topPendings)
-    else pure $ renderSummary idReference allSorted actives topPendings prefixes
+  pure $ if j
+    then resultJson (actives <> topPendings)
+    else renderSummary idReference allSorted actives topPendings prefixes
 
   where
     renderSummary idRef allTasks actives topPendings prefixes = resultSuccess

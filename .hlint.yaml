@@ -52,6 +52,7 @@
 - warn: {name: "move pure", lhs: "case a of ; Nothing -> pure y ; Just v -> pure x", rhs: "pure $ case a of ; Just v -> x ; Nothing -> y"}
 - warn: {name: "move pure", lhs: "case a of ; Left e -> pure x ; Right v -> pure y", rhs: "pure $ case a of ; Left e -> x ; Right v -> y"}
 - warn: {name: "move pure", lhs: "maybe (pure f) (pure . g) x", rhs: "pure $ maybe f g x"}
+- warn: {name: "move pure", lhs: "if a then pure b else pure c", rhs: "pure $ if a then b else c"}
 - warn: {name: "assert blank", lhs: "assertEqual \"\" x y", rhs: "x @=? y"}
 - warn: {name: "assert bool", lhs: "assertBool s x", rhs: "x @? s"}
 - warn: {name: "remove brackets", lhs: "(f . g) . h", rhs: "f . g . h"}
