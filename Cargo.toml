@@ -1,0 +1,23 @@
+[package]
+name = "htask"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.102"
+chrono = { version = "0.4.44", features = ["serde"] }
+clap = { version = "4.5.60", features = ["derive"] }
+colored = "3.1.1"
+dirs = "6.0.0"
+itertools = "0.14.0"
+rand = "0.10.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+tabled = "0.20.0"
+uuid = { version = "1.21.0", features = ["v4", "serde"] }
+
+[dev-dependencies]
+tempfile = "3.10"
+assert_cmd = "2.0"
+predicates = "3.1"
+
