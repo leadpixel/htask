@@ -16,7 +16,7 @@ And I want to keep a history of task changes to understand how I and collaborato
 
 ## Setup
 
-- install [GHC/Cabal](https://www.haskell.org/ghcup/)
+- install [Rust](https://www.rust-lang.org/tools/install)
 - install [just](https://github.com/casey/just)
 - checkout the repo and verify:
 ```sh
@@ -30,7 +30,7 @@ $ just test
 $ just install
 ```
 
-Ensure `~/.cabal/bin` (or your OS equivalent) is on your `$PATH`.
+Ensure `~/.cargo/bin` (or your OS equivalent) is on your `$PATH`.
 
 - first run:
 ```sh
