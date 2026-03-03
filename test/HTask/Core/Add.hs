@@ -4,7 +4,7 @@
 module HTask.Core.Add (testAdd) where
 
 import           Data.Functor       (($>))
-import qualified HTask.Core         as H
+import qualified HTask.Core         as Core
 
 import           Data.Time          (Day (ModifiedJulianDay), UTCTime (..))
 
@@ -20,27 +20,27 @@ fakeTime = UTCTime (ModifiedJulianDay 0) 0
 testAdd :: TestTree
 testAdd = testGroup "add"
   [ testCase "returns the created uuid on success" $ do
-      output <- runTestApp fakeTime $ H.addTask "some task"
+      output <- runTestApp fakeTime $ Core.addTask "some task"
       let result = getResult output
       isSuccess result @? "expected success"
 
 
   , testCase "tasks start out pending" $ do
       output <- runTestApp fakeTime $ do
-        (H.AddSuccess taskId) <- H.addTask "some task"
-        tasks <- H.listTasks
+        (Core.AddSuccess taskId) <- Core.addTask "some task"
+        tasks <- Core.listTasks
         pure (taskId, tasks)
 
       let (taskId, tasks) = getResult output
       let tsk = head tasks
-      taskId @=? H.taskUuid tsk
-      H.Pending @=? H.status tsk
+      taskId @=? Core.taskUuid tsk
+      Core.Pending @=? Core.status tsk
 
 
   , testCase "creates a unique id for each task" $ do
       output <- runTestApp fakeTime $ do
-        (H.AddSuccess id1) <- H.addTask "task 1"
-        (H.AddSuccess id2) <- H.addTask "task 2"
+        (Core.AddSuccess id1) <- Core.addTask "task 1"
+        (Core.AddSuccess id2) <- Core.addTask "task 2"
         pure (id1, id2)
 
       let (id1, id2) = getResult output
@@ -49,9 +49,9 @@ testAdd = testGroup "add"
 
   , testCase "ignores duplicates" $ do
       output <- runTestApp fakeTime $ do
-        (H.AddSuccess taskId) <- H.addTask "some task"
-        void $ H.addTask "some task"
-        tasks <- H.listTasks
+        (Core.AddSuccess taskId) <- Core.addTask "some task"
+        void $ Core.addTask "some task"
+        tasks <- Core.listTasks
         pure (taskId, tasks)
 
       let (_taskId, tasks) = getResult output
@@ -59,17 +59,17 @@ testAdd = testGroup "add"
 
 
   , testCase "disallows empty description" $ do
-      output <- runTestApp fakeTime $ H.addTask ""
+      output <- runTestApp fakeTime $ Core.addTask ""
       let result = getResult output
       isEmptyDescription result @? "expected EmptyDescription"
   ]
 
   where
-    isSuccess (H.AddSuccess _) = True
-    isSuccess _                = False
+    isSuccess (Core.AddSuccess _) = True
+    isSuccess _                   = False
 
-    isEmptyDescription H.EmptyDescription = True
-    isEmptyDescription _                  = False
+    isEmptyDescription Core.EmptyDescription = True
+    isEmptyDescription _                     = False
 
     void :: (Monad m) => m a -> m ()
     void op = op $> ()

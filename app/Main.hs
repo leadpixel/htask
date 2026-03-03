@@ -1,15 +1,15 @@
 module Main (main) where
 
-import qualified HTask.CLI.Options as Opt
-import qualified HTask.CLI.Output  as Render
-import qualified HTask.CLI.Runners as Runner
+import qualified HTask.CLI.Options as Options
+import qualified HTask.CLI.Output  as Output
+import qualified HTask.CLI.Runners as Runners
 
 import           HTask.CLI.App
 
 
 main :: IO ()
 main = do
-  options <- Opt.getOptions
-  let file = Opt.taskfile options
+  options <- Options.getOptions
+  let file = Options.taskfile options
 
-  runApp file (Runner.runAction options) >>= Render.renderResult
+  runApp file (Runners.runAction options) >>= Output.renderResult

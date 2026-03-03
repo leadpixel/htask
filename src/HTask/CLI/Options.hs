@@ -12,8 +12,8 @@ import           Data.Tagged         (Tagged (..))
 import qualified Data.Text           as Text
 import           Data.Version        (showVersion)
 import           HTask.CLI.Actions   (Action (..))
-import qualified HTask.Core          as H
-import qualified HTask.Events        as V
+import qualified HTask.Core          as Core
+import qualified HTask.Events        as Events
 import           Options.Applicative
 import           Paths_htask         (version)
 import           System.Directory    (doesFileExist, getCurrentDirectory,
@@ -109,10 +109,10 @@ taskCompleter = listIOCompleter $ do
   if not exists
     then pure []
     else do
-      evs <- V.runFileBackend path V.readEvents :: IO [V.Event H.TaskIntent]
-      let (tasks, _) = H.foldEventLog evs
-      let sorted = List.sortBy H.taskDisplayOrder (Map.elems tasks)
-      let prefixes = H.disambiguatingPrefixes (Map.keys tasks)
+      evs <- Events.runFileBackend path Events.readEvents :: IO [Events.Event Core.TaskIntent]
+      let (tasks, _) = Core.foldEventLog evs
+      let sorted = List.sortBy Core.taskDisplayOrder (Map.elems tasks)
+      let prefixes = Core.disambiguatingPrefixes (Map.keys tasks)
 
       let sortedIndices = fmap (show . fst) (zip ([1..] :: [Int]) sorted)
       let uuids = fmap Text.unpack (Map.elems prefixes)

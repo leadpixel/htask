@@ -6,8 +6,8 @@ module HTask.CLI.TestApp
   , runTestApp
   ) where
 
-import qualified HTask.Core                 as H
-import qualified HTask.Events               as V
+import qualified HTask.Core                 as Core
+import qualified HTask.Events               as Events
 
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Monad.IO.Unlift    (MonadUnliftIO)
@@ -27,14 +27,14 @@ data TestEnv
   = TestEnv
     { mockUUIDs :: IORef [UUID]
     , mockTime  :: UTCTime
-    , taskMap   :: IORef H.TaskMap
+    , taskMap   :: IORef Core.TaskMap
     }
 
 newtype TestApp a
   = TestApp { unTestApp :: ReaderT TestEnv IO a }
   deriving (Applicative, Functor, Monad, MonadIO, MonadUnliftIO)
 
-instance MonadState H.TaskMap TestApp where
+instance MonadState Core.TaskMap TestApp where
   get = TestApp $ do
     env <- ask
     liftIO $ readIORef (taskMap env)
@@ -42,10 +42,10 @@ instance MonadState H.TaskMap TestApp where
     env <- ask
     liftIO $ writeIORef (taskMap env) m
 
-instance V.HasEventSource TestApp where
+instance Events.HasEventSource TestApp where
   readEvents = pure []
 
-instance V.HasEventSink TestApp where
+instance Events.HasEventSink TestApp where
   writeEvent _ = pure ()
 
 instance MonadTime TestApp where
@@ -70,7 +70,7 @@ runTestApp :: FilePath -> [UUID] -> UTCTime -> TestApp a -> IO a
 runTestApp file uuids time app = do
   uRef <- newIORef uuids
   -- We still use runFileBackend to get the initial events
-  evs <- runFileBackend file V.readEvents
-  mRef <- newIORef (fst (H.foldEventLog evs))
+  evs <- runFileBackend file Events.readEvents
+  mRef <- newIORef (fst (Core.foldEventLog evs))
   let env = TestEnv uRef time mRef
   runReaderT (unTestApp app) env

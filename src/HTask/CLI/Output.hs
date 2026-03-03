@@ -20,10 +20,10 @@ module HTask.CLI.Output
   ) where
 
 import qualified Data.Aeson                 as Aeson
-import qualified Data.Aeson.Encode.Pretty   as Aeson
+import qualified Data.Aeson.Encode.Pretty   as AesonPretty
 import qualified Data.ByteString.Lazy.Char8 as LBS
 import qualified Data.Text                  as Text
-import qualified HTask.Core                 as H
+import qualified HTask.Core                 as Core
 
 import           Data.IORef
 import           Data.Text                  (Text)
@@ -50,7 +50,7 @@ resultError t = Error [t]
 text :: RunResult -> [Text]
 text (Success ts) = formatSuccess ts
 text (Error ts)   = formatError ts
-text (Json v)     = [Text.pack $ LBS.unpack $ Aeson.encodePretty v]
+text (Json v)     = [Text.pack $ LBS.unpack $ AesonPretty.encodePretty v]
 
 
 -- | Global coloring state
@@ -97,17 +97,17 @@ withBold t
 withDim :: Text -> Text
 withDim = Text.pack . withColor Gray . Text.unpack
 
-withStatusColor :: H.TaskStatus -> Text -> Text
-withStatusColor H.InProgress = Text.pack . withColor Cyan . Text.unpack
-withStatusColor H.Pending    = Text.pack . withColor Yellow . Text.unpack
-withStatusColor H.Complete   = Text.pack . withColor Green . Text.unpack
-withStatusColor H.Abandoned  = Text.pack . withColor Red . Text.unpack
+withStatusColor :: Core.TaskStatus -> Text -> Text
+withStatusColor Core.InProgress = Text.pack . withColor Cyan . Text.unpack
+withStatusColor Core.Pending    = Text.pack . withColor Yellow . Text.unpack
+withStatusColor Core.Complete   = Text.pack . withColor Green . Text.unpack
+withStatusColor Core.Abandoned  = Text.pack . withColor Red . Text.unpack
 
-statusSymbol :: H.TaskStatus -> Text
-statusSymbol H.InProgress = "▶"
-statusSymbol H.Pending    = "○"
-statusSymbol H.Complete   = "✔"
-statusSymbol H.Abandoned  = "✘"
+statusSymbol :: Core.TaskStatus -> Text
+statusSymbol Core.InProgress = "▶"
+statusSymbol Core.Pending    = "○"
+statusSymbol Core.Complete   = "✔"
+statusSymbol Core.Abandoned  = "✘"
 
 indent :: Text -> Text
 indent t = "  " <> t

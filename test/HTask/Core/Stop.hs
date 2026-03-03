@@ -3,7 +3,7 @@
 module HTask.Core.Stop (testStop) where
 
 import qualified Data.List          as List
-import qualified HTask.Core         as H
+import qualified HTask.Core         as Core
 
 import           Control.Monad      (void)
 import           Data.Time          (Day (ModifiedJulianDay), UTCTime (..))
@@ -21,9 +21,9 @@ testStop :: TestTree
 testStop = testGroup "stop"
   [ testCase "reports success when stopping a task" $ do
       output <- runTestApp fakeTime $ do
-        (H.AddSuccess taskId) <- H.addTask "some task"
-        void $ H.startTask (H.taskUuidToText taskId)
-        H.stopTask (H.taskUuidToText taskId)
+        (Core.AddSuccess taskId) <- Core.addTask "some task"
+        void $ Core.startTask (Core.taskUuidToText taskId)
+        Core.stopTask (Core.taskUuidToText taskId)
 
       let result = getResult output
       isSuccess result @? "expected success"
@@ -31,35 +31,35 @@ testStop = testGroup "stop"
 
   , testCase "marks the task as pending" $ do
       output <- runTestApp fakeTime $ do
-        (H.AddSuccess taskId) <- H.addTask "some task"
-        void $ H.startTask (H.taskUuidToText taskId)
-        void $ H.stopTask (H.taskUuidToText taskId)
-        tasks <- H.listTasks
+        (Core.AddSuccess taskId) <- Core.addTask "some task"
+        void $ Core.startTask (Core.taskUuidToText taskId)
+        void $ Core.stopTask (Core.taskUuidToText taskId)
+        tasks <- Core.listTasks
         pure (taskId, tasks)
 
       let (taskId, tasks) = getResult output
-      Just H.Pending @=? (H.status <$> List.find (\x -> H.taskUuid x == taskId) tasks)
+      Just Core.Pending @=? (Core.status <$> List.find (\x -> Core.taskUuid x == taskId) tasks)
 
 
   , testCase "fails when task is already pending" $ do
       output <- runTestApp fakeTime $ do
-        (H.AddSuccess taskId) <- H.addTask "some task"
-        H.stopTask (H.taskUuidToText taskId)
+        (Core.AddSuccess taskId) <- Core.addTask "some task"
+        Core.stopTask (Core.taskUuidToText taskId)
 
       let result = getResult output
-      H.FailedToModify @=? result
+      Core.FailedToModify @=? result
 
   , testCase "fails when task is complete" $ do
       output <- runTestApp fakeTime $ do
-        (H.AddSuccess taskId) <- H.addTask "some task"
-        void $ H.startTask (H.taskUuidToText taskId)
-        void $ H.completeTask (H.taskUuidToText taskId)
-        H.stopTask (H.taskUuidToText taskId)
+        (Core.AddSuccess taskId) <- Core.addTask "some task"
+        void $ Core.startTask (Core.taskUuidToText taskId)
+        void $ Core.completeTask (Core.taskUuidToText taskId)
+        Core.stopTask (Core.taskUuidToText taskId)
 
       let result = getResult output
-      H.FailedToModify @=? result
+      Core.FailedToModify @=? result
   ]
 
   where
-    isSuccess (H.ModifySuccess _) = True
-    isSuccess _                   = False
+    isSuccess (Core.ModifySuccess _) = True
+    isSuccess _                      = False

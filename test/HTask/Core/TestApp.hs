@@ -10,8 +10,8 @@ module HTask.Core.TestApp
   , runTestApp
   ) where
 
-import qualified HTask.Core                 as H
-import qualified HTask.Events               as V
+import qualified HTask.Core                 as Core
+import qualified HTask.Events               as Events
 
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Monad.State        (MonadState)
@@ -32,14 +32,14 @@ data TestEnv
   = TestEnv
     { _mockUUIDs :: IORef [UUID]
     , mockTime   :: IORef UTCTime
-    , taskMap    :: IORef H.TaskMap
+    , taskMap    :: IORef Core.TaskMap
     }
 
 newtype TestApp m a
-  = TestApp { unApp :: ReaderT TestEnv (V.MemoryEventBackend m) a }
+  = TestApp { unApp :: ReaderT TestEnv (Events.MemoryEventBackend m) a }
   deriving (Applicative, Functor, Monad, MonadFail, MonadIO)
 
-instance (MonadIO m) => MonadState H.TaskMap (TestApp m) where
+instance (MonadIO m) => MonadState Core.TaskMap (TestApp m) where
   get = TestApp $ do
     env <- ask
     lift $ liftIO $ readIORef (taskMap env)
@@ -47,11 +47,11 @@ instance (MonadIO m) => MonadState H.TaskMap (TestApp m) where
     env <- ask
     lift $ liftIO $ writeIORef (taskMap env) m
 
-instance (MonadIO m) => V.HasEventSource (TestApp m) where
-  readEvents = TestApp $ lift V.readEvents
+instance (MonadIO m) => Events.HasEventSource (TestApp m) where
+  readEvents = TestApp $ lift Events.readEvents
 
-instance (MonadIO m) => V.HasEventSink (TestApp m) where
-  writeEvent = TestApp . lift . V.writeEvent
+instance (MonadIO m) => Events.HasEventSink (TestApp m) where
+  writeEvent = TestApp . lift . Events.writeEvent
 
 instance (MonadIO m) => MonadTime (TestApp m) where
   currentTime = TestApp $ do
@@ -71,7 +71,7 @@ runTestApp time op = do
   tRef <- liftIO $ newIORef time
   mRef <- liftIO $ newIORef mempty
   let env = TestEnv uRef tRef mRef
-  V.runMemoryBackend' $ runReaderT (unApp op) env
+  Events.runMemoryBackend' $ runReaderT (unApp op) env
 
 
 getResult :: (a, b) -> a

@@ -31,7 +31,7 @@ import qualified Data.List           as List
 import qualified Data.Map.Strict     as Map
 import qualified Data.Text           as Text
 import qualified Data.UUID           as UUID
-import qualified HTask.Events        as V
+import qualified HTask.Events        as Events
 
 import           Control.Monad.State (MonadState, runState)
 import           Data.Foldable       (foldl')
@@ -114,7 +114,7 @@ data TaskIntent
 instance Aeson.ToJSON TaskIntent
 instance Aeson.FromJSON TaskIntent
 
-type TaskEvent = V.Event TaskIntent
+type TaskEvent = Events.Event TaskIntent
 
 
 -- | Task Container
@@ -176,9 +176,9 @@ foldEventLog = foldl' run (mempty, mempty)
 
 applyEvent :: Map TaskUuid Task -> TaskEvent -> (Map TaskUuid Task, Maybe TaskEvent)
 applyEvent xs ev =
-  case V.payload ev of
+  case Events.payload ev of
     (AddTask ref text) -> do
-      let t = Task ref text (V.timestamp ev) Pending
+      let t = Task ref text (Events.timestamp ev) Pending
       let (success, xs') = runState (addNewTask t) xs
       if success
          then (xs', Nothing)

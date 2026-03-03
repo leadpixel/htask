@@ -9,9 +9,9 @@ module HTask.CLI.App
 
 import qualified Data.Time                  as Time
 import qualified Data.UUID.V4               as UUID
-import qualified HTask.Core                 as H
+import qualified HTask.Core                 as Core
 import           HTask.Effects
-import qualified HTask.Events               as V
+import qualified HTask.Events               as Events
 
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Monad.IO.Unlift    (MonadUnliftIO)
@@ -27,10 +27,10 @@ import           System.IO                  (hFlush, hIsTerminalDevice,
 
 
 newtype App m a
-  = App { unApp :: ReaderT (IORef H.TaskMap) (V.FileEventBackend m) a }
+  = App { unApp :: ReaderT (IORef Core.TaskMap) (Events.FileEventBackend m) a }
   deriving (Applicative, Functor, Monad, MonadIO, MonadUnliftIO)
 
-instance (MonadIO m) => MonadState H.TaskMap (App m) where
+instance (MonadIO m) => MonadState Core.TaskMap (App m) where
   get = App $ do
     ref <- ask
     liftIO $ readIORef ref
@@ -43,17 +43,17 @@ type CanRunAction m =
   , MonadIO m
   , MonadUnliftIO m
   , MonadRandom m
-  , MonadState H.TaskMap m
-  , V.HasEventSink m
+  , MonadState Core.TaskMap m
+  , Events.HasEventSink m
   , MonadTime m
   , MonadUUID m
   )
 
-instance (Monad m, MonadUnliftIO m) => V.HasEventSource (App m) where
-  readEvents = App $ lift V.readEvents
+instance (Monad m, MonadUnliftIO m) => Events.HasEventSource (App m) where
+  readEvents = App $ lift Events.readEvents
 
-instance (Monad m, MonadUnliftIO m) => V.HasEventSink (App m) where
-  writeEvent = App . lift . V.writeEvent
+instance (Monad m, MonadUnliftIO m) => Events.HasEventSink (App m) where
+  writeEvent = App . lift . Events.writeEvent
 
 instance (MonadIO m) => MonadTime (App m) where
   currentTime = App $ liftIO Time.getCurrentTime
@@ -71,9 +71,9 @@ instance (MonadRandom m) => MonadRandom (App m) where
 runApp :: (MonadUnliftIO m) => FilePath -> App m a -> m a
 runApp file app = do
   liftIO $ ensureFileExists file
-  V.runFileBackend file $ do
-    evs <- V.readEvents
-    let (initialMap, _) = H.foldEventLog evs
+  Events.runFileBackend file $ do
+    evs <- Events.readEvents
+    let (initialMap, _) = Core.foldEventLog evs
     ref <- liftIO $ newIORef initialMap
     runReaderT (unApp app) ref
 
