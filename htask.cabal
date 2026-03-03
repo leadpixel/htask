@@ -68,6 +68,7 @@ test-suite htask-test
       HTask.Core.List
       HTask.Core.Remove
       HTask.Core.Start
+      HTask.Core.StateSpec
       HTask.Core.Stop
       HTask.Core.TestApp
       HTask.EffectsSpec

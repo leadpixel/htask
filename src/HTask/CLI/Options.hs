@@ -44,6 +44,7 @@ optionsParser
       <> command "done"     doneInfo
       <> command "drop"     dropInfo
       <> command "list"     listInfo
+      <> command "ls"       listInfo
       <> command "pick"     pickInfo
       <> command "remove"   removeInfo
       <> command "start"    startInfo
