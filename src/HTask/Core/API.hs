@@ -24,10 +24,8 @@ import qualified Text.Read           as Text
 
 import           Control.Monad.State (MonadState)
 import           Data.Text           (Text)
-import           Data.Time           (UTCTime)
-import           Data.UUID           (UUID)
 import           HTask.Core.Domain
-import           HTask.Provider
+import           HTask.Effects
 
 
 data AddResult
@@ -44,7 +42,7 @@ data ModifyResult
   deriving (Eq, Show)
 
 
-type CanModifyTask m = (Monad m, Provider UTCTime m, V.HasEventSink m, MonadState TaskMap m)
+type CanModifyTask m = (MonadTime m, V.HasEventSink m, MonadState TaskMap m)
 
 
 listTasks :: (MonadState TaskMap m) => m [Task]
@@ -71,7 +69,7 @@ withMatch tx op
 
 
 addTask
-  :: (Monad m, MonadState TaskMap m, V.HasEventSink m, Provider UUID m, Provider UTCTime m)
+  :: (MonadTime m, MonadUUID m, MonadState TaskMap m, V.HasEventSink m)
   => Text -> m AddResult
 addTask tx
   | Text.null (Text.strip tx) = pure EmptyDescription

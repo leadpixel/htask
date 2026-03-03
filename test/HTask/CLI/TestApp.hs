@@ -18,8 +18,8 @@ import           Data.IORef
 import           Data.Time                  (UTCTime)
 import           Data.UUID                  (UUID)
 import qualified Data.UUID                  as UUID
+import           HTask.Effects
 import           HTask.Events               (runFileBackend)
-import           HTask.Provider
 
 
 -- We use IORef for mock values to keep everything in ReaderT IO
@@ -48,11 +48,11 @@ instance V.HasEventSource TestApp where
 instance V.HasEventSink TestApp where
   writeEvent _ = pure ()
 
-instance Provider UTCTime TestApp where
-  provide = TestApp $ mockTime <$> ask
+instance MonadTime TestApp where
+  currentTime = TestApp $ mockTime <$> ask
 
-instance Provider UUID TestApp where
-  provide = TestApp $ do
+instance MonadUUID TestApp where
+  nextUUID = TestApp $ do
     env <- ask
     liftIO $ atomicModifyIORef' (mockUUIDs env) $ \uuids ->
       case uuids of
