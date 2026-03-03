@@ -16,8 +16,9 @@ import qualified HTask.Core          as H
 import qualified HTask.Events        as V
 import           Options.Applicative
 import           Paths_htask         (version)
-import           System.Directory    (doesFileExist, getHomeDirectory)
-import           System.FilePath     ((</>))
+import           System.Directory    (doesFileExist, getCurrentDirectory,
+                                      getHomeDirectory)
+import           System.FilePath     (splitDirectories, (</>))
 
 
 data Options
@@ -83,10 +84,21 @@ getOptions = do
 
 resolveDefaultPath :: IO FilePath
 resolveDefaultPath = do
-  localExists <- doesFileExist ".tasks"
-  if localExists
-    then pure ".tasks"
-    else (</> ".tasks") <$> getHomeDirectory
+  cwd <- getCurrentDirectory
+  let paths = scanl (</>) "/" (tail $ splitDirectories cwd)
+  let searchPaths = reverse (cwd : paths)
+
+  maybePath <- findM (\p -> doesFileExist (p </> ".tasks")) searchPaths
+  case maybePath of
+    Nothing -> (</> ".tasks") <$> getHomeDirectory
+    Just p  -> pure (p </> ".tasks")
+
+  where
+    findM :: Monad m => (a -> m Bool) -> [a] -> m (Maybe a)
+    findM _ [] = pure Nothing
+    findM p (x:xs) = do
+      r <- p x
+      if r then pure (Just x) else findM p xs
 
 
 -- | Dynamic Completer for Task IDs and UUIDs

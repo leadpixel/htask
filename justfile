@@ -47,5 +47,12 @@ completion:
     @echo "For Bash, add this to your .bashrc:"
     @echo '  eval "$$(htask --bash-completion-script htask)"'
     @echo ""
-    @echo "For Zsh, add this to your .zshrc:"
-    @echo '  source <(htask --zsh-completion-script htask)'
+    @echo "For Zsh, the most robust way is to save the script to a file in your fpath."
+    @echo "1. Create a directory for completions if you don't have one:"
+    @echo "   mkdir -p ~/.zsh/completion"
+    @echo "2. Add it to your fpath in .zshrc (before compinit):"
+    @echo '   fpath=(~/.zsh/completion $$fpath)'
+    @echo "3. Generate the completion script:"
+    @echo "   htask --zsh-completion-script htask > ~/.zsh/completion/_htask"
+    @echo "4. Ensure compinit is called in your .zshrc:"
+    @echo "   autoload -U compinit && compinit"
