@@ -36,3 +36,8 @@ vendor
 # Environment variables
 .env
 
+
+
+# Added by cargo
+
+/target

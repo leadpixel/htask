@@ -2,39 +2,39 @@
 default:
     @just --list
 
-# Build all packages
+# Build everything in release mode
 build:
-    cabal build all
+    cargo build --release
 
 # Run all tests
 test:
-    cabal test all
+    cargo test
 
-# Run the CLI app with arbitrary arguments
+# Task file to use for 'run' target
+tasks_file := ".tasks"
+
+# Run the CLI app with arbitrary arguments (defaults to local .tasks)
 run *args:
-    @cabal run htask -- {{args}}
+    @cargo run -- --file {{tasks_file}} {{args}}
 
-# Pin dependencies
-freeze:
-    cabal freeze
-
-# Install the CLI app to ~/.cabal/bin
+# Install the CLI app to ~/.cargo/bin
 install:
-    cabal install htask-cli --overwrite-policy=always
+    cargo install --path .
 
-# Start a REPL for a specific package (default: htask-core)
-repl package="htask-core":
-    cabal repl {{package}}
-
-# Run hlint on all source files
+# Run clippy on all source files
 lint:
-    hlint packages/
+    cargo clippy
 
-# Format all source files using stylish-haskell
+# Format all source files using rustfmt
 format:
-    find packages/ -name "*.hs" -exec stylish-haskell -i {} +
+    cargo fmt
 
 # Clean build artifacts
 clean:
-    cabal clean
-    rm -rf dist-newstyle
+    cargo clean
+    rm -f test.tasks
+
+# Show instructions for enabling autocompletion
+completion:
+    @echo "htask uses clap for completions. To generate completions, use htask's built-in completion command if implemented, or use clap_complete in the build script."
+    @echo "For now, refer to htask --help for available commands."

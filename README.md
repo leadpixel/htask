@@ -16,7 +16,7 @@ And I want to keep a history of task changes to understand how I and collaborato
 
 ## Setup
 
-- install [GHC/Cabal](https://www.haskell.org/ghcup/)
+- install [Rust](https://www.rust-lang.org/tools/install)
 - install [just](https://github.com/casey/just)
 - checkout the repo and verify:
 ```sh
@@ -30,7 +30,7 @@ $ just test
 $ just install
 ```
 
-Ensure `~/.cabal/bin` (or your OS equivalent) is on your `$PATH`.
+Ensure `~/.cargo/bin` (or your OS equivalent) is on your `$PATH`.
 
 - first run:
 ```sh
@@ -93,24 +93,22 @@ $ htask add "some task description"
 
 ### Start
 
-Starts a task selected by uuid.
+Starts a task selected by id or uuid.
 
-See [Selecting Tasks](#selecting-tasks) for a handy shortcut.
+See [Selecting Tasks](#selecting-tasks) for handy shortcuts.
 
 ```sh
-$ htask start SOME_TASK_UUID
+$ htask start 1
 # Success!
 # starting task: some task description
 ```
 
 ### Stop
 
-Stops a task selected by uuid.
-
-See [Selecting Tasks](#selecting-tasks) for a handy shortcut.
+Stops a task selected by id or uuid.
 
 ```sh
-$ htask stop SOME_TASK_UUID
+$ htask stop 1
 # Success!
 # stopping task: some task description
 ```
@@ -119,10 +117,8 @@ $ htask stop SOME_TASK_UUID
 
 Marks a task as completed.
 
-See [Selecting Tasks](#selecting-tasks) for a handy shortcut.
-
 ```sh
-$ htask complete SOME_TASK_UUID
+$ htask complete 1
 # Success!
 # completing task: some task description
 ```
@@ -131,16 +127,49 @@ $ htask complete SOME_TASK_UUID
 
 Marks a task as abandoned.
 
-See [Selecting Tasks](#selecting-tasks) for a handy shortcut.
-
 ```sh
-$ htask remove SOME_TASK_UUID
+$ htask remove 1
 # Success!
 # removing task: some task description
 ```
 
+### Done
+
+Marks all tasks currently `InProgress` as completed.
+
+```sh
+$ htask done
+# Success!
+# completing task: some task description
+```
+
+### Drop
+
+Stops all tasks currently `InProgress` (moving them back to `Pending`).
+
+```sh
+$ htask drop
+# Success!
+# stopping task: some task description
+```
+
+### Pick
+
+Randomly picks a `Pending` task and starts it.
+
+```sh
+$ htask pick
+# Success!
+# picking task: some task description
+```
+
 ## Tips
 ### Selecting Tasks
+
+You can select a task using:
+- **Numeric Index**: The numbers shown in `htask list` or `htask summary` (e.g., `1`, `02`).
+- **Short UUID**: The first few characters of a task's UUID (e.g., `9bb2`).
+- **Full UUID**: The complete UUID.
 
 It's a pain to type out the uuid, so using [fzf](https://github.com/junegunn/fzf) can make this easier
 ```sh
@@ -152,6 +181,11 @@ This is easier with an alias:
 $ alias hpick="htask list --show-uuid | fzf --ansi | cut -f 1 -d ' '"
 $ htask [CMD] $(hpick)
 ```
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [State Machine](docs/STATE_MACHINE.md)
 
 ### Global Tasks
 
