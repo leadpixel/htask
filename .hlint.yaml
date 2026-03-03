@@ -24,6 +24,13 @@
   - {name: [Test.QuickCheck], as: QC}
   - {name: [HTask.Core], as: Core}
   - {name: [HTask.Events], as: Events}
+  - {name: [HTask.CLI.Actions], as: Actions}
+  - {name: [HTask.CLI.Options], as: Options}
+  - {name: [HTask.CLI.Output], as: Output}
+  - {name: [HTask.CLI.Runners], as: Runners}
+  - {name: [Data.Aeson.Encode.Pretty], as: AesonPretty}
+  - {name: [Data.Text.Encoding], as: Encoding}
+  - {name: [Text.Read], as: Read}
 #   - {name: Control.Arrow, within: []}#  Certain modules are banned entirely
 
 - functions:
