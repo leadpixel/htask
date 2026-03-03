@@ -46,12 +46,12 @@ tInt = Text.pack . show
 
 -- | Helper to format a task entry with metadata on one line and description indented under it
 formatTaskEntry :: Bool -> Map.Map Core.TaskUuid Text -> [Core.Task] -> Core.Task -> [Text]
-formatTaskEntry _ _ allTs t =
+formatTaskEntry _ _ idRef t =
   [ headerLine
   ] <> descriptionLines
 
   where
-    idx = maybe "??" (padZero 2 . tInt . (+1)) (List.findIndex (\x -> Core.taskUuid x == Core.taskUuid t) allTs)
+    idx = maybe "??" (padZero 2 . tInt . (+1)) (List.findIndex (\x -> Core.taskUuid x == Core.taskUuid t) idRef)
     symbol = statusSymbol (Core.status t)
 
     uuidText = Core.taskUuidToText (Core.taskUuid t)
@@ -154,13 +154,15 @@ runDrop j
 
 runList :: (CanRunAction m) => Bool -> ShowUUID -> ShowAll -> m RunResult
 runList j showUUID showAll = do
-  allTasks <- List.sortBy Core.taskDisplayOrder <$> Core.listTasks
-  let filteredTasks = selectTasks allTasks
+  allTasks <- Core.listTasks
+  -- The 'reference' list for IDs is sorted by creation time so indices NEVER change
+  let idReference = List.sortBy Core.taskPriority allTasks
+  let displayTasks = List.sortBy Core.taskDisplayOrder (selectTasks allTasks)
   let prefixes = Core.disambiguatingPrefixes (Core.taskUuid <$> allTasks)
 
   if j
-    then pure $ resultJson filteredTasks
-    else pure $ formatList allTasks filteredTasks prefixes
+    then pure $ resultJson displayTasks
+    else pure $ formatList idReference displayTasks prefixes
 
   where
     selectTasks
@@ -171,14 +173,14 @@ runList j showUUID showAll = do
     justActive _               = False
 
     formatList :: [Core.Task] -> [Core.Task] -> Map.Map Core.TaskUuid Text -> RunResult
-    formatList allTs ts prefs = resultSuccess $
-      concatMap (formatGroup allTs ts prefs) [Core.InProgress, Core.Pending, Core.Complete, Core.Abandoned]
+    formatList idRef ts prefs = resultSuccess $
+      concatMap (formatGroup idRef ts prefs) [Core.InProgress, Core.Pending, Core.Complete, Core.Abandoned]
 
     formatGroup :: [Core.Task] -> [Core.Task] -> Map.Map Core.TaskUuid Text -> Core.TaskStatus -> [Text]
-    formatGroup allTs ts prefs s =
+    formatGroup idRef ts prefs s =
       case List.filter (hasStatus s) ts of
         [] -> []
-        gs -> ("\n" <> divider (statusHeader s)) : concatMap (nicePrint prefs allTs) gs
+        gs -> ("\n" <> divider (statusHeader s)) : concatMap (nicePrint prefs idRef) gs
 
     statusHeader Core.InProgress = "IN PROGRESS"
     statusHeader Core.Pending    = "PENDING"
@@ -273,6 +275,7 @@ runStop j t
 runSummary :: (CanRunAction m) => Bool -> m RunResult
 runSummary j = do
   tasks <- Core.listTasks
+  let idReference = List.sortBy Core.taskPriority tasks
   let allSorted = List.sortBy Core.taskDisplayOrder tasks
   let actives = List.filter (hasStatus Core.InProgress) allSorted
   let pendings = List.filter (hasStatus Core.Pending) allSorted
@@ -282,10 +285,10 @@ runSummary j = do
 
   if j
     then pure $ resultJson (actives <> topPendings)
-    else pure $ renderSummary allSorted actives topPendings prefixes
+    else pure $ renderSummary idReference allSorted actives topPendings prefixes
 
   where
-    renderSummary allTasks actives topPendings prefixes = resultSuccess
+    renderSummary idRef allTasks actives topPendings prefixes = resultSuccess
       $ displayCurrent
       <> displayTopPending
 
@@ -294,13 +297,14 @@ runSummary j = do
         displayCurrent =
           if List.null actives
             then [ "No current task" ]
-            else divider "CURRENT TASK" : concatMap (formatTaskEntry False prefixes allTasks) actives
+            else divider "CURRENT TASK" : concatMap (formatTaskEntry False prefixes idRef) actives
+
 
         displayTopPending :: [Text]
         displayTopPending =
           let totalPendings = List.length (List.filter (hasStatus Core.Pending) allTasks)
           in ("\n" <> divider (pendingMessage (length topPendings) totalPendings))
-             : concatMap (formatTaskEntry False prefixes allTasks) topPendings
+             : concatMap (formatTaskEntry False prefixes idRef) topPendings
 
           where
             pendingMessage x p =
