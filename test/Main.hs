@@ -14,10 +14,8 @@ import qualified HTask.Events.MemorySpec as EventsMemory
 
 import           Test.Tasty
 
-
 main :: IO ()
 main = defaultMain tests
-
 
 tests :: TestTree
 tests = testGroup "HTask"

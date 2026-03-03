@@ -15,7 +15,6 @@ import           HTask.Core.TestApp
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-
 fakeTime :: UTCTime
 fakeTime = UTCTime (ModifiedJulianDay 0) 0
 
@@ -29,7 +28,6 @@ testStart = testGroup "start"
       let result = getResult output
       isSuccess result @? "starts a pending task"
 
-
   , testCase "marks the task as in-progress" $ do
       output <- runTestApp fakeTime $ do
         (Core.AddSuccess taskId) <- Core.addTask "some task"
@@ -39,7 +37,6 @@ testStart = testGroup "start"
 
       let (taskId, tasks) = getResult output
       Just Core.InProgress @=? (Core.status <$> List.find (\x -> Core.taskUuid x == taskId) tasks)
-
 
   , testCase "fails if there is no matching task" $ do
       uuid <- UUID.nextRandom

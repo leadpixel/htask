@@ -7,14 +7,11 @@ module HTask.CLI.Actions
 import           Data.Tagged
 import           Data.Text   (Text)
 
-
 data ShowUUIDTag
 type ShowUUID = Tagged ShowUUIDTag Bool
 
-
 data ShowAllTag
 type ShowAll = Tagged ShowAllTag Bool
-
 
 data Action
   = Summary

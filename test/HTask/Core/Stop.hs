@@ -12,10 +12,8 @@ import           HTask.Core.TestApp
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-
 fakeTime :: UTCTime
 fakeTime = UTCTime (ModifiedJulianDay 0) 0
-
 
 testStop :: TestTree
 testStop = testGroup "stop"
@@ -28,7 +26,6 @@ testStop = testGroup "stop"
       let result = getResult output
       isSuccess result @? "expected success"
 
-
   , testCase "marks the task as pending" $ do
       output <- runTestApp fakeTime $ do
         (Core.AddSuccess taskId) <- Core.addTask "some task"
@@ -39,7 +36,6 @@ testStop = testGroup "stop"
 
       let (taskId, tasks) = getResult output
       Just Core.Pending @=? (Core.status <$> List.find (\x -> Core.taskUuid x == taskId) tasks)
-
 
   , testCase "fails when task is already pending" $ do
       output <- runTestApp fakeTime $ do

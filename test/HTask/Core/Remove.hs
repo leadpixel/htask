@@ -15,10 +15,8 @@ import           HTask.Core.TestApp
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-
 fakeTime :: UTCTime
 fakeTime = UTCTime (ModifiedJulianDay 0) 0
-
 
 testRemove :: TestTree
 testRemove = testGroup "remove"
@@ -30,7 +28,6 @@ testRemove = testGroup "remove"
       let result = getResult output
       isSuccess result @? "expected success"
 
-
   , testCase "marks the task as abandoned" $ do
       output <- runTestApp fakeTime $ do
         (Core.AddSuccess taskId) <- Core.addTask "some task"
@@ -40,7 +37,6 @@ testRemove = testGroup "remove"
 
       let (taskId, tasks) = getResult output
       Just Core.Abandoned @=? (Core.status <$> List.find (\x -> Core.taskUuid x == taskId) tasks)
-
 
   , testCase "fails if there is no matching task" $ do
       uuid <- UUID.nextRandom
@@ -58,7 +54,6 @@ testRemove = testGroup "remove"
       let result = getResult output
       Core.FailedToModify @=? result
   ]
-
 
   where
     isSuccess (Core.ModifySuccess _) = True

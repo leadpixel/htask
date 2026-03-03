@@ -11,10 +11,8 @@ import           HTask.Core.TestApp
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-
 fakeTime :: UTCTime
 fakeTime = UTCTime (ModifiedJulianDay 0) 0
-
 
 testList :: TestTree
 testList = testGroup "list"
@@ -23,7 +21,6 @@ testList = testGroup "list"
       let tasks = getResult output
       0 @=? length tasks
 
-
   , testCase "returns one task when created" $ do
       output <- runTestApp fakeTime $ do
         _ <- Core.addTask "some task"
@@ -31,7 +28,6 @@ testList = testGroup "list"
 
       let tasks = getResult output
       1 @=? length tasks
-
 
   , testCase "returns many tasks" $ do
       output <- runTestApp fakeTime $ do

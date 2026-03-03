@@ -7,7 +7,6 @@ import           HTask.Effects
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-
 tests :: TestTree
 tests = testGroup "Effects"
   [ testCase "MonadTime auto-increments in TestApp" $ do

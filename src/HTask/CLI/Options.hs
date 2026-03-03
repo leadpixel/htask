@@ -20,7 +20,6 @@ import           System.Directory    (doesFileExist, getCurrentDirectory,
                                       getHomeDirectory)
 import           System.FilePath     (splitDirectories, (</>))
 
-
 data Options
   = Options
     { action   :: Action
@@ -100,7 +99,6 @@ resolveDefaultPath = do
       r <- p x
       if r then pure (Just x) else findM p xs
 
-
 -- | Dynamic Completer for Task IDs and UUIDs
 taskCompleter :: Completer
 taskCompleter = listIOCompleter $ do
@@ -118,7 +116,6 @@ taskCompleter = listIOCompleter $ do
       let uuids = fmap Text.unpack (Map.elems prefixes)
 
       pure (sortedIndices <> uuids)
-
 
 -- | Command Parsers
 addInfo :: ParserInfo Action

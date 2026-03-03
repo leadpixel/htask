@@ -17,7 +17,6 @@ import           HTask.CLI.App
 import           HTask.CLI.Options          (Options (..))
 import           HTask.CLI.Output
 
-
 runAction :: (CanRunAction m) => Options -> m RunResult
 runAction opts =
   let j = useJson opts
@@ -33,22 +32,17 @@ runAction opts =
     Pick           -> runPick j
     Summary        -> runSummary j
 
-
 inProgress :: Core.Task -> Bool
 inProgress t = Core.status t == Core.InProgress
-
 
 taskToText :: Core.Task -> Text
 taskToText = Core.taskUuidToText . Core.taskUuid
 
-
 hasStatus :: Core.TaskStatus -> Core.Task -> Bool
 hasStatus s t = s == Core.status t
 
-
 tInt :: Int -> Text
 tInt = Text.pack . show
-
 
 -- | Helper to format a task entry with metadata on one line and description indented under it
 formatTaskEntry :: Bool -> Map.Map Core.TaskUuid Text -> [Core.Task] -> Core.Task -> [Text]
@@ -71,7 +65,6 @@ formatTaskEntry _ _ allTs t =
       (f:fs) -> ("       " <> treeLink <> withBold f)
               : fmap (\l -> "          " <> withBold l) fs
 
-
 runAdd :: (CanRunAction m) => Bool -> Text -> m RunResult
 runAdd j t
   = formatOutcome <$> Core.addTask t
@@ -90,7 +83,6 @@ runAdd j t
     formatOutcome Core.EmptyDescription
       = resultError "task description cannot be empty"
 
-
 runComplete :: (CanRunAction m) => Bool -> Text -> m RunResult
 runComplete j t
   = formatOutcome <$> Core.completeTask t
@@ -107,7 +99,6 @@ runComplete j t
 
           Core.FailedToModify ->
             resultError "unable to modify matching task"
-
 
 runDone :: (CanRunAction m) => Bool -> m RunResult
 runDone j
@@ -135,7 +126,6 @@ runDone j
           Core.FailedToModify ->
             "unable to modify matching task"
 
-
 runDrop :: (CanRunAction m) => Bool -> m RunResult
 runDrop j
   = formatOutcome <$> dropTask
@@ -161,7 +151,6 @@ runDrop j
 
           Core.FailedToModify ->
             "unable to modify matching task"
-
 
 runList :: (CanRunAction m) => Bool -> ShowUUID -> ShowAll -> m RunResult
 runList j showUUID showAll = do
@@ -199,7 +188,6 @@ runList j showUUID showAll = do
     nicePrint :: Map.Map Core.TaskUuid Text -> [Core.Task] -> Core.Task -> [Text]
     nicePrint = formatTaskEntry (untag showUUID)
 
-
 runPick :: (CanRunAction m) => Bool -> m RunResult
 runPick j = do
   tasks <- Core.listTasks
@@ -231,7 +219,6 @@ runPick j = do
       | n >= List.length xs = Nothing
       | otherwise = Just (xs !! n)
 
-
 runRemove :: (CanRunAction m) => Bool -> Text -> m RunResult
 runRemove j t
   = formatOutcome <$> Core.removeTask t
@@ -248,7 +235,6 @@ runRemove j t
 
           Core.FailedToModify ->
             resultError "unable to modify matching task"
-
 
 runStart :: (CanRunAction m) => Bool -> Text -> m RunResult
 runStart j t
@@ -267,7 +253,6 @@ runStart j t
           Core.FailedToModify ->
             resultError "unable to modify matching task"
 
-
 runStop :: (CanRunAction m) => Bool -> Text -> m RunResult
 runStop j t
   = formatOutcome <$> Core.stopTask t
@@ -284,9 +269,6 @@ runStop j t
 
           Core.FailedToModify ->
             resultError "unable to modify matching task"
-
-
-
 
 runSummary :: (CanRunAction m) => Bool -> m RunResult
 runSummary j = do
@@ -313,7 +295,6 @@ runSummary j = do
           if List.null actives
             then [ "No current task" ]
             else divider "CURRENT TASK" : concatMap (formatTaskEntry False prefixes allTasks) actives
-
 
         displayTopPending :: [Text]
         displayTopPending =

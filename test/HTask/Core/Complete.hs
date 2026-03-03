@@ -12,10 +12,8 @@ import           HTask.Core.TestApp
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-
 fakeTime :: UTCTime
 fakeTime = UTCTime (ModifiedJulianDay 0) 0
-
 
 testComplete :: TestTree
 testComplete = testGroup "complete"
@@ -28,7 +26,6 @@ testComplete = testGroup "complete"
       let result = getResult output
       isSuccess result @? "expected success"
 
-
   , testCase "marks the task as complete" $ do
       output <- runTestApp fakeTime $ do
         (Core.AddSuccess taskId)  <- Core.addTask "some task"
@@ -39,7 +36,6 @@ testComplete = testGroup "complete"
 
       let (taskId, tasks) = getResult output
       Just Core.Complete @=? (Core.status <$> List.find (\x -> Core.taskUuid x == taskId) tasks)
-
 
   , testCase "fails when unable to find a matching task" $ do
       output <- runTestApp fakeTime $ do

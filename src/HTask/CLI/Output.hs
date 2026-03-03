@@ -30,7 +30,6 @@ import           Data.Text                  (Text)
 import           System.IO                  (hIsTerminalDevice, stdout)
 import           System.IO.Unsafe           (unsafePerformIO)
 
-
 -- | Rendering Pipeline Types
 data RunResult
   = Success [Text]
@@ -52,7 +51,6 @@ text (Success ts) = formatSuccess ts
 text (Error ts)   = formatError ts
 text (Json v)     = [Text.pack $ LBS.unpack $ AesonPretty.encodePretty v]
 
-
 -- | Global coloring state
 {-# NOINLINE useColorRef #-}
 useColorRef :: IORef Bool
@@ -65,14 +63,12 @@ setUseColor = writeIORef useColorRef
 shouldUseColor :: Bool
 shouldUseColor = unsafePerformIO $ readIORef useColorRef
 
-
 -- | IO Rendering
 renderResult :: RunResult -> IO ()
 renderResult res = do
   useColor <- hIsTerminalDevice stdout
   setUseColor useColor
   mapM_ (putStrLn . Text.unpack) (text res)
-
 
 -- | Formatting Logic
 data Color = Red | Green | Yellow | Blue | Cyan | Gray

@@ -26,7 +26,6 @@ import           Data.UUID                  (UUID)
 import qualified Data.UUID.V4               as UUID
 import           HTask.Effects
 
-
 -- We use IORef for mock values to keep everything in ReaderT IO
 data TestEnv
   = TestEnv
@@ -64,7 +63,6 @@ instance (MonadIO m) => MonadTime (TestApp m) where
 instance (MonadIO m) => MonadUUID (TestApp m) where
   nextUUID = liftIO UUID.nextRandom
 
-
 runTestApp :: (MonadIO m) => UTCTime -> TestApp m a -> m (a, Seq Lazy.ByteString)
 runTestApp time op = do
   uRef <- liftIO $ newIORef [] -- Not using mock UUIDs here
@@ -72,7 +70,6 @@ runTestApp time op = do
   mRef <- liftIO $ newIORef mempty
   let env = TestEnv uRef tRef mRef
   Events.runMemoryBackend' $ runReaderT (unApp op) env
-
 
 getResult :: (a, b) -> a
 getResult = fst

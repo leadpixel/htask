@@ -18,7 +18,6 @@ import           System.IO
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-
 allTests :: TestTree
 allTests = testGroup "storage::file"
   [ initialReadEmpty
@@ -30,7 +29,6 @@ allTests = testGroup "storage::file"
   , manyEvents2
   , detectsDecodingErrors
   ]
-
 
 detectsDecodingErrors :: TestTree
 detectsDecodingErrors = testCase "reports decoding errors to stderr" $ do
@@ -44,7 +42,6 @@ detectsDecodingErrors = testCase "reports decoding errors to stderr" $ do
 
   ("Warning: Failed to decode event on line 1" `List.isInfixOf` output)
     @? ("Warning should be printed to stderr, got: " <> output)
-
 
 captureStderr :: IO a -> IO String
 captureStderr action = do
@@ -67,7 +64,6 @@ captureStderr action = do
       readFile path
     )
 
-
 run :: Events.FileEventBackend IO a -> IO a
 run op = do
   (path, _handle) <- openTempFile "." "file-test-tmp"
@@ -77,30 +73,24 @@ run op = do
   removeFile path
   pure x
 
-
 readEvents :: (MonadUnliftIO m, Monad m) => Events.FileEventBackend m [Events.Event Int]
 readEvents = Events.readEvents
-
 
 fakeTime :: UTCTime
 fakeTime = UTCTime (ModifiedJulianDay 0) 0
 
-
 createFakeEvent :: Int -> Events.Event Int
 createFakeEvent x = Events.Event { Events.timestamp = fakeTime, Events.payload = x }
-
 
 initialReadEmpty :: TestTree
 initialReadEmpty = testCase "initial read is empty" $ do
   xs <- run readEvents
   assertEqual "expecting 0 items" 0 (length xs)
 
-
 writeSucceeds :: TestTree
 writeSucceeds = testCase "writing appends to event log" $ do
   xs <- run ( Events.writeEvent (createFakeEvent 1))
   assertEqual "expecting 1 item" () xs
-
 
 writeThenReadReturnsOne :: TestTree
 writeThenReadReturnsOne = testCase "returns one event after writing" $ do
@@ -109,7 +99,6 @@ writeThenReadReturnsOne = testCase "returns one event after writing" $ do
     readEvents
   assertEqual "expecting 1 item" 1 (length xs)
 
-
 eventsRemainOrdered :: TestTree
 eventsRemainOrdered = testCase "events are returned in write order" $ do
   xs <- run $ do
@@ -117,7 +106,6 @@ eventsRemainOrdered = testCase "events are returned in write order" $ do
     Events.writeEvent (createFakeEvent 2)
     readEvents
   assertEqual "expecting 2 items" [1, 2] (Events.payload <$> xs)
-
 
 repeatEventsCanBeAdded :: TestTree
 repeatEventsCanBeAdded = testCase "events can be added repeatedly" $ do
@@ -128,7 +116,6 @@ repeatEventsCanBeAdded = testCase "events can be added repeatedly" $ do
     readEvents
   assertEqual "expecting 2 items" [1, 1] (Events.payload <$> xs)
 
-
 manyEvents :: TestTree
 manyEvents = testCase "repeated writing (one at a time)" $ do
   let ev = createFakeEvent 1
@@ -136,7 +123,6 @@ manyEvents = testCase "repeated writing (one at a time)" $ do
     replicateM_ 100000 ( Events.writeEvent ev)
     readEvents
   assertEqual "expecting 100000 items" 100000 (length xs)
-
 
 manyEvents2 :: TestTree
 manyEvents2 = testCase "repeated writing (batch)" $ do

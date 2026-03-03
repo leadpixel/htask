@@ -25,7 +25,6 @@ import           System.Exit                (exitFailure)
 import           System.IO                  (hFlush, hIsTerminalDevice,
                                              hPutStrLn, stderr, stdout)
 
-
 newtype App m a
   = App { unApp :: ReaderT (IORef Core.TaskMap) (Events.FileEventBackend m) a }
   deriving (Applicative, Functor, Monad, MonadIO, MonadUnliftIO)
@@ -66,7 +65,6 @@ instance (MonadRandom m) => MonadRandom (App m) where
   getRandoms = App $ lift $ lift getRandoms
   getRandomR = App . lift . lift . getRandomR
   getRandomRs = App . lift . lift . getRandomRs
-
 
 runApp :: (MonadUnliftIO m) => FilePath -> App m a -> m a
 runApp file app = do

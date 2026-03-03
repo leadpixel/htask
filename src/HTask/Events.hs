@@ -45,7 +45,6 @@ import           Data.Time                  (UTCTime)
 import           GHC.Generics               (Generic)
 import           HTask.Effects
 
-
 -- | Core Event Types
 class (Monad m) => HasEventSource m where
   readEvents :: (Aeson.FromJSON a) => m [Event a]
@@ -69,7 +68,6 @@ createEvent :: (MonadTime m) => a -> m (Event a)
 createEvent x = do
   t <- currentTime
   pure $ Event { timestamp = t , payload = x }
-
 
 -- | File Backend
 newtype FileEventBackend m a
@@ -115,7 +113,6 @@ encodeEvent e = Lazy.toStrict (Aeson.encode e) <> "\n"
 withAppendSinkFile :: (MonadUnliftIO m, MonadIO n) => FilePath -> (ConduitT Strict.ByteString o n () -> m a) -> m a
 withAppendSinkFile path op = withRunInIO $ \run ->
   Sys.withBinaryFile path Sys.AppendMode $ run . op . Conduit.sinkHandle
-
 
 -- | Memory Backend
 newtype MemoryEventBackend m a

@@ -27,13 +27,11 @@ import           Data.Text           (Text)
 import           HTask.Core.Domain
 import           HTask.Effects
 
-
 data AddResult
   = AddSuccess TaskUuid
   | FailedToAdd
   | EmptyDescription
   deriving (Eq, Show)
-
 
 data ModifyResult
   = ModifySuccess Task
@@ -41,13 +39,10 @@ data ModifyResult
   | FailedToFind
   deriving (Eq, Show)
 
-
 type CanModifyTask m = (MonadTime m, Events.HasEventSink m, MonadState TaskMap m)
-
 
 listTasks :: (MonadState TaskMap m) => m [Task]
 listTasks = Map.elems <$> getTasks
-
 
 findTask :: (MonadState TaskMap m) => Text -> m (Maybe Task)
 findTask tx = do
@@ -62,11 +57,9 @@ findTask tx = do
     uuidStartsWith t
       = Text.isPrefixOf t . taskUuidToText . taskUuid
 
-
 withMatch :: (MonadState TaskMap m) => Text -> (Task -> m ModifyResult) -> m ModifyResult
 withMatch tx op
   = findTask tx >>= maybe (pure FailedToFind) op
-
 
 addTask
   :: (MonadTime m, MonadUUID m, MonadState TaskMap m, Events.HasEventSink m)
@@ -88,7 +81,6 @@ addTask tx
         else
           pure FailedToAdd
 
-
 startTask :: (CanModifyTask m) => Text -> m ModifyResult
 startTask tx =
   withMatch tx $ \tsk ->
@@ -106,7 +98,6 @@ startTask tx =
             pure $ ModifySuccess t
 
       _ -> pure FailedToModify
-
 
 stopTask :: (CanModifyTask m) => Text -> m ModifyResult
 stopTask tx =
@@ -126,7 +117,6 @@ stopTask tx =
 
       _ -> pure FailedToModify
 
-
 completeTask :: (CanModifyTask m) => Text -> m ModifyResult
 completeTask tx =
   withMatch tx $ \tsk ->
@@ -144,7 +134,6 @@ completeTask tx =
             pure $ ModifySuccess t
 
       _ -> pure FailedToModify
-
 
 removeTask :: (CanModifyTask m) => Text -> m ModifyResult
 removeTask tx =

@@ -12,10 +12,8 @@ import           HTask.Core.TestApp
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-
 fakeTime :: UTCTime
 fakeTime = UTCTime (ModifiedJulianDay 0) 0
-
 
 testAdd :: TestTree
 testAdd = testGroup "add"
@@ -23,7 +21,6 @@ testAdd = testGroup "add"
       output <- runTestApp fakeTime $ Core.addTask "some task"
       let result = getResult output
       isSuccess result @? "expected success"
-
 
   , testCase "tasks start out pending" $ do
       output <- runTestApp fakeTime $ do
@@ -36,7 +33,6 @@ testAdd = testGroup "add"
       taskId @=? Core.taskUuid tsk
       Core.Pending @=? Core.status tsk
 
-
   , testCase "creates a unique id for each task" $ do
       output <- runTestApp fakeTime $ do
         (Core.AddSuccess id1) <- Core.addTask "task 1"
@@ -45,7 +41,6 @@ testAdd = testGroup "add"
 
       let (id1, id2) = getResult output
       (id1 /= id2) @? "expected ids to be different"
-
 
   , testCase "ignores duplicates" $ do
       output <- runTestApp fakeTime $ do
@@ -56,7 +51,6 @@ testAdd = testGroup "add"
 
       let (_taskId, tasks) = getResult output
       1 @=? length tasks
-
 
   , testCase "disallows empty description" $ do
       output <- runTestApp fakeTime $ Core.addTask ""

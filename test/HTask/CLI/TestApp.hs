@@ -21,7 +21,6 @@ import qualified Data.UUID                  as UUID
 import           HTask.Effects
 import           HTask.Events               (runFileBackend)
 
-
 -- We use IORef for mock values to keep everything in ReaderT IO
 data TestEnv
   = TestEnv
@@ -64,7 +63,6 @@ instance MonadRandom TestApp where
   getRandoms = TestApp $ liftIO getRandoms
   getRandomR = TestApp . liftIO . getRandomR
   getRandomRs = TestApp . liftIO . getRandomRs
-
 
 runTestApp :: FilePath -> [UUID] -> UTCTime -> TestApp a -> IO a
 runTestApp file uuids time app = do

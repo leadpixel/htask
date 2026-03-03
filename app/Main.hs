@@ -6,7 +6,6 @@ import qualified HTask.CLI.Runners as Runners
 
 import           HTask.CLI.App
 
-
 main :: IO ()
 main = do
   options <- Options.getOptions

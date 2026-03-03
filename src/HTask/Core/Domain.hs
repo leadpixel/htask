@@ -45,7 +45,6 @@ import           Data.UUID           (UUID)
 import           GHC.Generics        (Generic)
 import           HTask.Effects
 
-
 -- | Task Core Types
 type TaskUuid = Tagged "taskId" UUID
 
@@ -101,7 +100,6 @@ taskDisplayOrder :: Task -> Task -> Ordering
 taskDisplayOrder a b
   = (compare `on` status) a b <> taskPriority a b
 
-
 -- | Task Events
 data TaskIntent
   = AddTask TaskUuid Text
@@ -115,7 +113,6 @@ instance Aeson.ToJSON TaskIntent
 instance Aeson.FromJSON TaskIntent
 
 type TaskEvent = Events.Event TaskIntent
-
 
 -- | Task Container
 type TaskMap = Map TaskUuid Task
@@ -160,7 +157,6 @@ removeTaskUuid ref = do
       State.put (Map.delete ref ts)
       pure True)
     (Map.lookup ref ts)
-
 
 -- | Replay Logic
 foldEventLog
