@@ -7,7 +7,6 @@ module HTask.CLI.Options
   ) where
 
 import qualified Data.List           as List
-import           Data.Map.Strict     (Map)
 import qualified Data.Map.Strict     as Map
 import           Data.Tagged         (Tagged (..))
 import qualified Data.Text           as Text
@@ -55,7 +54,7 @@ optionsParser
       (  long "file"
       <> short 'f'
       <> metavar "ARG"
-      <> help "path to the task list file (default: ~/.tasks)"
+      <> help "path to the task list file (default: .tasks or ~/.tasks)"
       ))
   <*> switch
       (  long "json"
@@ -79,19 +78,21 @@ versioner = infoOption (showVersion version)
 getOptions :: IO Options
 getOptions = do
   raw <- execParser optionsInfo
-  file <- maybe ((</> ".tasks") <$> getHomeDirectory) pure (rawFile raw)
+  file <- maybe resolveDefaultPath pure (rawFile raw)
   pure $ Options (rawAction raw) file (rawJson raw)
+
+resolveDefaultPath :: IO FilePath
+resolveDefaultPath = do
+  localExists <- doesFileExist ".tasks"
+  if localExists
+    then pure ".tasks"
+    else (</> ".tasks") <$> getHomeDirectory
 
 
 -- | Dynamic Completer for Task IDs and UUIDs
 taskCompleter :: Completer
 taskCompleter = listIOCompleter $ do
-  -- Try local .tasks first, then home
-  localExists <- doesFileExist ".tasks"
-  path <- if localExists
-          then pure ".tasks"
-          else (</> ".tasks") <$> getHomeDirectory
-
+  path <- resolveDefaultPath
   exists <- doesFileExist path
   if not exists
     then pure []
